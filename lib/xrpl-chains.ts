@@ -17,4 +17,5 @@ export const xrplDevnet = {
     etherscan: { name: 'XRP Ledger', url: 'https://evm-sidechain.xrpl.org' },
     default: { name: 'XRP Ledger', url: 'https://evm-sidechain.xrpl.org' },
   },
+  testnet: true,
 } as const satisfies Chain
