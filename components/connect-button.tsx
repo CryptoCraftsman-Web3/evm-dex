@@ -10,7 +10,7 @@ const ConnectButton = () => {
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
-        const shortestAddress = address ? `${address.slice(0, 3)}...${address.slice(-3)}` : null;
+        const shortestAddress = address ? `${address.slice(0, 5)}...${address.slice(-3)}` : null;
 
         const displayAddress = isMdAndUp ? shortAddress : shortestAddress;
 
