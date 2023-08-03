@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { CiSearch } from 'react-icons/ci';
 import Image from 'next/image';
 import { Avatar, ConnectKitButton } from 'connectkit';
+import ConnectButton from './connect-button';
 
 const Header = () => {
   return (
@@ -80,30 +81,7 @@ const Header = () => {
             textAlign: 'right',
           }}
         >
-          <ConnectKitButton.Custom>
-            {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
-              const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
-              return (
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={show}
-                  startIcon={
-                    isConnected ?
-                    <Avatar
-                      size={18}
-                      address={address}
-                    /> : null
-                  }
-                  sx={{
-                    textTransform: 'none',
-                  }}
-                >
-                  {isConnected ? ensName || shortAddress : 'Connect Wallet'}
-                </Button>
-              );
-            }}
-          </ConnectKitButton.Custom>
+          <ConnectButton />
         </Grid>
       </Grid>
 
@@ -139,7 +117,8 @@ const Header = () => {
           <IconButton>
             <CiSearch />
           </IconButton>
-          <Button variant="outlined">Connect</Button>
+
+          <ConnectButton />
         </Stack>
       </Stack>
     </Box>
