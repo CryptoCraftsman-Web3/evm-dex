@@ -18,6 +18,7 @@ import {
   Radio,
 } from '@mui/material';
 import { config } from './config';
+import SelectToken from './select-token';
 
 const NewLiquidityPosition = () => {
   const [open, setOpen] = useState(false);
@@ -72,17 +73,9 @@ const NewLiquidityPosition = () => {
               width="100%"
               justifyContent="stretch"
             >
-              <TextField
-                label="Pair Token A"
-                variant="outlined"
-                size="small"
-              />
+              <SelectToken inputLabel="Pair Token A" />
 
-              <TextField
-                label="Pair Token B"
-                variant="outlined"
-                size="small"
-              />
+              <SelectToken inputLabel="Pair Token B" />
             </Stack>
 
             <FormControl>
