@@ -3,7 +3,7 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import { Inter } from 'next/font/google';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createConfig, WagmiConfig } from 'wagmi';
+import { createConfig, sepolia, WagmiConfig } from 'wagmi';
 import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from 'connectkit';
 import { xrplDevnet } from '@/lib/xrpl-chains';
 
@@ -14,7 +14,7 @@ const wagmiConfig = createConfig(
     infuraId: process.env.NEXT_PUBLIC_INFURA_API_KEY,
     walletConnectProjectId: process.env.NEXT_PUBLIC_WC_PID,
     appName: 'StaykX EVM Dex',
-    chains: [xrplDevnet]
+    chains: [xrplDevnet, sepolia],
   })
 );
 
@@ -36,9 +36,9 @@ const Providers = ({ children }: ProvidersProps) => {
           root: {
             textTransform: 'none',
           },
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   const ckBorderRadius = `${theme.shape.borderRadius}px`;
@@ -64,7 +64,7 @@ const Providers = ({ children }: ProvidersProps) => {
     '--ck-secondary-button-hover-background': theme.palette.primary.main,
     '--ck-secondary-button-active-background': theme.palette.primary.dark,
     '--ck-secondary-button-border-radius': ckBorderRadius,
-  }
+  };
 
   return (
     <WagmiConfig config={wagmiConfig}>
