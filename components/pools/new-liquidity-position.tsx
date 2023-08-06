@@ -1,11 +1,17 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { Button, Dialog, DialogContent, Stack, Typography, useMediaQuery, Theme } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
 import { FeeTier, Token } from '@/types/common';
-import { useAccount } from 'wagmi';
+import { useAccount, useContractRead } from 'wagmi';
 import { toast } from 'react-toastify';
 import SelectFeeTier from './select-fee-tier';
+import UniswapV3FactoryArtifact from '@/artifacts/UniswapV3Factory.json';
+import { usePoolFactory } from '@/hooks/swap-protocol-hooks';
+import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
+import { zeroAddress } from 'viem';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -36,6 +42,20 @@ const NewLiquidityPosition = () => {
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
   const [feeTier, setFeeTier] = useState<FeeTier>(config.feeTiers[0]);
+
+  const poolFactoryAddress = usePoolFactory();
+
+  const { data: pool } = useContractRead({
+    address: poolFactoryAddress,
+    abi: uniswapV3FactoryABI,
+    functionName: 'getPool',
+    args: [tokenA?.address ?? zeroAddress, tokenB?.address ?? zeroAddress, feeTier.value],
+    enabled: tokenA !== null && tokenB !== null,
+  });
+
+  const hasInitializedPool = pool !== zeroAddress && pool !== undefined;
+
+  console.log(pool, hasInitializedPool);
 
   return (
     <>
