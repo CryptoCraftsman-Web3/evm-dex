@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -20,12 +20,23 @@ import {
 import { config } from '../config';
 import SelectToken from './select-token';
 import { Token } from '@/hooks/token-hooks';
+import { useAccount } from 'wagmi';
+import { toast } from 'react-toastify';
 
 const NewLiquidityPosition = () => {
+  const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
+  useEffect(() => {
+    if (!isConnected) setOpen(false);
+  }, [isConnected]);
+
   const handleOpen = () => {
+    if (!isConnected) {
+      toast('Please connect your wallet first', { type: 'error' });
+      return;
+    }
     setOpen(true);
   };
 

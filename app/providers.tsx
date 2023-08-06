@@ -5,6 +5,8 @@ import { Inter } from 'next/font/google';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createConfig, sepolia, WagmiConfig } from 'wagmi';
 import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from 'connectkit';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { xrplDevnet } from '@/lib/xrpl-chains';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -72,6 +74,15 @@ const Providers = ({ children }: ProvidersProps) => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           {children}
+          <ToastContainer
+            theme="dark"
+            position="bottom-center"
+            autoClose={2500}
+            bodyStyle={{
+              fontFamily: inter.style.fontFamily,
+            }}
+            closeButton={false}
+          />
         </ThemeProvider>
       </ConnectKitProvider>
     </WagmiConfig>
