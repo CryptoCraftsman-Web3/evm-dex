@@ -1,7 +1,7 @@
 export type Token = {
   name: string;
   symbol: string;
-  address: string;
+  address: `0x${string}`;
   decimals: number;
 };
 
