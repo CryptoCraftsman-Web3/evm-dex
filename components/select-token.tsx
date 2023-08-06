@@ -1,12 +1,29 @@
-import { useErc20Tokens } from '@/hooks/token-hooks';
+import { Token, useErc20Tokens } from '@/hooks/token-hooks';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { isAddress } from 'viem';
+import { useToken } from 'wagmi';
 
 type SelectTokenProps = {
   inputLabel: string;
+  token: Token | null;
+  setToken: (token: Token) => void;
 };
 
-const SelectToken = ({ inputLabel }: SelectTokenProps) => {
+const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
   const tokens = useErc20Tokens();
+
+  const [inputValue, setInputValue] = useState<string>('');
+  const {
+    data: searchedToken,
+    isError: searchTokenError,
+    isFetching: searchTokenFetching,
+  } = useToken({
+    address: inputValue as `0x{string}`,
+    enabled: isAddress(inputValue),
+  });
+
+  console.log(searchedToken);
 
   return (
     <>
@@ -45,6 +62,37 @@ const SelectToken = ({ inputLabel }: SelectTokenProps) => {
             </Stack>
           </Box>
         )}
+        filterOptions={(options, state) => {
+          const isEthAddress = isAddress(state.inputValue);
+          if (isEthAddress) {
+            if (searchedToken && !searchTokenError && !searchTokenFetching) {
+              return [
+                {
+                  name: searchedToken?.name ?? 'Unnamed Token',
+                  symbol: searchedToken?.symbol ?? '',
+                  address: searchedToken?.address ?? '',
+                  decimals: searchedToken?.decimals ?? 18,
+                },
+              ];
+            }
+            return [];
+          } else {
+            return options.filter((option) => {
+              return (
+                option.name.toLowerCase().includes(state.inputValue.toLowerCase()) ||
+                option.symbol.toLowerCase().includes(state.inputValue.toLowerCase()) ||
+                option.address.toLowerCase().includes(state.inputValue.toLowerCase())
+              );
+            });
+          }
+        }}
+        value={token}
+        onChange={(event: any, value: Token | null) => {
+          if (value) setToken(value);
+        }}
+        onInputChange={(event, value) => {
+          setInputValue(value);
+        }}
       />
     </>
   );

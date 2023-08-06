@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { config } from './config';
 import SelectToken from './select-token';
+import { Token } from '@/hooks/token-hooks';
 
 const NewLiquidityPosition = () => {
   const [open, setOpen] = useState(false);
@@ -36,6 +37,9 @@ const NewLiquidityPosition = () => {
     if (reason === 'backdropClick') return;
     handleClose();
   };
+
+  const [tokenA, setTokenA] = useState<Token | null>(null);
+  const [tokenB, setTokenB] = useState<Token | null>(null);
 
   return (
     <>
@@ -73,9 +77,9 @@ const NewLiquidityPosition = () => {
               width="100%"
               justifyContent="stretch"
             >
-              <SelectToken inputLabel="Pair Token A" />
+              <SelectToken inputLabel="Pair Token A" token={tokenA} setToken={setTokenA} />
 
-              <SelectToken inputLabel="Pair Token B" />
+              <SelectToken inputLabel="Pair Token B" token={tokenB} setToken={setTokenB} />
             </Stack>
 
             <FormControl>
