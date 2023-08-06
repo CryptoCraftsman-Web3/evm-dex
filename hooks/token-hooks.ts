@@ -2,7 +2,7 @@
 
 import { useNetwork } from 'wagmi';
 
-type Token = {
+export type Token = {
   name: string;
   symbol: string;
   address: string;
