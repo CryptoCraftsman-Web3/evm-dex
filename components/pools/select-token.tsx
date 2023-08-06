@@ -1,4 +1,5 @@
-import { Token, useErc20Tokens } from '@/hooks/token-hooks';
+import { useErc20Tokens } from '@/hooks/token-hooks';
+import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { isAddress } from 'viem';

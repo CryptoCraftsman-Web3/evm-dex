@@ -1,13 +1,7 @@
 // returns a predefined list of ERC20 tokens to be used in the app
 
 import { useNetwork } from 'wagmi';
-
-export type Token = {
-  name: string;
-  symbol: string;
-  address: string;
-  decimals: number;
-};
+import { Token } from '../types/common';
 
 export const useErc20Tokens = () => {
   // get current chain

@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
-import { Token } from '@/hooks/token-hooks';
+import { Token } from '@/types/common';
 import { useAccount } from 'wagmi';
 import { toast } from 'react-toastify';
 
@@ -96,11 +96,11 @@ const NewLiquidityPosition = () => {
             <FormControl>
               <FormLabel>Fee Tier</FormLabel>
               <RadioGroup
-                defaultValue={config.feeAmounts[0].value}
+                defaultValue={config.feeTiers[0].value}
                 row={isMdAndUp}
                 sx={{ gap: { xs: 0, md: 4 } }}
               >
-                {config.feeAmounts.map((feeAmount, index) => {
+                {config.feeTiers.map((feeAmount, index) => {
                   let radioLabel = isMdAndUp ? `${feeAmount.label}` : `${feeAmount.label} (${feeAmount.tip})`;
                   return (
                     <Stack direction="column">
