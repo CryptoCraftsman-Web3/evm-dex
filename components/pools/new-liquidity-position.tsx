@@ -17,7 +17,7 @@ import {
   FormControlLabel,
   Radio,
 } from '@mui/material';
-import { config } from './config';
+import { config } from '../config';
 import SelectToken from './select-token';
 import { Token } from '@/hooks/token-hooks';
 

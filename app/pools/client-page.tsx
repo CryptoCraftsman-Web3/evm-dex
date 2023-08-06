@@ -4,7 +4,7 @@ import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
 import { useAccount } from 'wagmi';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
 import { useModal } from 'connectkit';
-import NewLiquidityPosition from '@/components/new-liquidity-position';
+import NewLiquidityPosition from '@/components/pool/new-liquidity-position';
 
 const PoolsClientPage = () => {
   const { isConnected } = useAccount();
