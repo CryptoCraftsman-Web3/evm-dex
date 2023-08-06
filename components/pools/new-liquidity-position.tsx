@@ -1,22 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Divider,
-  Stack,
-  TextField,
-  Typography,
-  useMediaQuery,
-  Theme,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from '@mui/material';
+import { Button, Dialog, DialogContent, Stack, Typography, useMediaQuery, Theme } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
 import { FeeTier, Token } from '@/types/common';
@@ -66,7 +49,7 @@ const NewLiquidityPosition = () => {
       <Dialog
         open={open}
         onClose={handleBackdropClose}
-        maxWidth={ isMdAndUp ? 'md' : 'xl' }
+        maxWidth={isMdAndUp ? 'md' : 'xl'}
         fullWidth={!isMdAndUp}
         PaperProps={{
           variant: 'outlined',
@@ -90,12 +73,23 @@ const NewLiquidityPosition = () => {
               width="100%"
               justifyContent="stretch"
             >
-              <SelectToken inputLabel="Pair Token A" token={tokenA} setToken={setTokenA} />
+              <SelectToken
+                inputLabel="Pair Token A"
+                token={tokenA}
+                setToken={setTokenA}
+              />
 
-              <SelectToken inputLabel="Pair Token B" token={tokenB} setToken={setTokenB} />
+              <SelectToken
+                inputLabel="Pair Token B"
+                token={tokenB}
+                setToken={setTokenB}
+              />
             </Stack>
 
-            <SelectFeeTier feeTier={feeTier} setFeeTier={setFeeTier} />
+            <SelectFeeTier
+              feeTier={feeTier}
+              setFeeTier={setFeeTier}
+            />
 
             <Stack
               direction={{ xs: 'column', md: 'row' }}
