@@ -33,7 +33,7 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
         id="combo-box-demo"
         options={tokens}
         getOptionLabel={(option) => option.name}
-        sx={{ width: 300 }}
+        sx={{ width: { xs: 'auto', md: 300 } }}
         renderInput={(params) => (
           <TextField
             {...params}
