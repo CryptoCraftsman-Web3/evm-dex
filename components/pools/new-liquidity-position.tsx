@@ -19,9 +19,10 @@ import {
 } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
-import { Token } from '@/types/common';
+import { FeeTier, Token } from '@/types/common';
 import { useAccount } from 'wagmi';
 import { toast } from 'react-toastify';
+import SelectFeeTier from './select-fee-tier';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -51,6 +52,7 @@ const NewLiquidityPosition = () => {
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
+  const [feeTier, setFeeTier] = useState<FeeTier>(config.feeTiers[0]);
 
   return (
     <>
@@ -93,29 +95,7 @@ const NewLiquidityPosition = () => {
               <SelectToken inputLabel="Pair Token B" token={tokenB} setToken={setTokenB} />
             </Stack>
 
-            <FormControl>
-              <FormLabel>Fee Tier</FormLabel>
-              <RadioGroup
-                defaultValue={config.feeTiers[0].value}
-                row={isMdAndUp}
-                sx={{ gap: { xs: 0, md: 4 } }}
-              >
-                {config.feeTiers.map((feeAmount, index) => {
-                  let radioLabel = isMdAndUp ? `${feeAmount.label}` : `${feeAmount.label} (${feeAmount.tip})`;
-                  return (
-                    <Stack direction="column">
-                      <FormControlLabel
-                        key={index}
-                        value={feeAmount.value}
-                        control={<Radio />}
-                        label={radioLabel}
-                      />
-                      {isMdAndUp && <Typography variant="body2">{feeAmount.tip}</Typography>}
-                    </Stack>
-                  );
-                })}
-              </RadioGroup>
-            </FormControl>
+            <SelectFeeTier feeTier={feeTier} setFeeTier={setFeeTier} />
 
             <Stack
               direction={{ xs: 'column', md: 'row' }}
