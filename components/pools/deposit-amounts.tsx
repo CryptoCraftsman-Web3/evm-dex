@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAccount, useContractRead } from 'wagmi';
 import { formatUnits, parseUnits, zeroAddress } from 'viem';
 import standardErc20Abi from '@/abi/standard-erc20.json';
+import { ierc20ABI } from '@/types/wagmi/staykx';
 
 type DepositAmountProps = {
   tokenA: Token | null;
@@ -19,18 +20,18 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
 
   const { data: tokenABalance } = useContractRead({
     address: tokenA?.address ?? zeroAddress,
-    abi: standardErc20Abi,
+    abi: ierc20ABI,
     functionName: 'balanceOf',
-    args: [userAddress],
-    enabled: tokenA !== null
+    args: [userAddress ?? zeroAddress],
+    enabled: tokenA !== null && userAddress !== undefined
   });
 
-  const { data: tokenBBalance } = useContractRead({
+  const { data: tokenBBalance, isLoading } = useContractRead({
     address: tokenB?.address ?? zeroAddress,
-    abi: standardErc20Abi,
+    abi: ierc20ABI,
     functionName: 'balanceOf',
-    args: [userAddress],
-    enabled: tokenB !== null
+    args: [userAddress ?? zeroAddress],
+    enabled: tokenB !== null && userAddress !== undefined
   });
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
