@@ -37,13 +37,11 @@ const SelectFeeTier = ({ feeTier, setFeeTier }: SelectFeeTierProps) => {
               let radioLabel = isMdAndUp ? `${ftier.label}` : `${ftier.label} (${ftier.tip})`;
               return (
                 <Paper
+                  key={ftier.id}
                   variant="outlined"
                   sx={{ px: 3, pt: 1, pb: 2 }}
                 >
-                  <Stack
-                    direction="column"
-                    key={ftier.id}
-                  >
+                  <Stack direction="column">
                     <FormControlLabel
                       key={index}
                       value={ftier.value}
