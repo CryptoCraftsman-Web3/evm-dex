@@ -1,5 +1,5 @@
 import { Token } from '@/types/common';
-import { Alert, FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
 
 type SetPriceRangeProps = {
   minPrice: number;
@@ -19,7 +19,7 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
         spacing={2}
       >
         <Stack
-          direction="row"
+          direction={{ xs: 'column', md: 'row' }}
           spacing={2}
         >
           <TextField
