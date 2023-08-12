@@ -19,7 +19,7 @@ export const useErc20Tokens = () => {
   return tokens;
 };
 
-const xrplDevnetTokens = [
+const xrplDevnetTokens: Token[] = [
   {
     name: 'Wrapped XRP',
     symbol: 'WXRP',
@@ -34,7 +34,7 @@ const xrplDevnetTokens = [
   },
 ];
 
-const sepoliaTokens = [
+const sepoliaTokens: Token[] = [
   {
     name: 'Wrapped XRP',
     symbol: 'WXRP',
