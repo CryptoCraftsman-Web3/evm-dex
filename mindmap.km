@@ -62,38 +62,6 @@
                                         "children": [
                                             {
                                                 "data": {
-                                                    "id": "cupf1u5tfvk0",
-                                                    "created": 1691726658893,
-                                                    "text": "Token A"
-                                                },
-                                                "children": []
-                                            },
-                                            {
-                                                "data": {
-                                                    "id": "cupff0x38dk0",
-                                                    "created": 1691727692337,
-                                                    "text": "Token B"
-                                                },
-                                                "children": []
-                                            },
-                                            {
-                                                "data": {
-                                                    "id": "cupffaz7b740",
-                                                    "created": 1691727714233,
-                                                    "text": "Fee Tier"
-                                                },
-                                                "children": []
-                                            },
-                                            {
-                                                "data": {
-                                                    "id": "cupffc9ndjc0",
-                                                    "created": 1691727717041,
-                                                    "text": "Starting Price (if not yet initialized)"
-                                                },
-                                                "children": []
-                                            },
-                                            {
-                                                "data": {
                                                     "id": "cupffje6y5s0",
                                                     "created": 1691727732553,
                                                     "text": "Deposit Amounts",
@@ -142,6 +110,73 @@
                                                         "children": []
                                                     }
                                                 ]
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cuqb5qvzb2o0",
+                                                    "created": 1691817240742,
+                                                    "text": "Select Asset Pair",
+                                                    "expandState": "expand"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "cupf1u5tfvk0",
+                                                            "created": 1691726658893,
+                                                            "text": "Token A"
+                                                        },
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "data": {
+                                                            "id": "cupff0x38dk0",
+                                                            "created": 1691727692337,
+                                                            "text": "Token B"
+                                                        },
+                                                        "children": []
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupffc9ndjc0",
+                                                    "created": 1691727717041,
+                                                    "text": "Starting Price (if not yet initialized)"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupffaz7b740",
+                                                    "created": 1691727714233,
+                                                    "text": "Fee Tier"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cuqb6p7uki00",
+                                                    "created": 1691817315470,
+                                                    "text": "Deposit Amounts"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "cuqb6u61uvc0",
+                                                            "created": 1691817326245,
+                                                            "text": "Token A Deposit"
+                                                        },
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "data": {
+                                                            "id": "cuqb6xz95zc0",
+                                                            "created": 1691817334541,
+                                                            "text": "Token B Deposit"
+                                                        },
+                                                        "children": []
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
@@ -158,7 +193,8 @@
                                         "data": {
                                             "id": "cupfhx3xipc0",
                                             "created": 1691727919136,
-                                            "text": "Pair/fee combination has to be initialized (smart contract deployed)"
+                                            "text": "Pair/fee combination has to be initialized (smart contract deployed)",
+                                            "expandState": "expand"
                                         },
                                         "children": []
                                     },
@@ -174,7 +210,9 @@
                                         "data": {
                                             "id": "cupfixwl8ew0",
                                             "created": 1691727999233,
-                                            "text": "Liquidity position can only earn fees if within the set price range"
+                                            "text": "Liquidity position can only earn fees if within the set price range",
+                                            "priority": null,
+                                            "progress": null
                                         },
                                         "children": []
                                     }
