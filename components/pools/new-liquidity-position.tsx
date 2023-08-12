@@ -27,6 +27,7 @@ import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
 import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
+import DepositAmounts from './deposit-amounts';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -60,6 +61,8 @@ const NewLiquidityPosition = () => {
   const [startingPrice, setStartingPrice] = useState<number>(0);
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(0);
+  const [amountA, setAmountA] = useState<number>(0);
+  const [amountB, setAmountB] = useState<number>(0);
 
   const poolFactoryAddress = usePoolFactory();
 
@@ -133,6 +136,17 @@ const NewLiquidityPosition = () => {
                 feeTier={feeTier}
                 setFeeTier={setFeeTier}
               />
+
+              {isMdAndUp && (
+                <DepositAmounts
+                  tokenA={tokenA}
+                  tokenB={tokenB}
+                  amountA={amountA}
+                  setAmountA={setAmountA}
+                  amountB={amountB}
+                  setAmountB={setAmountB}
+                />
+              )}
             </Stack>
             {/* end of column 1 in desktop layout */}
 
@@ -162,6 +176,17 @@ const NewLiquidityPosition = () => {
                 tokenA={tokenA}
                 tokenB={tokenB}
               />
+
+              {!isMdAndUp && (
+                <DepositAmounts
+                  tokenA={tokenA}
+                  tokenB={tokenB}
+                  amountA={amountA}
+                  setAmountA={setAmountA}
+                  amountB={amountB}
+                  setAmountB={setAmountB}
+                />
+              )}
             </Stack>
             {/* end of column 2 in desktop layout */}
           </Stack>
