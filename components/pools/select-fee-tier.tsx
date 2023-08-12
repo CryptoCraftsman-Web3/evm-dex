@@ -27,21 +27,14 @@ const SelectFeeTier = ({ feeTier, setFeeTier }: SelectFeeTierProps) => {
     <>
       {isMdAndUp ? (
         <FormControl>
-          <FormLabel>Fee Tier</FormLabel>
-          <RadioGroup
-            defaultValue={config.feeTiers[0].value}
-            value={feeTier.value}
-            row
-            onChange={(e) => {
-              const feeTierValue = Number(e.target.value);
-              const feeTier = config.feeTiers.find((feeTier) => feeTier.value === feeTierValue);
-              if (!feeTier) return;
-              setFeeTier(feeTier);
-            }}
-            sx={{ gap: { xs: 1, md: 2 }, width: '100%', justifyContent: 'space-between', pt: 1 }}
+          <FormLabel sx={{ mb: 2 }}>Fee Tier</FormLabel>
+          <Stack
+            direction="row"
+            spacing={2}
+            // justifyContent="space-between"
           >
-            {config.feeTiers.map((feeTier, index) => {
-              let radioLabel = isMdAndUp ? `${feeTier.label}` : `${feeTier.label} (${feeTier.tip})`;
+            {config.feeTiers.map((ftier, index) => {
+              let radioLabel = isMdAndUp ? `${ftier.label}` : `${ftier.label} (${ftier.tip})`;
               return (
                 <Paper
                   variant="outlined"
@@ -49,20 +42,29 @@ const SelectFeeTier = ({ feeTier, setFeeTier }: SelectFeeTierProps) => {
                 >
                   <Stack
                     direction="column"
-                    key={feeTier.id}
+                    key={ftier.id}
                   >
                     <FormControlLabel
                       key={index}
-                      value={feeTier.value}
+                      value={ftier.value}
+                      checked={ftier.value === feeTier.value}
+                      onClick={() => setFeeTier(ftier)}
                       control={<Radio />}
                       label={radioLabel}
                     />
-                    {isMdAndUp && <Typography variant="body2">{feeTier.tip}</Typography>}
+                    {isMdAndUp && (
+                      <Typography
+                        variant="caption"
+                        color="GrayText"
+                      >
+                        {ftier.tip}
+                      </Typography>
+                    )}
                   </Stack>
                 </Paper>
               );
             })}
-          </RadioGroup>
+          </Stack>
         </FormControl>
       ) : (
         <FormControl fullWidth>
