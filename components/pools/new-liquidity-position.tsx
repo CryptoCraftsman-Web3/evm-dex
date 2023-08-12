@@ -26,6 +26,7 @@ import { usePoolFactory } from '@/hooks/swap-protocol-hooks';
 import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
 import StartingPrice from './starting-price';
+import SetPriceRange from './set-price-range';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -57,6 +58,8 @@ const NewLiquidityPosition = () => {
   const [tokenB, setTokenB] = useState<Token | null>(null);
   const [feeTier, setFeeTier] = useState<FeeTier>(config.feeTiers[0]);
   const [startingPrice, setStartingPrice] = useState<number>(0);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
 
   const poolFactoryAddress = usePoolFactory();
 
@@ -150,6 +153,15 @@ const NewLiquidityPosition = () => {
                   tokenB={tokenB}
                 />
               )}
+
+              <SetPriceRange
+                minPrice={minPrice}
+                setMinPrice={setMinPrice}
+                maxPrice={maxPrice}
+                setMaxPrice={setMaxPrice}
+                tokenA={tokenA}
+                tokenB={tokenB}
+              />
             </Stack>
             {/* end of column 2 in desktop layout */}
           </Stack>
