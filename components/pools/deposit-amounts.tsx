@@ -3,7 +3,6 @@ import { Token } from '@/types/common';
 import { useState } from 'react';
 import { useAccount, useContractRead } from 'wagmi';
 import { formatUnits, parseUnits, zeroAddress } from 'viem';
-import standardErc20Abi from '@/abi/standard-erc20.json';
 import { ierc20ABI } from '@/types/wagmi/staykx';
 
 type DepositAmountProps = {
