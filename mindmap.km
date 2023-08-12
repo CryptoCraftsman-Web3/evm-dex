@@ -1,0 +1,218 @@
+{
+    "root": {
+        "data": {
+            "id": "cupezwjjtc00",
+            "created": 1691726507349,
+            "text": "StaykX EVM DEX App"
+        },
+        "children": [
+            {
+                "data": {
+                    "id": "cupf0rod5c00",
+                    "created": 1691726575120,
+                    "text": "Pages"
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cupf0v7q7cw0",
+                            "created": 1691726582821,
+                            "text": "Swap"
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cupf0y1c4gw0",
+                            "created": 1691726588965,
+                            "text": "Tokens"
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cupf105xy3k0",
+                            "created": 1691726593597,
+                            "text": "NFTs"
+                        },
+                        "children": []
+                    },
+                    {
+                        "data": {
+                            "id": "cupf15ampnk0",
+                            "created": 1691726604765,
+                            "text": "Pools",
+                            "expandState": "expand"
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cupf17z7rns0",
+                                    "created": 1691726610605,
+                                    "text": "Add Liquidity"
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "cupf1shvnuo0",
+                                            "created": 1691726655269,
+                                            "text": "Form Data",
+                                            "expandState": "expand"
+                                        },
+                                        "children": [
+                                            {
+                                                "data": {
+                                                    "id": "cupf1u5tfvk0",
+                                                    "created": 1691726658893,
+                                                    "text": "Token A"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupff0x38dk0",
+                                                    "created": 1691727692337,
+                                                    "text": "Token B"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupffaz7b740",
+                                                    "created": 1691727714233,
+                                                    "text": "Fee Tier"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupffc9ndjc0",
+                                                    "created": 1691727717041,
+                                                    "text": "Starting Price (if not yet initialized)"
+                                                },
+                                                "children": []
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupffje6y5s0",
+                                                    "created": 1691727732553,
+                                                    "text": "Deposit Amounts",
+                                                    "expandState": "expand"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "cupfgtwd4340",
+                                                            "created": 1691727833784,
+                                                            "text": "Token A"
+                                                        },
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "data": {
+                                                            "id": "cupfgzjupsw0",
+                                                            "created": 1691727846088,
+                                                            "text": "Token B"
+                                                        },
+                                                        "children": []
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "data": {
+                                                    "id": "cupfh2kqxi80",
+                                                    "created": 1691727852673,
+                                                    "text": "Price Range"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "cupfh9mmog80",
+                                                            "created": 1691727868024,
+                                                            "text": "Min (default 0)"
+                                                        },
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "data": {
+                                                            "id": "cupfhetb0ow0",
+                                                            "created": 1691727879312,
+                                                            "text": "Max (default infinity)"
+                                                        },
+                                                        "children": []
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "data": {
+                                    "id": "cupfhv47vtk0",
+                                    "created": 1691727914800,
+                                    "text": "Constraints"
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "cupfhx3xipc0",
+                                            "created": 1691727919136,
+                                            "text": "Pair/fee combination has to be initialized (smart contract deployed)"
+                                        },
+                                        "children": []
+                                    },
+                                    {
+                                        "data": {
+                                            "id": "cupfidpk4m80",
+                                            "created": 1691727955273,
+                                            "text": "Token/asset spending must be approved"
+                                        },
+                                        "children": []
+                                    },
+                                    {
+                                        "data": {
+                                            "id": "cupfixwl8ew0",
+                                            "created": 1691727999233,
+                                            "text": "Liquidity position can only earn fees if within the set price range"
+                                        },
+                                        "children": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "data": {
+                    "id": "cupffob76080",
+                    "created": 1691727743256,
+                    "text": "Types"
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "cupfgctyeh40",
+                            "created": 1691727796633,
+                            "text": "wagmi"
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "cupfglq9jco0",
+                                    "created": 1691727816001,
+                                    "text": "uniswap-v3-core"
+                                },
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "template": "right",
+    "theme": "classic",
+    "version": "1.4.43"
+}
