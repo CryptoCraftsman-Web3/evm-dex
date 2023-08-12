@@ -1,6 +1,9 @@
 import { Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
 import { Token } from '@/types/common';
 import { useState } from 'react';
+import { useAccount, useContractRead } from 'wagmi';
+import { formatUnits, parseUnits, zeroAddress } from 'viem';
+import standardErc20Abi from '@/abi/standard-erc20.json';
 
 type DepositAmountProps = {
   tokenA: Token | null;
@@ -12,8 +15,29 @@ type DepositAmountProps = {
 };
 
 const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmountB }: DepositAmountProps) => {
-  const [balanceA, setBalanceA] = useState<number>(0);
-  const [balanceB, setBalanceB] = useState<number>(0);
+  const { address: userAddress } = useAccount();
+
+  const { data: tokenABalance } = useContractRead({
+    address: tokenA?.address ?? zeroAddress,
+    abi: standardErc20Abi,
+    functionName: 'balanceOf',
+    args: [userAddress],
+    enabled: tokenA !== null
+  });
+
+  const { data: tokenBBalance } = useContractRead({
+    address: tokenB?.address ?? zeroAddress,
+    abi: standardErc20Abi,
+    functionName: 'balanceOf',
+    args: [userAddress],
+    enabled: tokenB !== null
+  });
+
+  const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
+  const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
+
+  const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
+  const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
 
   return (
     <FormControl fullWidth>
@@ -60,7 +84,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
                   variant="caption"
                   color="GrayText"
                 >
-                  Balance: {balanceA}
+                  Balance: {tokenABalanceParsed.toLocaleString()}
                 </Typography>
                 <Link>
                   <Typography
@@ -108,7 +132,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
                   variant="caption"
                   color="GrayText"
                 >
-                  Balance: {balanceB}
+                  Balance: {tokenBBalanceParsed.toLocaleString()}
                 </Typography>
                 <Link>
                   <Typography
