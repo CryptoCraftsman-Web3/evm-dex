@@ -75,6 +75,7 @@ const NewLiquidityPosition = () => {
   });
 
   const hasInitializedPool = pool !== zeroAddress && pool !== undefined;
+  const validPriceRange = minPrice < maxPrice && minPrice > 0 && maxPrice > 0;
 
   return (
     <>
@@ -187,6 +188,7 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
+                  validPriceRange={validPriceRange}
                 />
               )}
             </Stack>

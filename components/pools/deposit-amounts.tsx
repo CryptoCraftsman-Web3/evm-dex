@@ -12,9 +12,18 @@ type DepositAmountProps = {
   setAmountA: (amountA: number) => void;
   amountB: number;
   setAmountB: (amountB: number) => void;
+  validPriceRange: boolean;
 };
 
-const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmountB }: DepositAmountProps) => {
+const DepositAmounts = ({
+  tokenA,
+  tokenB,
+  amountA,
+  setAmountA,
+  amountB,
+  setAmountB,
+  validPriceRange,
+}: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
 
   const { data: tokenABalance } = useContractRead({
@@ -22,7 +31,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
     abi: ierc20ABI,
     functionName: 'balanceOf',
     args: [userAddress ?? zeroAddress],
-    enabled: tokenA !== null && userAddress !== undefined
+    enabled: tokenA !== null && userAddress !== undefined,
   });
 
   const { data: tokenBBalance, isLoading } = useContractRead({
@@ -30,7 +39,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
     abi: ierc20ABI,
     functionName: 'balanceOf',
     args: [userAddress ?? zeroAddress],
-    enabled: tokenB !== null && userAddress !== undefined
+    enabled: tokenB !== null && userAddress !== undefined,
   });
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
@@ -40,7 +49,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth disabled={!validPriceRange}>
       <FormLabel sx={{ mb: 2 }}>Deposit Amounts</FormLabel>
       <Stack
         direction="column"
@@ -71,6 +80,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
                 if (isNaN(parsed)) setAmountA(0);
                 setAmountA(parsed);
               }}
+              disabled={!validPriceRange}
             />
 
             {tokenA && (
@@ -119,6 +129,7 @@ const DepositAmounts = ({ tokenA, tokenB, amountA, setAmountA, amountB, setAmoun
                 if (isNaN(parsed)) setAmountB(0);
                 setAmountB(parsed);
               }}
+              disabled={!validPriceRange}
             />
 
             {tokenB && (
