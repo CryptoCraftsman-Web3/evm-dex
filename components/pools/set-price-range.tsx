@@ -1,5 +1,6 @@
 import { Token } from '@/types/common';
-import { FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { Box, FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { IoFileTrayStackedOutline } from 'react-icons/io5';
 
 type SetPriceRangeProps = {
   minPrice: number;
@@ -8,17 +9,37 @@ type SetPriceRangeProps = {
   setMaxPrice: (maxPrice: number) => void;
   tokenA: Token | null;
   tokenB: Token | null;
+  hasInitializedPool: boolean;
 };
 
-const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, tokenB }: SetPriceRangeProps) => {
+const SetPriceRange = ({
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
+  tokenA,
+  tokenB,
+  hasInitializedPool,
+}: SetPriceRangeProps) => {
   const disabled = tokenA === null || tokenB === null;
   return (
-    <FormControl fullWidth disabled={disabled}>
+    <FormControl
+      fullWidth
+      disabled={disabled}
+    >
       <FormLabel sx={{ mb: 2 }}>Set Price Range</FormLabel>
       <Stack
         direction="column"
-        spacing={2}
+        spacing={3}
       >
+        {hasInitializedPool && (
+          <>
+            <Box p={1} textAlign="center">
+              <IoFileTrayStackedOutline size={96} />
+            </Box>
+            <Typography variant="h6" textAlign="center" pb={2}>Your position will appear here</Typography>
+          </>
+        )}
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           spacing={2}
@@ -26,8 +47,9 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
           <TextField
             label="Minimum Price"
             InputProps={{
-              endAdornment: tokenA ? <>per {tokenA.symbol}</> : null,
+              endAdornment: tokenA && tokenB ? <>{tokenB.symbol} / {tokenA.symbol}</> : null,
               inputProps: {
+                min: 0,
                 style: { textAlign: 'right', paddingRight: '1rem' },
               },
             }}
@@ -44,13 +66,15 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
               setMinPrice(parsed);
             }}
             disabled={disabled}
+            sx={{ whiteSpace: 'nowrap' }}
           />
 
           <TextField
             label="Maximum Price"
             InputProps={{
-              endAdornment: tokenA ? <>per {tokenA.symbol}</> : null,
+              endAdornment: tokenA && tokenB ? <>{tokenB.symbol} / {tokenA.symbol}</> : null,
               inputProps: {
+                min: 0,
                 style: { textAlign: 'right', paddingRight: '1rem' },
               },
             }}
@@ -67,6 +91,7 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
               setMaxPrice(parsed);
             }}
             disabled={disabled}
+            sx={{ whiteSpace: 'nowrap' }}
           />
         </Stack>
       </Stack>

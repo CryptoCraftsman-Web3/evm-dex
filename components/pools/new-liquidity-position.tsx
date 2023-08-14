@@ -179,6 +179,7 @@ const NewLiquidityPosition = () => {
                 setMaxPrice={setMaxPrice}
                 tokenA={tokenA}
                 tokenB={tokenB}
+                hasInitializedPool={hasInitializedPool}
               />
 
               {!isMdAndUp && (
