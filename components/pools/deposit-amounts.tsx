@@ -12,6 +12,7 @@ type DepositAmountProps = {
   setAmountA: (amountA: number) => void;
   amountB: number;
   setAmountB: (amountB: number) => void;
+  exchangeRate: number;
   validPriceRange: boolean;
 };
 
@@ -22,6 +23,7 @@ const DepositAmounts = ({
   setAmountA,
   amountB,
   setAmountB,
+  exchangeRate,
   validPriceRange,
 }: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
@@ -44,12 +46,19 @@ const DepositAmounts = ({
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
+  const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
+  console.log('tokenAMax', tokenAMax);
 
   const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
+  const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
+  console.log('tokenBMax', tokenBMax);
 
   return (
-    <FormControl fullWidth disabled={!validPriceRange}>
+    <FormControl
+      fullWidth
+      disabled={!validPriceRange}
+    >
       <FormLabel sx={{ mb: 2 }}>Deposit Amounts</FormLabel>
       <Stack
         direction="column"
@@ -94,9 +103,18 @@ const DepositAmounts = ({
                   variant="caption"
                   color="GrayText"
                 >
-                  Balance: {tokenABalanceParsed.toLocaleString()}
+                  Balance:{' '}
+                  {tokenBBalanceParsed.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 5,
+                  })}
                 </Typography>
-                <Link>
+                <Link
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setAmountA(tokenAMax);
+                  }}
+                >
                   <Typography
                     variant="caption"
                     color="primary"
@@ -143,9 +161,18 @@ const DepositAmounts = ({
                   variant="caption"
                   color="GrayText"
                 >
-                  Balance: {tokenBBalanceParsed.toLocaleString()}
+                  Balance:{' '}
+                  {tokenBBalanceParsed.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 5,
+                  })}
                 </Typography>
-                <Link>
+                <Link
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setAmountB(tokenBMax);
+                  }}
+                >
                   <Typography
                     variant="caption"
                     color="primary"

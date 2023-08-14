@@ -148,6 +148,7 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
+                  exchangeRate={startingPrice}
                   validPriceRange={validPriceRange}
                 />
               )}
@@ -190,6 +191,7 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
+                  exchangeRate={startingPrice}
                   validPriceRange={validPriceRange}
                 />
               )}
