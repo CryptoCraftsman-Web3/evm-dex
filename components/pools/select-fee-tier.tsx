@@ -25,7 +25,7 @@ type SelectFeeTierProps = {
 
 const SelectFeeTier = ({ tokenA, tokenB, feeTier, setFeeTier }: SelectFeeTierProps) => {
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-  const disabled = tokenA === null || tokenB === null; console.log('fee disabled', disabled);
+  const disabled = tokenA === null || tokenB === null;
   return (
     <>
       {isMdAndUp ? (
