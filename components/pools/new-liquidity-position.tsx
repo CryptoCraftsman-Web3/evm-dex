@@ -22,12 +22,13 @@ import { FeeTier, Token } from '@/types/common';
 import { useAccount, useContractRead } from 'wagmi';
 import { toast } from 'react-toastify';
 import SelectFeeTier from './select-fee-tier';
-import { usePoolFactory } from '@/hooks/swap-protocol-hooks';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
 import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
 import DepositAmounts from './deposit-amounts';
+import PoolButtons from './pool-buttons';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -64,7 +65,7 @@ const NewLiquidityPosition = () => {
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
 
-  const poolFactoryAddress = usePoolFactory();
+  const { poolFactoryAddress } = useSwapProtocolAddresses();
 
   const { data: pool } = useContractRead({
     address: poolFactoryAddress,
@@ -195,6 +196,13 @@ const NewLiquidityPosition = () => {
                   validPriceRange={validPriceRange}
                 />
               )}
+
+              <PoolButtons
+                tokenA={tokenA}
+                tokenB={tokenB}
+                amountA={amountA}
+                amountB={amountB}
+              />
             </Stack>
             {/* end of column 2 in desktop layout */}
           </Stack>
