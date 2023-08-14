@@ -148,6 +148,7 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
+                  validPriceRange={validPriceRange}
                 />
               )}
             </Stack>
