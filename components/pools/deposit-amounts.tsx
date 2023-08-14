@@ -1,9 +1,8 @@
 import { Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
 import { Token } from '@/types/common';
-import { useEffect, useState } from 'react';
-import { useAccount, useContractRead } from 'wagmi';
+import { useEffect } from 'react';
+import { erc20ABI, useAccount, useContractRead } from 'wagmi';
 import { formatUnits, parseUnits, zeroAddress } from 'viem';
-import { ierc20ABI } from '@/types/wagmi/staykx';
 
 type DepositAmountProps = {
   tokenA: Token | null;
@@ -30,7 +29,7 @@ const DepositAmounts = ({
 
   const { data: tokenABalance } = useContractRead({
     address: tokenA?.address ?? zeroAddress,
-    abi: ierc20ABI,
+    abi: erc20ABI,
     functionName: 'balanceOf',
     args: [userAddress ?? zeroAddress],
     enabled: tokenA !== null && userAddress !== undefined,
@@ -38,7 +37,7 @@ const DepositAmounts = ({
 
   const { data: tokenBBalance, isLoading } = useContractRead({
     address: tokenB?.address ?? zeroAddress,
-    abi: ierc20ABI,
+    abi: erc20ABI,
     functionName: 'balanceOf',
     args: [userAddress ?? zeroAddress],
     enabled: tokenB !== null && userAddress !== undefined,
@@ -47,10 +46,12 @@ const DepositAmounts = ({
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
   const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
+  console.log(tokenABalanceParsed, tokenAMax);
 
   const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
   const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
+  console.log(tokenBBalanceParsed, tokenBMax);
 
   useEffect(() => {
     if (amountA > tokenAMax) setAmountA(tokenAMax);
@@ -114,7 +115,7 @@ const DepositAmounts = ({
                   color="GrayText"
                 >
                   Balance:{' '}
-                  {tokenBBalanceParsed.toLocaleString(undefined, {
+                  {tokenABalanceParsed.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 5,
                   })}
