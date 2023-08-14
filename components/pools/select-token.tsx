@@ -24,8 +24,6 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
     enabled: isAddress(inputValue),
   });
 
-  console.log(searchedToken);
-
   return (
     <>
       <Autocomplete
