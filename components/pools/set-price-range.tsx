@@ -11,8 +11,9 @@ type SetPriceRangeProps = {
 };
 
 const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, tokenB }: SetPriceRangeProps) => {
+  const disabled = tokenA === null || tokenB === null;
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth disabled={disabled}>
       <FormLabel sx={{ mb: 2 }}>Set Price Range</FormLabel>
       <Stack
         direction="column"
@@ -42,6 +43,7 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
               if (isNaN(parsed)) setMinPrice(0);
               setMinPrice(parsed);
             }}
+            disabled={disabled}
           />
 
           <TextField
@@ -64,6 +66,7 @@ const SetPriceRange = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, tokenA, t
               if (isNaN(parsed)) setMaxPrice(0);
               setMaxPrice(parsed);
             }}
+            disabled={disabled}
           />
         </Stack>
       </Stack>
