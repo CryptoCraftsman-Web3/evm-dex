@@ -29,6 +29,7 @@ const StartingPrice = ({ startingPrice, setStartingPrice, tokenA, tokenB }: Star
           InputProps={{
             endAdornment: <>{tokenB?.symbol ?? ''}</>,
             inputProps: {
+              min: 0,
               style: { textAlign: 'right', paddingRight: '1rem' },
             }
           }}
@@ -42,6 +43,7 @@ const StartingPrice = ({ startingPrice, setStartingPrice, tokenA, tokenB }: Star
             }
             const parsed = parseFloat(value);
             if (isNaN(parsed)) setStartingPrice(0);
+            if (parsed < 0) setStartingPrice(0);
             setStartingPrice(parsed);
           }}
         />

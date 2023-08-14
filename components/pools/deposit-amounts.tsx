@@ -1,6 +1,6 @@
 import { Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
 import { Token } from '@/types/common';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useContractRead } from 'wagmi';
 import { formatUnits, parseUnits, zeroAddress } from 'viem';
 import { ierc20ABI } from '@/types/wagmi/staykx';
@@ -47,12 +47,15 @@ const DepositAmounts = ({
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
   const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
-  console.log('tokenAMax', tokenAMax);
 
   const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
   const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
-  console.log('tokenBMax', tokenBMax);
+
+  useEffect(() => {
+    if (amountA > tokenAMax) setAmountA(tokenAMax);
+    if (amountB > tokenBMax) setAmountB(tokenBMax);
+  }, [exchangeRate, tokenABalance, tokenBBalance]);
 
   return (
     <FormControl
@@ -87,7 +90,14 @@ const DepositAmounts = ({
                 }
                 const parsed = parseFloat(value);
                 if (isNaN(parsed)) setAmountA(0);
-                setAmountA(parsed);
+
+                if (parsed < 0) {
+                  setAmountA(0);
+                } else {
+                  setAmountA(parsed);
+                  const amountInB = parsed * exchangeRate;
+                  setAmountB(Math.min(amountInB, tokenBMax));
+                }
               }}
               disabled={!validPriceRange}
             />
@@ -145,7 +155,14 @@ const DepositAmounts = ({
                 }
                 const parsed = parseFloat(value);
                 if (isNaN(parsed)) setAmountB(0);
-                setAmountB(parsed);
+
+                if (parsed < 0) {
+                  setAmountB(0);
+                } else {
+                  setAmountB(parsed);
+                  const amountInA = parsed / exchangeRate;
+                  setAmountA(Math.min(amountInA, tokenAMax));
+                }
               }}
               disabled={!validPriceRange}
             />
