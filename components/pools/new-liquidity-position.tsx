@@ -133,6 +133,8 @@ const NewLiquidityPosition = () => {
               </FormControl>
 
               <SelectFeeTier
+                tokenA={tokenA}
+                tokenB={tokenB}
                 feeTier={feeTier}
                 setFeeTier={setFeeTier}
               />

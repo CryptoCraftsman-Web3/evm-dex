@@ -1,4 +1,4 @@
-import { FeeTier } from '@/types/common';
+import { FeeTier, Token } from '@/types/common';
 import {
   FormControl,
   FormControlLabel,
@@ -17,21 +17,25 @@ import {
 import { config } from '../config';
 
 type SelectFeeTierProps = {
+  tokenA: Token | null;
+  tokenB: Token | null;
   feeTier: FeeTier;
   setFeeTier: (feeTier: FeeTier) => void;
 };
 
-const SelectFeeTier = ({ feeTier, setFeeTier }: SelectFeeTierProps) => {
+const SelectFeeTier = ({ tokenA, tokenB, feeTier, setFeeTier }: SelectFeeTierProps) => {
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+  const disabled = tokenA === null || tokenB === null; console.log('fee disabled', disabled);
   return (
     <>
       {isMdAndUp ? (
-        <FormControl>
+        <FormControl
+          disabled={disabled}
+        >
           <FormLabel sx={{ mb: 2 }}>Fee Tier</FormLabel>
           <Stack
             direction="row"
             spacing={2}
-            // justifyContent="space-between"
           >
             {config.feeTiers.map((ftier, index) => {
               let radioLabel = isMdAndUp ? `${ftier.label}` : `${ftier.label} (${ftier.tip})`;
@@ -46,8 +50,11 @@ const SelectFeeTier = ({ feeTier, setFeeTier }: SelectFeeTierProps) => {
                       key={index}
                       value={ftier.value}
                       checked={ftier.value === feeTier.value}
-                      onClick={() => setFeeTier(ftier)}
-                      control={<Radio />}
+                      onClick={() => {
+                        if (disabled) return;
+                        setFeeTier(ftier)
+                      }}
+                      control={<Radio disabled={disabled} />}
                       label={radioLabel}
                     />
                     {isMdAndUp && (
