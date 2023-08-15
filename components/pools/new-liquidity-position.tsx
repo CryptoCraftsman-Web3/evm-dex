@@ -15,6 +15,7 @@ import {
   DialogTitle,
   Alert,
   TextField,
+  IconButton,
 } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
@@ -25,6 +26,7 @@ import SelectFeeTier from './select-fee-tier';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
+import { IoIosClose } from 'react-icons/io';
 import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
 import DepositAmounts from './deposit-amounts';
@@ -98,6 +100,16 @@ const NewLiquidityPosition = () => {
       >
         <DialogTitle>
           <b>Add Liquidity</b>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+            }}
+          >
+            <IoIosClose />
+          </IconButton>
         </DialogTitle>
         <DialogContent>
           <Stack direction={{ xs: 'column', md: 'row' }}
