@@ -218,14 +218,6 @@ const NewLiquidityPosition = () => {
             </Stack>
             {/* end of column 2 in desktop layout */}
           </Stack>
-          <Stack
-            direction="row"
-            spacing={2}
-            mt={2}
-          >
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleClose}>Add</Button>
-          </Stack>
         </DialogContent>
       </Dialog>
     </>
