@@ -124,6 +124,8 @@ const DepositAmounts = ({
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
                     setAmountA(tokenAMax);
+                    const amountInB = tokenAMax * exchangeRate;
+                    setAmountB(Math.min(amountInB, tokenBMax));
                   }}
                 >
                   <Typography
@@ -189,6 +191,8 @@ const DepositAmounts = ({
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
                     setAmountB(tokenBMax);
+                    const amountInA = tokenBMax / exchangeRate;
+                    setAmountA(Math.min(amountInA, tokenAMax));
                   }}
                 >
                   <Typography
