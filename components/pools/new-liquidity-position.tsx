@@ -119,8 +119,6 @@ const NewLiquidityPosition = () => {
             <Stack
               direction="column"
               spacing={2}
-              px={{ xs: 0, md: 2 }}
-              py={{ xs: 0, md: 1 }}
               justifyContent="stretch"
               width="100%"
             >
@@ -172,8 +170,6 @@ const NewLiquidityPosition = () => {
             <Stack
               direction="column"
               spacing={2}
-              px={{ xs: 0, md: 2 }}
-              py={{ xs: 0, md: 1 }}
               justifyContent="stretch"
               width="100%"
             >
@@ -212,8 +208,12 @@ const NewLiquidityPosition = () => {
               <PoolButtons
                 tokenA={tokenA}
                 tokenB={tokenB}
+                feeTier={feeTier}
                 amountA={amountA}
                 amountB={amountB}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                price={startingPrice}
               />
             </Stack>
             {/* end of column 2 in desktop layout */}

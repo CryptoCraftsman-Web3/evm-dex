@@ -9,7 +9,7 @@ import PreviewPosition from './preview-position';
 type PoolButtonsProps = {
   tokenA: Token | null;
   tokenB: Token | null;
-  feeTier: FeeTier
+  feeTier: FeeTier;
   amountA: number;
   amountB: number;
   minPrice: number;
@@ -17,7 +17,7 @@ type PoolButtonsProps = {
   price: number;
 };
 
-const PoolButtons = ({ tokenA, tokenB, amountA, amountB }: PoolButtonsProps) => {
+const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxPrice, price }: PoolButtonsProps) => {
   const { address: userAddress } = useAccount();
   const { nonfungiblePositionManagerAddress } = useSwapProtocolAddresses();
   const tokenAContract = {
@@ -113,14 +113,17 @@ const PoolButtons = ({ tokenA, tokenB, amountA, amountB }: PoolButtonsProps) => 
         )}
       </Stack>
 
-      <PreviewPosition canSpendTokens={canSpendTokens}
+      <PreviewPosition
+        canSpendTokens={canSpendTokens}
         tokenA={tokenA}
         tokenB={tokenB}
-        feeTier={fee}
+        feeTier={feeTier}
         amountA={amountA}
         amountB={amountB}
-
-       />
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        price={price}
+      />
     </Stack>
   );
 };
