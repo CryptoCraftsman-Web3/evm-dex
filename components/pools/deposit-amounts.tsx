@@ -46,12 +46,10 @@ const DepositAmounts = ({
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
   const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
-  console.log(tokenABalanceParsed, tokenAMax);
 
   const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
   const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
-  console.log(tokenBBalanceParsed, tokenBMax);
 
   useEffect(() => {
     if (amountA > tokenAMax) setAmountA(tokenAMax);
@@ -103,7 +101,7 @@ const DepositAmounts = ({
               disabled={!validPriceRange}
             />
 
-            {tokenA && (
+            {tokenA && validPriceRange && (
               <Stack
                 direction="row"
                 justifyContent="flex-end"
@@ -121,7 +119,7 @@ const DepositAmounts = ({
                   })}
                 </Typography>
                 <Link
-                  style={{ cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer' }}
                   onClick={() => {
                     setAmountA(tokenAMax);
                     const amountInB = tokenAMax * exchangeRate;
@@ -170,7 +168,7 @@ const DepositAmounts = ({
               disabled={!validPriceRange}
             />
 
-            {tokenB && (
+            {tokenB && validPriceRange && (
               <Stack
                 direction="row"
                 justifyContent="flex-end"
@@ -188,7 +186,7 @@ const DepositAmounts = ({
                   })}
                 </Typography>
                 <Link
-                  style={{ cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer' }}
                   onClick={() => {
                     setAmountB(tokenBMax);
                     const amountInA = tokenBMax / exchangeRate;
