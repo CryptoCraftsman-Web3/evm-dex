@@ -3,8 +3,17 @@ import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { FeeTier, Token } from '@/types/common';
 import { Button, Stack } from '@mui/material';
 import { formatEther, formatUnits, parseUnits, zeroAddress } from 'viem';
-import { erc20ABI, useAccount, useContractReads, useContractWrite } from 'wagmi';
+import {
+  erc20ABI,
+  useAccount,
+  useContractReads,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 import PreviewPosition from './preview-position';
+import { LoadingButton } from '@mui/lab';
+import { toast } from 'react-toastify';
 
 type PoolButtonsProps = {
   tokenA: Token | null;
@@ -30,7 +39,11 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
     abi: erc20ABI,
   };
 
-  const { data: allowances, refetch: refetchAllowances } = useContractReads({
+  const {
+    data: allowances,
+    refetch: refetchAllowances,
+    isRefetching: refetchingAllowances,
+  } = useContractReads({
     contracts: [
       {
         ...tokenAContract,
@@ -51,15 +64,33 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
   const amountAInWei = amountA ? BigInt(amountA * 10 ** (tokenA?.decimals ?? 18)) : 0n;
   const amountBInWei = amountB ? BigInt(amountB * 10 ** (tokenB?.decimals ?? 18)) : 0n;
 
-  const {
-    data: approveTokenAResult,
-    isLoading: isApprovingTokenA,
-    isSuccess: isTokenAApproved,
-    write: approveTokenA,
-  } = useContractWrite({
+  const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
     functionName: 'approve',
     args: [nonfungiblePositionManagerAddress, amountAInWei],
+  });
+
+  const {
+    data: approveTokenAResult,
+    status: approveTokenAStatus,
+    isLoading: isApprovingTokenA,
+    isSuccess: isTokenAApproved,
+    write: approveTokenA,
+  } = useContractWrite(tokenAConfig);
+
+  const {
+    data: approveTokenATxReceipt,
+    isLoading: isApproveTokenATxPending,
+    isSuccess: isApproveTokenATxSuccess,
+    isError: isApproveTokenATxError,
+  } = useWaitForTransaction({
+    hash: approveTokenAResult?.hash,
+  });
+
+  const { config: tokenBConfig } = usePrepareContractWrite({
+    ...tokenBContract,
+    functionName: 'approve',
+    args: [nonfungiblePositionManagerAddress, amountBInWei],
   });
 
   const {
@@ -67,16 +98,26 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
     isLoading: isApprovingTokenB,
     isSuccess: isTokenBApproved,
     write: approveTokenB,
-  } = useContractWrite({
-    ...tokenBContract,
-    functionName: 'approve',
-    args: [nonfungiblePositionManagerAddress, amountBInWei],
+  } = useContractWrite(tokenBConfig);
+
+  const {
+    data: approveTokenBTxReceipt,
+    isLoading: isApproveTokenBTxPending,
+    isSuccess: isApproveTokenBTxSuccess,
+    isError: isApproveTokenBTxError,
+  } = useWaitForTransaction({
+    hash: approveTokenBResult?.hash,
   });
 
   useEffect(() => {
-    if (isTokenAApproved) refetchAllowances();
-    if (isTokenBApproved) refetchAllowances();
-  }, [isTokenAApproved, isTokenBApproved]);
+    refetchAllowances();
+
+    if (isApproveTokenATxSuccess)
+      toast.success(`You have approved ${tokenA?.symbol} to be spent by the Swap Protocol.`);
+
+    if (isApproveTokenBTxSuccess)
+      toast.success(`You have approved ${tokenB?.symbol} to be spent by the Swap Protocol.`);
+  }, [isTokenAApproved, isTokenBApproved, isApproveTokenATxSuccess, isApproveTokenBTxSuccess]);
 
   const canSpendTokens = tokenA !== null && tokenB !== null && allowanceA >= amountAInWei && allowanceB >= amountBInWei;
 
@@ -85,33 +126,41 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
       direction="column"
       spacing={2}
     >
-      <Stack
-        direction="row"
-        spacing={2}
-        justifyContent="stretch"
-      >
-        {tokenA !== null && allowanceA < amountAInWei && (
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
-            onClick={() => approveTokenA()}
-          >
-            Approve {tokenA.symbol}
-          </Button>
-        )}
+      {((tokenA !== null && allowanceA < amountAInWei) || (tokenB !== null && allowanceB < amountBInWei)) && (
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="stretch"
+        >
+          {tokenA !== null && allowanceA < amountAInWei && (
+            <LoadingButton
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={async () => {
+                if (approveTokenA) await approveTokenA();
+              }}
+              loading={isApprovingTokenA || isApproveTokenATxPending}
+            >
+              Approve {tokenA.symbol}
+            </LoadingButton>
+          )}
 
-        {tokenB !== null && allowanceB < amountBInWei && (
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
-            onClick={() => approveTokenB()}
-          >
-            Approve {tokenB.symbol}
-          </Button>
-        )}
-      </Stack>
+          {tokenB !== null && allowanceB < amountBInWei && (
+            <LoadingButton
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={async () => {
+                if (approveTokenB) await approveTokenB();
+              }}
+              loading={isApprovingTokenB || isApproveTokenBTxPending}
+            >
+              Approve {tokenB.symbol}
+            </LoadingButton>
+          )}
+        </Stack>
+      )}
 
       <PreviewPosition
         canSpendTokens={canSpendTokens}

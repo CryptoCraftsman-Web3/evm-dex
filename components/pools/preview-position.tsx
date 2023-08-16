@@ -62,7 +62,7 @@ const PreviewPosition = ({
         color="primary"
         size="large"
         fullWidth
-        // disabled={!canSpendTokens}
+        disabled={!canSpendTokens}
         onClick={handleOpen}
       >
         Preview Position
