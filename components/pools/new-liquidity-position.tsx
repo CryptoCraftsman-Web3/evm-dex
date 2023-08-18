@@ -16,6 +16,7 @@ import {
   Alert,
   TextField,
   IconButton,
+  Divider,
 } from '@mui/material';
 import { config } from '../config';
 import SelectToken from './select-token';
@@ -113,13 +114,13 @@ const NewLiquidityPosition = () => {
         </DialogTitle>
         <DialogContent>
           <Stack direction={{ xs: 'column', md: 'row' }}
-            spacing={2}
+            spacing={{ xs: 2, md: 4 }}
+            alignItems="stretch"
           >
             {/* start of column 1 in desktop layout */}
             <Stack
               direction="column"
               spacing={2}
-              justifyContent="stretch"
               width="100%"
             >
               <FormControl fullWidth>
@@ -165,6 +166,8 @@ const NewLiquidityPosition = () => {
               )}
             </Stack>
             {/* end of column 1 in desktop layout */}
+
+            {isMdAndUp && <Divider orientation="vertical" sx={{ height: 'auto' }} />}
 
             {/* start of column 2 in desktop layout */}
             <Stack
