@@ -36,7 +36,7 @@ const Providers = ({ children }: ProvidersProps) => {
       MuiButton: {
         styleOverrides: {
           root: {
-            textTransform: 'none',
+            textTransform: 'none'
           },
         },
       },

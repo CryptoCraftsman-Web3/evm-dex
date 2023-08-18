@@ -152,6 +152,7 @@ const PoolButtons = ({
                 if (approveTokenA) await approveTokenA();
               }}
               loading={isApprovingTokenA || isApproveTokenATxPending}
+              sx={{ h: 56 }}
             >
               Approve {tokenA.symbol}
             </LoadingButton>
@@ -166,6 +167,7 @@ const PoolButtons = ({
                 if (approveTokenB) await approveTokenB();
               }}
               loading={isApprovingTokenB || isApproveTokenBTxPending}
+              sx={{ h: 56 }}
             >
               Approve {tokenB.symbol}
             </LoadingButton>

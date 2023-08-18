@@ -180,6 +180,7 @@ const NewLiquidityPosition = () => {
                   tokenA={tokenA}
                   tokenB={tokenB}
                   feeTier={feeTier}
+                  refetchPool={refetchPool}
                 />
               )}
 

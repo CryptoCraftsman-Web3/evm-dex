@@ -28,7 +28,6 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
     <>
       <Autocomplete
         disablePortal
-        id="combo-box-demo"
         options={tokens}
         getOptionLabel={(option) => option.name}
         sx={{ width: { xs: 'auto', md: 300 } }}
