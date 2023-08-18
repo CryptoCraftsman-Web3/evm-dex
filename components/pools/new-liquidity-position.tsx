@@ -67,17 +67,17 @@ const NewLiquidityPosition = () => {
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
 
-  const { poolFactoryAddress } = useSwapProtocolAddresses();
+  const { poolFactory } = useSwapProtocolAddresses();
 
-  const { data: pool } = useContractRead({
-    address: poolFactoryAddress,
+  const { data: pool, refetch: refetchPool } = useContractRead({
+    address: poolFactory,
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
     args: [tokenA?.address ?? zeroAddress, tokenB?.address ?? zeroAddress, feeTier.value],
     enabled: tokenA !== null && tokenB !== null,
   });
 
-  const hasInitializedPool = pool !== zeroAddress && pool !== undefined;
+  const isPoolInitialized = pool !== zeroAddress && pool !== undefined;
   const validPriceRange = minPrice < maxPrice && minPrice > 0 && maxPrice > 0;
 
   return (
@@ -173,12 +173,13 @@ const NewLiquidityPosition = () => {
               justifyContent="stretch"
               width="100%"
             >
-              {!hasInitializedPool && tokenA && tokenB && (
+              {!isPoolInitialized && tokenA && tokenB && (
                 <StartingPrice
                   startingPrice={startingPrice}
                   setStartingPrice={setStartingPrice}
                   tokenA={tokenA}
                   tokenB={tokenB}
+                  feeTier={feeTier}
                 />
               )}
 
@@ -189,7 +190,7 @@ const NewLiquidityPosition = () => {
                 setMaxPrice={setMaxPrice}
                 tokenA={tokenA}
                 tokenB={tokenB}
-                hasInitializedPool={hasInitializedPool}
+                hasInitializedPool={isPoolInitialized}
               />
 
               {!isMdAndUp && (
@@ -214,6 +215,7 @@ const NewLiquidityPosition = () => {
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 price={startingPrice}
+                isPoolInitialized={isPoolInitialized}
               />
             </Stack>
             {/* end of column 2 in desktop layout */}

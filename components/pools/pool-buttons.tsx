@@ -24,11 +24,22 @@ type PoolButtonsProps = {
   minPrice: number;
   maxPrice: number;
   price: number;
+  isPoolInitialized: boolean;
 };
 
-const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxPrice, price }: PoolButtonsProps) => {
+const PoolButtons = ({
+  tokenA,
+  tokenB,
+  feeTier,
+  amountA,
+  amountB,
+  minPrice,
+  maxPrice,
+  price,
+  isPoolInitialized,
+}: PoolButtonsProps) => {
   const { address: userAddress } = useAccount();
-  const { nonfungiblePositionManagerAddress } = useSwapProtocolAddresses();
+  const { nfPositionManager } = useSwapProtocolAddresses();
   const tokenAContract = {
     address: tokenA?.address ?? zeroAddress,
     abi: erc20ABI,
@@ -48,12 +59,12 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
       {
         ...tokenAContract,
         functionName: 'allowance',
-        args: [userAddress ?? zeroAddress, nonfungiblePositionManagerAddress],
+        args: [userAddress ?? zeroAddress, nfPositionManager],
       },
       {
         ...tokenBContract,
         functionName: 'allowance',
-        args: [userAddress ?? zeroAddress, nonfungiblePositionManagerAddress],
+        args: [userAddress ?? zeroAddress, nfPositionManager],
       },
     ],
   });
@@ -67,7 +78,7 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
     functionName: 'approve',
-    args: [nonfungiblePositionManagerAddress, amountAInWei],
+    args: [nfPositionManager, amountAInWei],
   });
 
   const {
@@ -90,7 +101,7 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
   const { config: tokenBConfig } = usePrepareContractWrite({
     ...tokenBContract,
     functionName: 'approve',
-    args: [nonfungiblePositionManagerAddress, amountBInWei],
+    args: [nfPositionManager, amountBInWei],
   });
 
   const {
@@ -172,6 +183,7 @@ const PoolButtons = ({ tokenA, tokenB, feeTier, amountA, amountB, minPrice, maxP
         minPrice={minPrice}
         maxPrice={maxPrice}
         price={price}
+        isPoolInitialized={isPoolInitialized}
       />
     </Stack>
   );
