@@ -1,34 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Notes
 
-## Getting Started
+### **Slot 0 in Pool Contract**
 
-First, run the development server:
+Uniswap V3 introduced a lot of new concepts and features, one of which is the way it handles liquidity. In V3, liquidity is not provided across the entire price range but rather within specific price ranges. This allows liquidity providers (LPs) to specify a price range for their liquidity, which can result in more efficient capital usage.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+The way Uniswap V3 manages this is through a data structure called a "doubly-linked list" of "ticks." Each tick represents a specific price level. Ticks are points in price space where the relative weights of assets in the pool cross an integer value, which implies a potential fee-earning event for liquidity that is active across that price.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To efficiently manage and update the liquidity between these specific price points, Uniswap V3 uses "slots."
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Now, slot0 in the Uniswap V3 pool contract is particularly important. It's a struct that contains key data that can change frequently:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+sqrtPriceX96: This is the current price of the pool, but it's stored as the square root and has been multiplied by a large constant (2^96) to allow for fixed-point arithmetic. The square root storage allows for some gas optimization.
 
-## Learn More
+tick: This is the current tick of the pool. It represents the closest, previously initialized tick below the current price.
 
-To learn more about Next.js, take a look at the following resources:
+observationIndex: This is an index that points to the most recent observation (used for TWAPs - Time-Weighted Average Prices) in the circular buffer.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+And a few other variables related to the management of observations and protocol fees.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+slot0 is essentially a quick way to get the most up-to-date and frequently-accessed information about the state of the pool, without having to iterate over or look up many storage slots.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+To summarize, slot0 is a central storage location in Uniswap V3's smart contract that holds the current state of the pool, including the current price, tick, and other key parameters.
