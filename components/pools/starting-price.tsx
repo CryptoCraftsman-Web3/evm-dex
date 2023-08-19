@@ -88,8 +88,7 @@ const StartingPrice = ({
           variant="outlined"
           icon={false}
         >
-          This pool has not been initialized yet. You will need to deploy and set the starting price. Gas fees will be
-          higher than usual.
+          This pool has not been initialized yet. You will need to deploy and set the starting price. This is a separate and additional gas fee from adding liquidity.
         </Alert>
 
         <Stack
