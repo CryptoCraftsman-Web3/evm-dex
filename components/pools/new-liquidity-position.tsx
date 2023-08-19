@@ -21,17 +21,19 @@ import {
 import { config } from '../config';
 import SelectToken from './select-token';
 import { FeeTier, Token } from '@/types/common';
-import { useAccount, useContractRead } from 'wagmi';
+import { useAccount, useContractRead, useContractReads, useNetwork } from 'wagmi';
 import { toast } from 'react-toastify';
 import SelectFeeTier from './select-fee-tier';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
+import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { IoIosClose } from 'react-icons/io';
 import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
 import DepositAmounts from './deposit-amounts';
 import PoolButtons from './pool-buttons';
+import { computePoolAddress } from '@uniswap/v3-sdk';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -63,12 +65,14 @@ const NewLiquidityPosition = () => {
   const [tokenB, setTokenB] = useState<Token | null>(null);
   const [feeTier, setFeeTier] = useState<FeeTier>(config.feeTiers[0]);
   const [startingPrice, setStartingPrice] = useState<number>(0);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(0);
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
 
   const { poolFactory } = useSwapProtocolAddresses();
+  const { chain } = useNetwork(); console.log(chain);
 
   const { data: pool, refetch: refetchPool } = useContractRead({
     address: poolFactory,
@@ -113,7 +117,8 @@ const NewLiquidityPosition = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Stack direction={{ xs: 'column', md: 'row' }}
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
             spacing={{ xs: 2, md: 4 }}
             alignItems="stretch"
           >
@@ -160,14 +165,21 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
-                  exchangeRate={startingPrice}
+                  startingPrice={startingPrice}
+                  currentPrice={currentPrice}
+                  isPoolInitialized={isPoolInitialized}
                   validPriceRange={validPriceRange}
                 />
               )}
             </Stack>
             {/* end of column 1 in desktop layout */}
 
-            {isMdAndUp && <Divider orientation="vertical" sx={{ height: 'auto' }} />}
+            {isMdAndUp && (
+              <Divider
+                orientation="vertical"
+                sx={{ height: 'auto' }}
+              />
+            )}
 
             {/* start of column 2 in desktop layout */}
             <Stack
@@ -194,7 +206,10 @@ const NewLiquidityPosition = () => {
                 setMaxPrice={setMaxPrice}
                 tokenA={tokenA}
                 tokenB={tokenB}
-                hasInitializedPool={isPoolInitialized}
+                feeTier={feeTier}
+                isPoolInitialized={isPoolInitialized}
+                currentPrice={currentPrice}
+                setCurrentPrice={setCurrentPrice}
               />
 
               {!isMdAndUp && (
@@ -205,7 +220,9 @@ const NewLiquidityPosition = () => {
                   setAmountA={setAmountA}
                   amountB={amountB}
                   setAmountB={setAmountB}
-                  exchangeRate={startingPrice}
+                  startingPrice={startingPrice}
+                  currentPrice={currentPrice}
+                  isPoolInitialized={isPoolInitialized}
                   validPriceRange={validPriceRange}
                 />
               )}
@@ -218,7 +235,8 @@ const NewLiquidityPosition = () => {
                 amountB={amountB}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
-                price={startingPrice}
+                startingPrice={startingPrice}
+                currentPrice={currentPrice}
                 isPoolInitialized={isPoolInitialized}
               />
             </Stack>

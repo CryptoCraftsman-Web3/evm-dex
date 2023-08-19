@@ -11,7 +11,9 @@ type DepositAmountProps = {
   setAmountA: (amountA: number) => void;
   amountB: number;
   setAmountB: (amountB: number) => void;
-  exchangeRate: number;
+  startingPrice: number;
+  currentPrice: number;
+  isPoolInitialized: boolean;
   validPriceRange: boolean;
 };
 
@@ -22,7 +24,9 @@ const DepositAmounts = ({
   setAmountA,
   amountB,
   setAmountB,
-  exchangeRate,
+  startingPrice,
+  currentPrice,
+  isPoolInitialized,
   validPriceRange,
 }: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
@@ -43,6 +47,8 @@ const DepositAmounts = ({
     enabled: tokenB !== null && userAddress !== undefined,
   });
 
+  const exchangeRate = isPoolInitialized ? currentPrice : startingPrice;
+
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
   const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
@@ -55,6 +61,8 @@ const DepositAmounts = ({
     if (amountA > tokenAMax) setAmountA(tokenAMax);
     if (amountB > tokenBMax) setAmountB(tokenBMax);
   }, [exchangeRate, tokenABalance, tokenBBalance]);
+
+  console.log('exchangeRate', exchangeRate);
 
   return (
     <FormControl

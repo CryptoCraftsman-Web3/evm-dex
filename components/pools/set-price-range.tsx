@@ -1,6 +1,13 @@
-import { Token } from '@/types/common';
+import { useEffect } from 'react';
+import { FeeTier, Token } from '@/types/common';
 import { Box, FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
+import { Token as UniswapToken } from '@uniswap/sdk-core';
+import { useContractRead, useContractReads, useNetwork } from 'wagmi';
+import { computePoolAddress } from '@uniswap/v3-sdk';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { zeroAddress } from 'viem';
 
 type SetPriceRangeProps = {
   minPrice: number;
@@ -9,7 +16,10 @@ type SetPriceRangeProps = {
   setMaxPrice: (maxPrice: number) => void;
   tokenA: Token | null;
   tokenB: Token | null;
-  hasInitializedPool: boolean;
+  feeTier: FeeTier;
+  isPoolInitialized: boolean;
+  currentPrice: number;
+  setCurrentPrice: (currentPrice: number) => void;
 };
 
 const SetPriceRange = ({
@@ -19,9 +29,54 @@ const SetPriceRange = ({
   setMaxPrice,
   tokenA,
   tokenB,
-  hasInitializedPool,
+  feeTier,
+  isPoolInitialized,
+  currentPrice,
+  setCurrentPrice,
 }: SetPriceRangeProps) => {
   const disabled = tokenA === null || tokenB === null;
+  const { poolFactory } = useSwapProtocolAddresses();
+  const { chain } = useNetwork();
+
+  const uniswapTokenA = new UniswapToken(
+    chain?.id || 1,
+    tokenA?.address || zeroAddress,
+    tokenA?.decimals || 18,
+    tokenA?.symbol || 'A',
+    tokenA?.name || 'A'
+  );
+  const uniswapTokenB = new UniswapToken(
+    chain?.id || 1,
+    tokenB?.address || zeroAddress,
+    tokenB?.decimals || 18,
+    tokenB?.symbol || 'B',
+    tokenB?.name || 'B'
+  );
+
+  const poolAddress = (tokenA !== null && tokenB !== null) ? computePoolAddress({
+    factoryAddress: poolFactory,
+    tokenA: uniswapTokenA,
+    tokenB: uniswapTokenB,
+    fee: feeTier.value,
+  }) as `0x${string}` : zeroAddress;
+
+  const poolContract = {
+    address: poolAddress,
+    abi: uniswapV3PoolABI,
+  };
+
+  const { data: slot0 } = useContractRead({
+    address: poolAddress,
+    abi: uniswapV3PoolABI,
+    functionName: 'slot0',
+  });
+
+  useEffect(() => {
+    const _currentPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
+    setCurrentPrice(_currentPrice);
+    console.log(slot0, _currentPrice);
+  }, [slot0])
+
   return (
     <FormControl
       fullWidth
@@ -32,12 +87,24 @@ const SetPriceRange = ({
         direction="column"
         spacing={3}
       >
-        {hasInitializedPool && (
+        {isPoolInitialized && (
           <>
-            <Box p={1} textAlign="center">
+            <Typography textAlign="center">
+              Current Price: {currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenB?.symbol} / {tokenA?.symbol}
+            </Typography>
+            <Box
+              p={1}
+              textAlign="center"
+            >
               <IoFileTrayStackedOutline size={96} />
             </Box>
-            <Typography variant="h6" textAlign="center" pb={2}>Your position will appear here</Typography>
+            <Typography
+              variant="h6"
+              textAlign="center"
+              pb={2}
+            >
+              Your position will appear here
+            </Typography>
           </>
         )}
         <Stack
@@ -47,7 +114,12 @@ const SetPriceRange = ({
           <TextField
             label="Minimum Price"
             InputProps={{
-              endAdornment: tokenA && tokenB ? <>{tokenB.symbol} / {tokenA.symbol}</> : null,
+              endAdornment:
+                tokenA && tokenB ? (
+                  <>
+                    {tokenB.symbol} / {tokenA.symbol}
+                  </>
+                ) : null,
               inputProps: {
                 min: 0,
                 style: { textAlign: 'right', paddingRight: '1rem' },
@@ -72,7 +144,12 @@ const SetPriceRange = ({
           <TextField
             label="Maximum Price"
             InputProps={{
-              endAdornment: tokenA && tokenB ? <>{tokenB.symbol} / {tokenA.symbol}</> : null,
+              endAdornment:
+                tokenA && tokenB ? (
+                  <>
+                    {tokenB.symbol} / {tokenA.symbol}
+                  </>
+                ) : null,
               inputProps: {
                 min: 0,
                 style: { textAlign: 'right', paddingRight: '1rem' },

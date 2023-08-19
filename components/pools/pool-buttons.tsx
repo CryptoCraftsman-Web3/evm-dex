@@ -23,7 +23,8 @@ type PoolButtonsProps = {
   amountB: number;
   minPrice: number;
   maxPrice: number;
-  price: number;
+  startingPrice: number;
+  currentPrice: number;
   isPoolInitialized: boolean;
 };
 
@@ -35,7 +36,8 @@ const PoolButtons = ({
   amountB,
   minPrice,
   maxPrice,
-  price,
+  startingPrice,
+  currentPrice,
   isPoolInitialized,
 }: PoolButtonsProps) => {
   const { address: userAddress } = useAccount();
@@ -184,7 +186,8 @@ const PoolButtons = ({
         amountB={amountB}
         minPrice={minPrice}
         maxPrice={maxPrice}
-        price={price}
+        startingPrice={startingPrice}
+        currentPrice={currentPrice}
         isPoolInitialized={isPoolInitialized}
       />
     </Stack>
