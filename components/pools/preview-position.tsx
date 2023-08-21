@@ -27,11 +27,12 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import {
   useAccount,
   useContractReads,
+  useContractWrite,
   useNetwork,
   usePrepareContractWrite,
   usePrepareSendTransaction,
@@ -42,6 +43,8 @@ import { iUniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { parseUnits, zeroAddress } from 'viem';
 import JSBI from 'jsbi';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { LoadingButton } from '@mui/lab';
+import { toast } from 'react-toastify';
 
 type PreviewPositionProps = {
   canSpendTokens: boolean;
@@ -153,8 +156,11 @@ const PreviewPosition = ({
     enabled: tokenA !== null && tokenB !== null && isPoolInitialized,
   });
 
+  console.log('poolInfo', poolInfo);
+
   const tickSpacing = poolInfo?.[3].result ? (poolInfo[3].result as number) : 0;
-  const liquidity = poolInfo?.[4].result ? (poolInfo[4].result as bigint) : 0n; console.log(liquidity);
+  const liquidity = poolInfo?.[4].result ? (poolInfo[4].result as bigint) : 0n;
+
   const slot0 = poolInfo?.[5].result
     ? (poolInfo[5].result as [bigint, number, number, number, number, number, boolean])
     : [0n, 0, 0, 0, 0, 0, false];
@@ -171,63 +177,58 @@ const PreviewPosition = ({
     parseUnits(amountB.toString(), tokenB?.decimals || 18).toString()
   );
 
-  const configuredPool =
-    isPoolInitialized && tokenA !== null && tokenB !== null
-      ? new Pool(
-          tokenAAmount.currency,
-          tokenBAmount.currency,
-          feeTier.value,
-          slot0[0].toString(),
-          liquidity.toString(),
-          slot0[1] as number
-        )
-      : undefined; console.log(liquidity, liquidity.toString());
+  const tickLower = tick && tickSpacing ? nearestUsableTick(tick, tickSpacing) - tickSpacing * 2 : TickMath.MIN_TICK;
+  const tickUpper = tick && tickSpacing ? nearestUsableTick(tick, tickSpacing) + tickSpacing * 2 : TickMath.MAX_TICK;
 
-  const position =
-    configuredPool !== undefined && liquidity > 0n
-      ? Position.fromAmounts({
-          pool: configuredPool,
-          tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
-          tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2,
-          amount0: tokenAAmount.quotient,
-          amount1: tokenBAmount.quotient,
-          useFullPrecision: true,
-        })
-      : undefined;
-
-  const mintOptions: MintOptions = {
-    recipient: address ? address : zeroAddress,
-    deadline: Math.floor(Date.now() / 1000) + 60 * 20,
-    slippageTolerance: new Percent(50, 10_000),
-  };
-
-  const { calldata } =
-    position !== undefined
-      ? NonfungiblePositionManager.addCallParameters(position, mintOptions)
-      : {
-          calldata: undefined,
-        };
-
-  const { config: mintLiquidtyTxConfig } = usePrepareSendTransaction({
-    to: nfPositionManager,
+  const { config: mintTxConfig } = usePrepareContractWrite({
+    address: nfPositionManager,
+    abi: nonfungiblePositionManagerABI,
+    functionName: 'mint',
+    args: [
+      {
+        token0: tokenA?.address ? tokenA.address : zeroAddress,
+        token1: tokenB?.address ? tokenB.address : zeroAddress,
+        fee: feeTier.value,
+        tickLower,
+        tickUpper,
+        amount0Desired: parseUnits(amountA.toString(), tokenA?.decimals || 18),
+        amount1Desired: parseUnits(amountB.toString(), tokenB?.decimals || 18),
+        amount0Min: 0n,
+        amount1Min: 0n,
+        recipient: address ? address : zeroAddress,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
+      },
+    ],
     value: 0n,
-    data: calldata ? calldata as `0x${string}` : '0x0',
   });
 
   const {
-    data: mintLiquidtyTxData,
-    sendTransaction: mintLiquidity,
-    isLoading: mintingLiquidty,
-  } = useSendTransaction(mintLiquidtyTxConfig);
+    data: mintTxData,
+    write: mint,
+    isLoading: minting,
+  } = useContractWrite(mintTxConfig);
 
-  const { isLoading: isMintLiquidtyTxWaiting } = useWaitForTransaction({
-    hash: mintLiquidtyTxData?.hash,
-    enabled: Boolean(mintLiquidtyTxData?.hash),
+  const {
+    isLoading: mintTxWaiting,
+    isSuccess: mintTxSuccess,
+    isError: mintTxError,
+  } = useWaitForTransaction({
+    hash: mintTxData?.hash,
+    enabled: mintTxData !== undefined,
   });
 
+  useEffect(() => {
+    if (mintTxSuccess) {
+      toast('Position minted successfully', { type: 'success' });
+    }
+
+    if (mintTxError) {
+      toast('Error minting position', { type: 'error' });
+    }
+  }, [mintTxSuccess, mintTxError]);
+
   const addLiquidity = async () => {
-    if (!mintLiquidity) return;
-    mintLiquidity();
+    if (mint) mint();
   };
 
   return (
@@ -414,15 +415,16 @@ const PreviewPosition = ({
               </Stack>
             </Paper>
 
-            <Button
+            <LoadingButton
               variant="contained"
               color="primary"
               size="large"
               fullWidth
+              loading={minting || mintTxWaiting}
               onClick={() => addLiquidity()}
             >
               Add Liquidity
-            </Button>
+            </LoadingButton>
           </Stack>
         </DialogContent>
       </Dialog>
