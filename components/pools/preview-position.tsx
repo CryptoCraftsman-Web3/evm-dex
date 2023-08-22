@@ -155,9 +155,6 @@ const PreviewPosition = ({
     ],
     enabled: tokenA !== null && tokenB !== null && isPoolInitialized,
   });
-
-  console.log('poolInfo', poolInfo);
-
   const tickSpacing = poolInfo?.[3].result ? (poolInfo[3].result as number) : 0;
   const liquidity = poolInfo?.[4].result ? (poolInfo[4].result as bigint) : 0n;
 
@@ -177,8 +174,18 @@ const PreviewPosition = ({
     parseUnits(amountB.toString(), tokenB?.decimals || 18).toString()
   );
 
-  const tickLower = tick && tickSpacing ? nearestUsableTick(tick, tickSpacing) - tickSpacing * 2 : TickMath.MIN_TICK;
-  const tickUpper = tick && tickSpacing ? nearestUsableTick(tick, tickSpacing) + tickSpacing * 2 : TickMath.MAX_TICK;
+  const sqrtMinPriceX96 = Math.sqrt(minPrice) * 2 ** 96;
+  const sqrtMaxPriceX96 = Math.sqrt(maxPrice) * 2 ** 96;
+
+  const minPriceTargetTick =
+    sqrtMinPriceX96 !== 0 ? TickMath.getTickAtSqrtRatio(JSBI.BigInt(sqrtMinPriceX96)) : TickMath.MIN_TICK;
+  const maxPriceTargetTick =
+    sqrtMaxPriceX96 !== 0 ? TickMath.getTickAtSqrtRatio(JSBI.BigInt(sqrtMaxPriceX96)) : TickMath.MAX_TICK;
+
+  const tickLower =
+    tick && tickSpacing ? nearestUsableTick(minPriceTargetTick, tickSpacing) - tickSpacing * 2 : TickMath.MIN_TICK;
+  const tickUpper =
+    tick && tickSpacing ? nearestUsableTick(maxPriceTargetTick, tickSpacing) + tickSpacing * 2 : TickMath.MAX_TICK;
 
   const { config: mintTxConfig } = usePrepareContractWrite({
     address: nfPositionManager,
@@ -202,11 +209,7 @@ const PreviewPosition = ({
     value: 0n,
   });
 
-  const {
-    data: mintTxData,
-    write: mint,
-    isLoading: minting,
-  } = useContractWrite(mintTxConfig);
+  const { data: mintTxData, write: mint, isLoading: minting } = useContractWrite(mintTxConfig);
 
   const {
     isLoading: mintTxWaiting,

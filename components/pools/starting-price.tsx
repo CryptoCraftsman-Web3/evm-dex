@@ -31,7 +31,6 @@ const StartingPrice = ({
   const tokenBAddress = tokenB?.address ?? zeroAddress;
 
   const sqrtPriceX96: bigint = BigInt(Math.sqrt(startingPrice) * 2 ** 96);
-  console.log('sqrtPriceX96', sqrtPriceX96);
 
   const { config: initializePoolTxConfig } = usePrepareContractWrite({
     address: nfPositionManager,
