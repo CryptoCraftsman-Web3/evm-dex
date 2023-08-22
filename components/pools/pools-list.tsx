@@ -10,7 +10,7 @@ const PoolsList = () => {
   const { nfPositionManager } = useSwapProtocolAddresses();
   const { address } = useAccount();
 
-  const { data: poolsCount, isLoading: isGettingPoolsCount } = useContractRead({
+  const { data: poolsCount, isLoading: isGettingPoolsCount, refetch: getPoolsCount } = useContractRead({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'balanceOf',
@@ -34,11 +34,11 @@ const PoolsList = () => {
     enabled: address !== undefined,
   });
 
-  const tokenIds = tokenIdResults
-    ?.map((t) => {
+  const tokenIds = tokenIdResults !== undefined ? tokenIdResults
+    .map((t) => {
       return t.status === 'success' ? (t.result as bigint) : undefined;
     })
-    .filter((t) => t !== undefined) as bigint[];
+    .filter((t) => t !== undefined) as bigint[] : [];
 
   const { data: positionResults, isLoading: isGettingPositions } = useContractReads({
     contracts: tokenIds.map((tokenId) => {
