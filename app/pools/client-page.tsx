@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
 import { useModal } from 'connectkit';
 import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
+import PoolsList from '@/components/pools/pools-list';
 
 const PoolsClientPage = () => {
   const { isConnected } = useAccount();
@@ -42,7 +43,7 @@ const PoolsClientPage = () => {
           }}
         >
           {isConnected ? (
-            <></>
+            <PoolsList />
           ) : (
             <Stack
               direction="column"
