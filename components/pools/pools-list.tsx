@@ -1,7 +1,10 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { Stack } from '@mui/material';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractRead, useContractReads } from 'wagmi';
+import Pool from './pool';
 
 const PoolsList = () => {
   const { nfPositionManager } = useSwapProtocolAddresses();
@@ -50,12 +53,11 @@ const PoolsList = () => {
   });
   console.log(positionResults);
 
-  const positions = positionResults?.map((p) => {
-    if (p.status === 'failure') {
-      return undefined;
-    }
+  const positions: Position[] = [];
+  for (const positionResult of positionResults?.reverse() || []) {
+    if (positionResult.status === 'failure') continue;
 
-    const result = p.result as [
+    const result = positionResult.result as [
       bigint,
       '0x${string}',
       '0x${string}',
@@ -70,7 +72,7 @@ const PoolsList = () => {
       bigint
     ];
 
-    return {
+    positions.push({
       nonce: result[0],
       operator: result[1],
       token0: result[2],
@@ -83,15 +85,15 @@ const PoolsList = () => {
       feeGrowthInside1LastX128: result[9],
       tokensOwed0: result[10],
       tokensOwed1: result[11],
-    };
-  });
-
-  console.log(positions);
+    });
+  }
 
   return (
-    <div>
-      <h1>Pool List</h1>
-    </div>
+    <Stack direction="column" spacing={2}>
+      {positions.map((position, index) => {
+        return <Pool key={index} position={position} />;
+      })}
+    </Stack>
   );
 };
 
