@@ -25,7 +25,7 @@ import { useAccount, useContractRead, useContractReads, useNetwork } from 'wagmi
 import { toast } from 'react-toastify';
 import SelectFeeTier from './select-fee-tier';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { iUniswapV3PoolABI, uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
 import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { IoIosClose } from 'react-icons/io';
@@ -33,7 +33,8 @@ import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
 import DepositAmounts from './deposit-amounts';
 import PoolButtons from './pool-buttons';
-import { computePoolAddress } from '@uniswap/v3-sdk';
+import { TickMath, computePoolAddress, nearestUsableTick } from '@uniswap/v3-sdk';
+import JSBI from 'jsbi';
 
 const NewLiquidityPosition = () => {
   const { isConnected } = useAccount();
@@ -71,8 +72,8 @@ const NewLiquidityPosition = () => {
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
 
-  const { poolFactory } = useSwapProtocolAddresses();
-  const { chain } = useNetwork(); console.log(chain);
+  const { poolFactory, nfPositionManager } = useSwapProtocolAddresses();
+  const { chain } = useNetwork();
 
   const { data: pool, refetch: refetchPool } = useContractRead({
     address: poolFactory,
@@ -169,6 +170,8 @@ const NewLiquidityPosition = () => {
                   currentPrice={currentPrice}
                   isPoolInitialized={isPoolInitialized}
                   validPriceRange={validPriceRange}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
                 />
               )}
             </Stack>
@@ -224,6 +227,8 @@ const NewLiquidityPosition = () => {
                   currentPrice={currentPrice}
                   isPoolInitialized={isPoolInitialized}
                   validPriceRange={validPriceRange}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
                 />
               )}
 

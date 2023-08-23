@@ -164,16 +164,6 @@ const PreviewPosition = ({
   const sqrtPriceX96 = slot0[0] as bigint;
   const tick = slot0[1] as number;
 
-  const tokenAAmount = CurrencyAmount.fromRawAmount(
-    uniswapTokenA,
-    parseUnits(amountA.toString(), tokenA?.decimals || 18).toString()
-  );
-
-  const tokenBAmount = CurrencyAmount.fromRawAmount(
-    uniswapTokenB,
-    parseUnits(amountB.toString(), tokenB?.decimals || 18).toString()
-  );
-
   const sqrtMinPriceX96 = Math.sqrt(minPrice) * 2 ** 96;
   const sqrtMaxPriceX96 = Math.sqrt(maxPrice) * 2 ** 96;
 

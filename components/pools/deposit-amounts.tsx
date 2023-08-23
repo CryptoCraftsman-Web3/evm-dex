@@ -15,6 +15,8 @@ type DepositAmountProps = {
   currentPrice: number;
   isPoolInitialized: boolean;
   validPriceRange: boolean;
+  minPrice: number;
+  maxPrice: number;
 };
 
 const DepositAmounts = ({
@@ -28,6 +30,8 @@ const DepositAmounts = ({
   currentPrice,
   isPoolInitialized,
   validPriceRange,
+  minPrice,
+  maxPrice,
 }: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
 
@@ -47,7 +51,10 @@ const DepositAmounts = ({
     enabled: tokenB !== null && userAddress !== undefined,
   });
 
-  const exchangeRate = isPoolInitialized ? currentPrice : startingPrice;
+  const liquidityAtOneOfA = 1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
+  const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(minPrice));
+
+  const exchangeRate = isPoolInitialized ? amountBAtOneA : startingPrice;
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
@@ -58,11 +65,13 @@ const DepositAmounts = ({
   const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
 
   useEffect(() => {
-    if (amountA > tokenAMax) setAmountA(tokenAMax);
-    if (amountB > tokenBMax) setAmountB(tokenBMax);
-  }, [exchangeRate, tokenABalance, tokenBBalance]);
+    const newAmountA = amountA > tokenAMax ? tokenAMax : amountA;
+    let newAmountB = newAmountA * exchangeRate;
+    if (newAmountB > tokenBMax) newAmountB = tokenBMax;
 
-  console.log('exchangeRate', exchangeRate);
+    setAmountA(newAmountA);
+    setAmountB(newAmountB);
+  }, [exchangeRate, tokenABalance, tokenBBalance]);
 
   return (
     <FormControl

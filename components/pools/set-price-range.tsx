@@ -74,7 +74,6 @@ const SetPriceRange = ({
   useEffect(() => {
     const _currentPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
     setCurrentPrice(_currentPrice);
-    console.log(slot0, _currentPrice);
   }, [slot0])
 
   return (
