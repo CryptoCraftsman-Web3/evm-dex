@@ -25,18 +25,19 @@ import { useAccount, useContractRead, useContractReads, useNetwork } from 'wagmi
 import { toast } from 'react-toastify';
 import SelectFeeTier from './select-fee-tier';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { iUniswapV3PoolABI, uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { zeroAddress } from 'viem';
-import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { IoIosClose } from 'react-icons/io';
 import StartingPrice from './starting-price';
 import SetPriceRange from './set-price-range';
 import DepositAmounts from './deposit-amounts';
 import PoolButtons from './pool-buttons';
-import { TickMath, computePoolAddress, nearestUsableTick } from '@uniswap/v3-sdk';
-import JSBI from 'jsbi';
 
-const NewLiquidityPosition = () => {
+type NewLiquidityPositionProps = {
+  refetchPoolsCount: () => void;
+};
+
+const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) => {
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -97,6 +98,8 @@ const NewLiquidityPosition = () => {
     setAmountA(0);
     setAmountB(0);
     handleClose();
+
+    refetchPoolsCount();
   };
 
   return (

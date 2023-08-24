@@ -7,21 +7,15 @@ import { useAccount, useContractRead, useContractReads } from 'wagmi';
 import Pool from './pool';
 import { useState } from 'react';
 
-const PoolsList = () => {
+type PoolsListProps = {
+  poolsCount: bigint;
+  isGettingPoolsCount: boolean;
+  refetchPoolsCount: () => void;
+};
+
+const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: PoolsListProps) => {
   const { nfPositionManager } = useSwapProtocolAddresses();
   const { address } = useAccount();
-
-  const {
-    data: poolsCount,
-    isLoading: isGettingPoolsCount,
-    refetch: getPoolsCount,
-  } = useContractRead({
-    address: nfPositionManager,
-    abi: nonfungiblePositionManagerABI,
-    functionName: 'balanceOf',
-    args: [address!],
-    enabled: address !== undefined,
-  });
 
   const tokenIdContracts = Array(Number(poolsCount))
     .fill(0)
@@ -132,11 +126,17 @@ const PoolsList = () => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h6">You have {positions.length} positions</Typography>
+            {hideClosedPositions ? (
+              <Typography variant="h6">
+                You have {positions.filter((p) => p.liquidity > 0n).length} open positions
+              </Typography>
+            ) : (
+              <Typography variant="h6">You have {positions.length} positions</Typography>
+            )}
 
             <Link
               onClick={toggleHideClosedPositions}
-              sx={{ cursor: 'pointer', textDecoration: 'none' }}
+              sx={{ cursor: 'pointer', textDecoration: 'none', textAlign: 'right' }}
             >
               {hideClosedPositions ? 'Show Closed Positions' : 'Hide Closed Positions'}
             </Link>

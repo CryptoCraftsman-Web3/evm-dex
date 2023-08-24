@@ -1,5 +1,6 @@
 import { Position, Token } from '@/types/common';
 import { Stack, Typography } from '@mui/material';
+import { TickMath } from '@uniswap/v3-sdk';
 import { erc20ABI, useContractReads } from 'wagmi';
 
 type PoolProps = {
@@ -61,6 +62,9 @@ const Pool = ({ position, hideClosedPositions }: PoolProps) => {
     name: tokenPairDetailsResult?.[5].result as string,
   };
 
+  const minPrice = 1.0001 ** position.tickLower / 10 ** (tokenB.decimals - tokenA.decimals);
+  const maxPrice = 1.0001 ** position.tickUpper / 10 ** (tokenB.decimals - tokenA.decimals);
+
   return hideClosedPositions && position.liquidity === 0n ? null : (
     <Stack
       direction="row"
@@ -69,7 +73,7 @@ const Pool = ({ position, hideClosedPositions }: PoolProps) => {
     >
       <Stack
         direction="column"
-        spacing={1}
+        spacing={0}
       >
         <Stack
           direction="row"
@@ -80,6 +84,41 @@ const Pool = ({ position, hideClosedPositions }: PoolProps) => {
             {tokenA.symbol}/{tokenB.symbol}
           </Typography>
           <Typography variant="body2">{position.fee / 10_000}% Fee</Typography>
+        </Stack>
+
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+        >
+          <Typography
+            variant="body2"
+            color="GrayText"
+          >
+            Min:
+          </Typography>
+
+          <Typography variant="body2">
+            {minPrice.toFixed(4)} {tokenB.symbol} per {tokenA.symbol}
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="GrayText"
+          >
+            ↔
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="GrayText"
+          >
+            Max:
+          </Typography>
+
+          <Typography variant="body2">
+            {maxPrice.toFixed(4)} {tokenB.symbol} per {tokenA.symbol}
+          </Typography>
         </Stack>
       </Stack>
 

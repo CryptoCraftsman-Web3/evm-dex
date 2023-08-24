@@ -1,15 +1,32 @@
 'use client';
 
 import { Alert, Box, Button, Card, Paper, Stack, Typography } from '@mui/material';
-import { useAccount } from 'wagmi';
+import { useAccount, useContractRead } from 'wagmi';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
 import { useModal } from 'connectkit';
 import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
 import PoolsList from '@/components/pools/pools-list';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 
 const PoolsClientPage = () => {
   const { isConnected } = useAccount();
   const { setOpen: setConnectWalletOpen } = useModal();
+
+  const { nfPositionManager } = useSwapProtocolAddresses();
+  const { address } = useAccount();
+
+  const {
+    data: poolsCount,
+    isLoading: isGettingPoolsCount,
+    refetch: refetchPoolsCount,
+  } = useContractRead({
+    address: nfPositionManager,
+    abi: nonfungiblePositionManagerABI,
+    functionName: 'balanceOf',
+    args: [address!],
+    enabled: address !== undefined,
+  });
 
   return (
     <Box
@@ -22,7 +39,7 @@ const PoolsClientPage = () => {
       <Stack
         direction="column"
         spacing={4}
-        width={{ xs: '100%', md: '600px' }}
+        width={{ xs: '100%', md: '600px', lg: '800px' }}
       >
         <Stack
           direction="row"
@@ -33,17 +50,22 @@ const PoolsClientPage = () => {
             <b>Pools</b>
           </Typography>
 
-          <NewLiquidityPosition />
+          <NewLiquidityPosition refetchPoolsCount={refetchPoolsCount} />
         </Stack>
 
         <Paper
           variant="outlined"
           sx={{
             p: { xs: 2, md: 4 },
+            w: { xs: '100%', md: '600px', lg: '800px' }
           }}
         >
           {isConnected ? (
-            <PoolsList />
+            <PoolsList
+              poolsCount={poolsCount || 0n}
+              isGettingPoolsCount={isGettingPoolsCount}
+              refetchPoolsCount={refetchPoolsCount}
+            />
           ) : (
             <Stack
               direction="column"
