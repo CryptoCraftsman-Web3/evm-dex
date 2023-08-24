@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, Paper, Stack, Typography } from '@mui/material';
 import { useAccount } from 'wagmi';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
 import { useModal } from 'connectkit';
@@ -36,7 +36,7 @@ const PoolsClientPage = () => {
           <NewLiquidityPosition />
         </Stack>
 
-        <Card
+        <Paper
           variant="outlined"
           sx={{
             p: { xs: 2, md: 4 },
@@ -63,7 +63,7 @@ const PoolsClientPage = () => {
               </Button>
             </Stack>
           )}
-        </Card>
+        </Paper>
       </Stack>
     </Box>
   );

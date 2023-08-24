@@ -1,16 +1,21 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Stack } from '@mui/material';
+import { Button, Divider, Link, Stack, Typography } from '@mui/material';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractRead, useContractReads } from 'wagmi';
 import Pool from './pool';
+import { useState } from 'react';
 
 const PoolsList = () => {
   const { nfPositionManager } = useSwapProtocolAddresses();
   const { address } = useAccount();
 
-  const { data: poolsCount, isLoading: isGettingPoolsCount, refetch: getPoolsCount } = useContractRead({
+  const {
+    data: poolsCount,
+    isLoading: isGettingPoolsCount,
+    refetch: getPoolsCount,
+  } = useContractRead({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'balanceOf',
@@ -27,18 +32,22 @@ const PoolsList = () => {
         functionName: 'tokenOfOwnerByIndex',
         args: [address || zeroAddress, i],
       };
-    });
+    })
+    .reverse();
 
   const { data: tokenIdResults, isLoading: isGettingTokenIds } = useContractReads({
     contracts: tokenIdContracts,
     enabled: address !== undefined,
   });
 
-  const tokenIds = tokenIdResults !== undefined ? tokenIdResults
-    .map((t) => {
-      return t.status === 'success' ? (t.result as bigint) : undefined;
-    })
-    .filter((t) => t !== undefined) as bigint[] : [];
+  const tokenIds =
+    tokenIdResults !== undefined
+      ? (tokenIdResults
+          .map((t) => {
+            return t.status === 'success' ? (t.result as bigint) : undefined;
+          })
+          .filter((t) => t !== undefined) as bigint[])
+      : [];
 
   const { data: positionResults, isLoading: isGettingPositions } = useContractReads({
     contracts: tokenIds.map((tokenId) => {
@@ -51,10 +60,9 @@ const PoolsList = () => {
     }),
     enabled: tokenIds.length > 0,
   });
-  console.log(positionResults);
 
   const positions: Position[] = [];
-  for (const positionResult of positionResults?.reverse() || []) {
+  for (const positionResult of positionResults || []) {
     if (positionResult.status === 'failure') continue;
 
     const result = positionResult.result as [
@@ -88,10 +96,43 @@ const PoolsList = () => {
     });
   }
 
+  const [hideClosedPositions, setHideClosedPositions] = useState<boolean>(
+    window?.localStorage?.getItem('hideClosedPositions') === 'true' || false
+  );
+
+  const toggleHideClosedPositions = () => {
+    // persist in local storage
+    window?.localStorage?.setItem('hideClosedPositions', (!hideClosedPositions).toString());
+    setHideClosedPositions(!hideClosedPositions);
+  };
+
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack
+      direction="column"
+      spacing={2}
+    >
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Typography variant="h6">You have {positions.length} positions</Typography>
+
+        <Link onClick={toggleHideClosedPositions} sx={{ cursor: 'pointer', textDecoration: 'none' }}>
+          {hideClosedPositions ? 'Show Closed Positions' : 'Hide Closed Positions'}
+        </Link>
+      </Stack>
+
+      <Divider />
+
       {positions.map((position, index) => {
-        return <Pool key={index} position={position} />;
+        return (
+          <Pool
+            key={index}
+            position={position}
+            hideClosedPositions={hideClosedPositions}
+          />
+        );
       })}
     </Stack>
   );
