@@ -86,6 +86,19 @@ const NewLiquidityPosition = () => {
   const isPoolInitialized = pool !== zeroAddress && pool !== undefined;
   const validPriceRange = minPrice < maxPrice && minPrice > 0 && maxPrice > 0;
 
+  const resetAndClose = () => {
+    setTokenA(null);
+    setTokenB(null);
+    setFeeTier(config.feeTiers[0]);
+    setStartingPrice(0);
+    setCurrentPrice(0);
+    setMinPrice(0);
+    setMaxPrice(0);
+    setAmountA(0);
+    setAmountB(0);
+    handleClose();
+  };
+
   return (
     <>
       <Button
@@ -243,6 +256,7 @@ const NewLiquidityPosition = () => {
                 startingPrice={startingPrice}
                 currentPrice={currentPrice}
                 isPoolInitialized={isPoolInitialized}
+                resetAndClose={resetAndClose}
               />
             </Stack>
             {/* end of column 2 in desktop layout */}

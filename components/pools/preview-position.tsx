@@ -58,6 +58,7 @@ type PreviewPositionProps = {
   startingPrice: number;
   currentPrice: number;
   isPoolInitialized: boolean;
+  resetAndClose: () => void;
 };
 
 const PreviewPosition = ({
@@ -72,6 +73,7 @@ const PreviewPosition = ({
   startingPrice,
   currentPrice,
   isPoolInitialized,
+  resetAndClose,
 }: PreviewPositionProps) => {
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [open, setOpen] = useState(false);
@@ -177,6 +179,9 @@ const PreviewPosition = ({
   const tickUpper =
     tick && tickSpacing ? nearestUsableTick(maxPriceTargetTick, tickSpacing) + tickSpacing * 2 : TickMath.MAX_TICK;
 
+  const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
+  const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
+
   const { config: mintTxConfig } = usePrepareContractWrite({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
@@ -188,8 +193,8 @@ const PreviewPosition = ({
         fee: feeTier.value,
         tickLower,
         tickUpper,
-        amount0Desired: parseUnits(amountA.toString(), tokenA?.decimals || 18),
-        amount1Desired: parseUnits(amountB.toString(), tokenB?.decimals || 18),
+        amount0Desired: isAmountAValid ? parseUnits(amountA.toString(), tokenA?.decimals || 18) : 0n,
+        amount1Desired: isAmountBValid ? parseUnits(amountB.toString(), tokenB?.decimals || 18) : 0n,
         amount0Min: 0n,
         amount1Min: 0n,
         recipient: address ? address : zeroAddress,
@@ -213,6 +218,8 @@ const PreviewPosition = ({
   useEffect(() => {
     if (mintTxSuccess) {
       toast('Position minted successfully', { type: 'success' });
+      handleClose();
+      resetAndClose();
     }
 
     if (mintTxError) {

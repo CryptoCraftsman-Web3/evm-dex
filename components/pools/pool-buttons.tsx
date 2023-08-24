@@ -26,6 +26,7 @@ type PoolButtonsProps = {
   startingPrice: number;
   currentPrice: number;
   isPoolInitialized: boolean;
+  resetAndClose: () => void;
 };
 
 const PoolButtons = ({
@@ -39,6 +40,7 @@ const PoolButtons = ({
   startingPrice,
   currentPrice,
   isPoolInitialized,
+  resetAndClose
 }: PoolButtonsProps) => {
   const { address: userAddress } = useAccount();
   const { nfPositionManager } = useSwapProtocolAddresses();
@@ -74,8 +76,11 @@ const PoolButtons = ({
   const allowanceA = (allowances?.[0].result as bigint) || 0n;
   const allowanceB = (allowances?.[1].result as bigint) || 0n;
 
-  const amountAInWei = amountA ? BigInt(amountA * 10 ** (tokenA?.decimals ?? 18)) : 0n;
-  const amountBInWei = amountB ? BigInt(amountB * 10 ** (tokenB?.decimals ?? 18)) : 0n;
+  const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
+  const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
+
+  const amountAInWei = isAmountAValid ? BigInt(amountA * 10 ** (tokenA?.decimals ?? 18)) : 0n;
+  const amountBInWei = isAmountBValid ? BigInt(amountB * 10 ** (tokenB?.decimals ?? 18)) : 0n;
 
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
@@ -189,6 +194,7 @@ const PoolButtons = ({
         startingPrice={startingPrice}
         currentPrice={currentPrice}
         isPoolInitialized={isPoolInitialized}
+        resetAndClose={resetAndClose}
       />
     </Stack>
   );
