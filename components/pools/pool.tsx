@@ -67,10 +67,21 @@ const Pool = ({ position, hideClosedPositions }: PoolProps) => {
       justifyContent="space-between"
       alignItems="center"
     >
-      <Typography variant="h6">
-        {tokenA.symbol}/{tokenB.symbol}
-      </Typography>
-      <Typography variant="body1">{position.fee / 10_000}% Fee</Typography>
+      <Stack
+        direction="column"
+        spacing={1}
+      >
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+        >
+          <Typography variant="h6">
+            {tokenA.symbol}/{tokenB.symbol}
+          </Typography>
+          <Typography variant="body2">{position.fee / 10_000}% Fee</Typography>
+        </Stack>
+      </Stack>
 
       <Typography
         variant="body1"
