@@ -1,7 +1,7 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Button, Divider, Link, Stack, Typography } from '@mui/material';
+import { Button, Divider, Link, Skeleton, Stack, Typography } from '@mui/material';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractRead, useContractReads } from 'wagmi';
 import Pool from './pool';
@@ -111,29 +111,50 @@ const PoolsList = () => {
       direction="column"
       spacing={2}
     >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Typography variant="h6">You have {positions.length} positions</Typography>
+      {isGettingPoolsCount || isGettingTokenIds || isGettingPositions ? (
+        <>
+          {Array(14)
+            .fill(0)
+            .map((_, index) => {
+              return (
+                <Skeleton
+                  key={index}
+                  variant="rounded"
+                  width="100%"
+                />
+              );
+            })}
+        </>
+      ) : (
+        <>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h6">You have {positions.length} positions</Typography>
 
-        <Link onClick={toggleHideClosedPositions} sx={{ cursor: 'pointer', textDecoration: 'none' }}>
-          {hideClosedPositions ? 'Show Closed Positions' : 'Hide Closed Positions'}
-        </Link>
-      </Stack>
+            <Link
+              onClick={toggleHideClosedPositions}
+              sx={{ cursor: 'pointer', textDecoration: 'none' }}
+            >
+              {hideClosedPositions ? 'Show Closed Positions' : 'Hide Closed Positions'}
+            </Link>
+          </Stack>
 
-      <Divider />
+          <Divider />
 
-      {positions.map((position, index) => {
-        return (
-          <Pool
-            key={index}
-            position={position}
-            hideClosedPositions={hideClosedPositions}
-          />
-        );
-      })}
+          {positions.map((position, index) => {
+            return (
+              <Pool
+                key={index}
+                position={position}
+                hideClosedPositions={hideClosedPositions}
+              />
+            );
+          })}
+        </>
+      )}
     </Stack>
   );
 };
