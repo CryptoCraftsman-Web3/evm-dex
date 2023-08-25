@@ -13,6 +13,7 @@ export type FeeTier = {
 };
 
 export type Position = {
+  tokenId: bigint;
   nonce: bigint;
   operator: '0x${string}';
   token0: '0x${string}';

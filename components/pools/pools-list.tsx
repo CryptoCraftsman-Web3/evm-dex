@@ -1,9 +1,9 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Button, Divider, Link, Skeleton, Stack, Typography } from '@mui/material';
+import { Divider, Link, Skeleton, Stack, Typography } from '@mui/material';
 import { zeroAddress } from 'viem';
-import { useAccount, useContractRead, useContractReads } from 'wagmi';
+import { useAccount, useContractReads } from 'wagmi';
 import Pool from './pool';
 import { useState } from 'react';
 
@@ -56,7 +56,10 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
   });
 
   const positions: Position[] = [];
-  for (const positionResult of positionResults || []) {
+  for (let i = 0; i < tokenIds.length; i++) {
+    const tokenId = tokenIds[i];
+    const positionResult = positionResults?.[i];
+    if (positionResult === undefined) continue;
     if (positionResult.status === 'failure') continue;
 
     const result = positionResult.result as [
@@ -75,6 +78,7 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
     ];
 
     positions.push({
+      tokenId,
       nonce: result[0],
       operator: result[1],
       token0: result[2],
@@ -148,6 +152,7 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
             return (
               <Pool
                 key={index}
+                tokenId={position.tokenId}
                 position={position}
                 hideClosedPositions={hideClosedPositions}
               />
