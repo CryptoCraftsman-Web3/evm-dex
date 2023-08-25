@@ -3,18 +3,21 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Alert, Button, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Button, Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
-import { zeroAddress } from 'viem';
-import { erc20ABI, useContractRead } from 'wagmi';
+import { formatUnits, zeroAddress } from 'viem';
+import { erc20ABI, useAccount, useContractRead, useNetwork, usePublicClient } from 'wagmi';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { IoLink } from 'react-icons/io5';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
 };
 
 const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPageProps) => {
+  const { chain } = useNetwork();
+  const { address } = useAccount();
   const { nfPositionManager, poolFactory } = useSwapProtocolAddresses();
 
   const { data: positionResult, isLoading: gettingPosition } = useContractRead({
@@ -92,13 +95,49 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   const sqrtPriceX96 = slot0?.[0] || 0n;
   const currentTick = slot0?.[1] || 0;
 
-  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2)
-  console.log(sqrtPriceX96, currentTick, price);
+  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
 
   const minPrice =
     tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickLower / 10 ** (tokenBDecimals - tokenADecimals) : 0;
   const maxPrice =
     tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickUpper / 10 ** (tokenBDecimals - tokenADecimals) : 0;
+
+  const sqrtRatioA = Math.sqrt(1.0001 ** position.tickLower);
+  const sqrtRatioB = Math.sqrt(1.0001 ** position.tickUpper);
+  const sqrtPrice = Number(sqrtPriceX96) / 2 ** 96;
+
+  let amountAInWei = 0;
+  let amountBInWei = 0;
+  if (currentTick <= position.tickLower) {
+    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB)));
+  } else if (currentTick > position.tickUpper) {
+    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtRatioB - sqrtRatioA));
+  } else if (currentTick >= position.tickLower && currentTick < position.tickUpper) {
+    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB)));
+    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtPrice - sqrtRatioA));
+  }
+
+  const amountAFormatted = (amountAInWei / 10 ** (tokenADecimals || 18)).toLocaleString(undefined, {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+  });
+  const amountBFormatted = (amountBInWei / 10 ** (tokenBDecimals || 18)).toLocaleString(undefined, {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
+  });
+
+  // we need to use ethers.js to get the amount of uncollected fees
+  // this is because wagmi/viem does not have callstatic support
+
+  // const provider = useEthersProvider();
+  // const nfPositionManagerContract = new ethers.Contract(nfPositionManager, nonfungiblePositionManagerABI, provider);
+
+  // nfPositionManagerContract.callStatic.collect({
+  //   tokenId,
+  //   recipient: address,
+  //   amount0Max: 0,
+  //   amount1Max: 0,
+  // });
 
   const isLoading =
     gettingPosition ||
@@ -137,6 +176,12 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
             variant="rounded"
             width="100%"
             height={50}
+          />
+
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={150}
           />
         </>
       ) : (
@@ -202,7 +247,51 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
             >
               <Typography variant="h6">Liquidity</Typography>
 
-              <Typography variant="body1"></Typography>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <a href={`${chain?.blockExplorers?.default}/address/${position.token0}`}>
+                  <Typography
+                    variant="body1"
+                    display="flex"
+                    alignItems="center"
+                    sx={{
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    {tokenASymbol} ({tokenAName}) &nbsp; <IoLink />
+                  </Typography>
+                </a>
+
+                <Typography variant="body1">{amountAFormatted}</Typography>
+              </Stack>
+
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <a href={`${chain?.blockExplorers?.default}/address/${position.token1}`}>
+                  <Typography
+                    variant="body1"
+                    display="flex"
+                    alignItems="center"
+                    sx={{
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    {tokenBSymbol} ({tokenBName}) &nbsp; <IoLink />
+                  </Typography>
+                </a>
+
+                <Typography variant="body1">{amountBFormatted}</Typography>
+              </Stack>
             </Stack>
           </Paper>
         </>
