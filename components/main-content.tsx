@@ -18,7 +18,7 @@ const MainContent = ({ children }: MainContentProps) => {
       >
         <Stack
           direction="column"
-          spacing={4}
+          spacing={2}
           width={{ xs: '100%', md: '600px', lg: '800px' }}
         >
           {children}

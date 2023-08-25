@@ -16,7 +16,7 @@ const wagmiConfig = createConfig(
     infuraId: process.env.NEXT_PUBLIC_INFURA_API_KEY,
     walletConnectProjectId: process.env.NEXT_PUBLIC_WC_PID,
     appName: 'StaykX EVM Dex',
-    chains: [xrplDevnet, sepolia],
+    chains: [sepolia, xrplDevnet],
   })
 );
 

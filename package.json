@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3185",
+    "dev-turbo": "next dev -p 3185 --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -15,9 +15,9 @@ export type FeeTier = {
 export type Position = {
   tokenId: bigint;
   nonce: bigint;
-  operator: '0x${string}';
-  token0: '0x${string}';
-  token1: '0x${string}';
+  operator: `0x${string}`;
+  token0: `0x${string}`;
+  token1: `0x${string}`;
   fee: number;
   tickLower: number;
   tickUpper: number;
