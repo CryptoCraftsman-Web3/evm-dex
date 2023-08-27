@@ -4,8 +4,7 @@ import { ethers } from 'ethers';
 export const useEthersProvider = () => {
   const { chain } = useNetwork();
   if (!chain) return null;
-
-  if (chain.id === 11155111 && process.env.VERCEL_ENV === 'development') {
+  if (chain.id === 11155111 && window?.location?.hostname === 'localhost') {
     // sepolia testnet running locally
     return new ethers.providers.InfuraProvider(11155111, process.env.NEXT_PUBLIC_INFURA_API_KEY);
   }
