@@ -5,8 +5,10 @@ export const useEthersProvider = () => {
   const { chain } = useNetwork();
   if (!chain) return null;
 
-  if (chain.id === 11155111)
+  if (chain.id === 11155111 && process.env.VERCEL_ENV === 'development') {
+    // sepolia testnet running locally
     return new ethers.providers.InfuraProvider(11155111, process.env.NEXT_PUBLIC_INFURA_API_KEY);
+  }
 
   const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls.public.http[0]);
   return provider;
