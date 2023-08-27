@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
@@ -10,6 +11,9 @@ import { erc20ABI, useAccount, useContractRead, useNetwork, usePublicClient } fr
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { IoLink } from 'react-icons/io5';
+import { useEthersProvider } from '@/lib/ethers';
+import { ethers, BigNumber } from 'ethers';
+import { isConstructorDeclaration } from 'typescript';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
@@ -129,15 +133,29 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   // we need to use ethers.js to get the amount of uncollected fees
   // this is because wagmi/viem does not have callstatic support
 
-  // const provider = useEthersProvider();
-  // const nfPositionManagerContract = new ethers.Contract(nfPositionManager, nonfungiblePositionManagerABI, provider);
+  const provider = useEthersProvider();
+  const nfPositionManagerContract = new ethers.Contract(
+    nfPositionManager,
+    nonfungiblePositionManagerABI,
+    provider || ethers.getDefaultProvider()
+  );
 
-  // nfPositionManagerContract.callStatic.collect({
-  //   tokenId,
-  //   recipient: address,
-  //   amount0Max: 0,
-  //   amount1Max: 0,
-  // });
+  const [tokenAUnclaimedFees, setTokenAUnclaimedFees] = useState<number>(0);
+  const [tokenBUnclaimedFees, setTokenBUnclaimedFees] = useState<number>(0);
+
+  useEffect(() => {
+    nfPositionManagerContract.callStatic
+      .collect({
+        tokenId,
+        recipient: address,
+        amount0Max: BigNumber.from(2).pow(128).sub(1),
+        amount1Max: BigNumber.from(2).pow(128).sub(1),
+      })
+      .then((result: { amount0: BigNumber; amount1: BigNumber }) => {
+        setTokenAUnclaimedFees(Number(formatUnits(result.amount0.toBigInt(), tokenADecimals || 18)));
+        setTokenBUnclaimedFees(Number(formatUnits(result.amount1.toBigInt(), tokenBDecimals || 18)));
+      });
+  }, []);
 
   const isLoading =
     gettingPosition ||
@@ -252,7 +270,11 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <a href={`${chain?.blockExplorers?.default}/address/${position.token0}`}>
+                <a
+                  href={`${chain?.blockExplorers?.default.url}/address/${position.token0}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Typography
                     variant="body1"
                     display="flex"
@@ -275,7 +297,11 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <a href={`${chain?.blockExplorers?.default}/address/${position.token1}`}>
+                <a
+                  href={`${chain?.blockExplorers?.default.url}/address/${position.token1}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Typography
                     variant="body1"
                     display="flex"
