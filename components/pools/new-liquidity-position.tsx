@@ -73,8 +73,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
 
-  const { poolFactory, nfPositionManager } = useSwapProtocolAddresses();
-  const { chain } = useNetwork();
+  const { poolFactory } = useSwapProtocolAddresses();
 
   const { data: pool, refetch: refetchPool } = useContractRead({
     address: poolFactory,
