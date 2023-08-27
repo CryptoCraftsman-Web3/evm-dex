@@ -14,6 +14,7 @@ import { IoLink } from 'react-icons/io5';
 import { useEthersProvider } from '@/lib/ethers';
 import { ethers, BigNumber } from 'ethers';
 import { isConstructorDeclaration } from 'typescript';
+import ClaimFees from '@/components/pools/claim-fees';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
@@ -142,8 +143,10 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
 
   const [tokenAUnclaimedFees, setTokenAUnclaimedFees] = useState<number>(0);
   const [tokenBUnclaimedFees, setTokenBUnclaimedFees] = useState<number>(0);
+  const [gettingUnclaimedFees, setGettingUnclaimedFees] = useState<boolean>(false);
 
-  useEffect(() => {
+  const getUnclaimedFees = () => {
+    setGettingUnclaimedFees(true);
     nfPositionManagerContract.callStatic
       .collect({
         tokenId,
@@ -154,7 +157,12 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
       .then((result: { amount0: BigNumber; amount1: BigNumber }) => {
         setTokenAUnclaimedFees(Number(formatUnits(result.amount0.toBigInt(), tokenADecimals || 18)));
         setTokenBUnclaimedFees(Number(formatUnits(result.amount1.toBigInt(), tokenBDecimals || 18)));
-      });
+      })
+      .finally(() => setGettingUnclaimedFees(false));
+  };
+
+  useEffect(() => {
+    getUnclaimedFees();
   }, []);
 
   const tokenAUnclaimedFeesFormatted = tokenAUnclaimedFees.toLocaleString(undefined, {
@@ -175,7 +183,9 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
     gettingToken1Symbol ||
     gettingToken1Decimals ||
     gettingToken1Name ||
-    gettingPool;
+    gettingPool ||
+    gettingSlot0 ||
+    gettingUnclaimedFees;
 
   return (
     <>
@@ -205,6 +215,35 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
             width="100%"
             height={50}
           />
+
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={150}
+          />
+
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={150}
+          />
+
+          <Stack
+            direction="row"
+            spacing={2}
+          >
+            <Skeleton
+              variant="rounded"
+              width="49%"
+              height={150}
+            />
+
+            <Skeleton
+              variant="rounded"
+              width="49%"
+              height={150}
+            />
+          </Stack>
 
           <Skeleton
             variant="rounded"
@@ -347,12 +386,15 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 alignItems="center"
               >
                 <Typography variant="h6">Unclaimed Fees</Typography>
-                <Button
-                  variant="contained"
-                  size="large"
-                >
-                  Claim Fees
-                </Button>
+
+                <ClaimFees
+                  tokenASymbol={tokenASymbol || ''}
+                  tokenBSymbol={tokenBSymbol || ''}
+                  tokenAUnclaimedAmount={tokenAUnclaimedFees}
+                  tokenBUnclaimedAmount={tokenBUnclaimedFees}
+                  positionTokenId={tokenId}
+                  getUnclaimedFees={getUnclaimedFees}
+                />
               </Stack>
 
               <Stack
