@@ -289,6 +289,8 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               pt={{ xs: 2, md: 'initial' }}
             >
               <AddLiquidity
+                tokenAAddress={position.token0}
+                tokenBAddress={position.token1}
                 tokenASymbol={tokenASymbol || ''}
                 tokenBSymbol={tokenBSymbol || ''}
                 tokenADecimals={tokenADecimals || 18}
