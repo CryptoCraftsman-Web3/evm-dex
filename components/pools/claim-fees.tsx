@@ -106,6 +106,7 @@ const ClaimFees = ({
         variant="contained"
         color="primary"
         onClick={handleOpen}
+        size="large"
       >
         Claim Fees
       </Button>
