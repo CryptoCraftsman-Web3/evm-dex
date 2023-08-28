@@ -15,6 +15,7 @@ import { useEthersProvider } from '@/lib/ethers';
 import { ethers, BigNumber } from 'ethers';
 import { isConstructorDeclaration } from 'typescript';
 import ClaimFees from '@/components/pools/claim-fees';
+import AddLiquidity from '@/components/pools/add-liquidity';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
@@ -123,17 +124,16 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   }
 
   const amountAFormatted = (amountAInWei / 10 ** (tokenADecimals || 18)).toLocaleString(undefined, {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
   });
   const amountBFormatted = (amountBInWei / 10 ** (tokenBDecimals || 18)).toLocaleString(undefined, {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
   });
 
   // we need to use ethers.js to get the amount of uncollected fees
   // this is because wagmi/viem does not have callstatic support
-
   const provider = useEthersProvider();
   const nfPositionManagerContract = new ethers.Contract(
     nfPositionManager,
@@ -166,13 +166,13 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   }, []);
 
   const tokenAUnclaimedFeesFormatted = tokenAUnclaimedFees.toLocaleString(undefined, {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
   });
 
   const tokenBUnclaimedFeesFormatted = tokenBUnclaimedFees.toLocaleString(undefined, {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
   });
 
   const isLoading =
@@ -254,8 +254,9 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
       ) : (
         <>
           <Stack
-            direction="row"
-            justifyContent="space-between"
+            direction={{ xs: 'column', md: 'row' }}
+            justifyContent={{ xs: 'flex-start', md: 'space-between' }}
+            alignItems="center"
           >
             <Stack
               direction="row"
@@ -285,13 +286,20 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               spacing={1}
               alignItems="center"
               justifyContent="flex-end"
+              pt={{ xs: 2, md: 'initial' }}
             >
-              <Button
-                variant="outlined"
-                size="large"
-              >
-                Add Liquidity
-              </Button>
+              <AddLiquidity
+                tokenASymbol={tokenASymbol || ''}
+                tokenBSymbol={tokenBSymbol || ''}
+                tokenADecimals={tokenADecimals || 18}
+                tokenBDecimals={tokenBDecimals || 18}
+                amountAInWei={amountAInWei}
+                amountBInWei={amountBInWei}
+                fee={position.fee}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                currentPrice={price}
+              />
 
               <Button
                 variant="contained"
@@ -463,7 +471,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               variant="outlined"
               sx={{
                 padding: 2,
-                minWidth: '49%',
+                minWidth: { xs: '47%', md: '49%'},
               }}
             >
               <Stack
@@ -479,7 +487,12 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 </Typography>
 
                 <Typography variant="body1">
-                  <strong>{minPrice.toFixed(4)}</strong>
+                  <strong>
+                    {minPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 8,
+                      maximumFractionDigits: 8,
+                    })}
+                  </strong>
                 </Typography>
 
                 <Typography
@@ -494,7 +507,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               variant="outlined"
               sx={{
                 padding: 2,
-                minWidth: '49%',
+                minWidth: { xs: '47%', md: '49%'},
               }}
             >
               <Stack
@@ -510,7 +523,12 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 </Typography>
 
                 <Typography variant="body1">
-                  <strong>{maxPrice.toFixed(4)}</strong>
+                  <strong>
+                    {maxPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 8,
+                      maximumFractionDigits: 8,
+                    })}
+                  </strong>
                 </Typography>
 
                 <Typography
@@ -542,7 +560,12 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               </Typography>
 
               <Typography variant="body1">
-                <strong>{price.toFixed(4)}</strong>
+                <strong>
+                  {price.toLocaleString(undefined, {
+                    minimumFractionDigits: 8,
+                    maximumFractionDigits: 8,
+                  })}
+                </strong>
               </Typography>
 
               <Typography
