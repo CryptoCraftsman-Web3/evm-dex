@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
 import { Token } from '@/types/common';
 import { useEffect } from 'react';
 import { erc20ABI, useAccount, useContractRead } from 'wagmi';
@@ -17,6 +17,8 @@ type DepositAmountProps = {
   validPriceRange: boolean;
   minPrice: number;
   maxPrice: number;
+  showLabel?: boolean;
+  layout?: 'column' | 'row' | 'auto';
 };
 
 const DepositAmounts = ({
@@ -32,6 +34,8 @@ const DepositAmounts = ({
   validPriceRange,
   minPrice,
   maxPrice,
+  showLabel = true,
+  layout = 'auto'
 }: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
 
@@ -51,7 +55,8 @@ const DepositAmounts = ({
     enabled: tokenB !== null && userAddress !== undefined,
   });
 
-  const liquidityAtOneOfA = 1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
+  const liquidityAtOneOfA =
+    (1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice)) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
   const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(minPrice));
 
   const exchangeRate = isPoolInitialized ? amountBAtOneA : startingPrice;
@@ -78,13 +83,13 @@ const DepositAmounts = ({
       fullWidth
       disabled={!validPriceRange}
     >
-      <FormLabel sx={{ mb: 2 }}>Deposit Amounts</FormLabel>
+      {showLabel ? <FormLabel sx={{ mb: 2 }}>Deposit Amounts</FormLabel> : <Box sx={{ mb: 1 }} />}
       <Stack
         direction="column"
         spacing={2}
       >
         <Stack
-          direction={{ xs: 'column', md: 'row' }}
+          direction={ layout === 'auto' ? { xs: 'column', md: 'row' } : layout }
           spacing={2}
         >
           <Stack direction="column">

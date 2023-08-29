@@ -20,13 +20,21 @@ import {
 import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
-import { zeroAddress } from 'viem';
-import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { parseUnits, zeroAddress } from 'viem';
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 import { computePoolAddress } from '@uniswap/v3-sdk';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import DepositAmounts from './deposit-amounts';
 
 type AddLiquidityProps = {
+  positionTokenId: bigint;
   tokenAAddress: `0x${string}`;
   tokenBAddress: `0x${string}`;
   tokenASymbol: string;
@@ -39,9 +47,11 @@ type AddLiquidityProps = {
   minPrice: number;
   maxPrice: number;
   currentPrice: number;
+  refetchPosition: () => void;
 };
 
 const AddLiquidity = ({
+  positionTokenId,
   tokenAAddress,
   tokenBAddress,
   tokenASymbol,
@@ -54,6 +64,7 @@ const AddLiquidity = ({
   minPrice,
   maxPrice,
   currentPrice,
+  refetchPosition,
 }: AddLiquidityProps) => {
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
@@ -62,7 +73,7 @@ const AddLiquidity = ({
   const { address } = useAccount();
   const { chain } = useNetwork();
 
-  const { poolFactory } = useSwapProtocolAddresses();
+  const { poolFactory, nfPositionManager } = useSwapProtocolAddresses();
 
   const handleOpen = () => {
     if (!isConnected) {
@@ -117,6 +128,54 @@ const AddLiquidity = ({
 
   const isPoolInitialized = pool !== zeroAddress && pool !== undefined;
   const validPriceRange = minPrice < maxPrice && minPrice > 0 && maxPrice > 0;
+
+  const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
+  const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
+
+  const { config: increaseLiquidityTxConfig } = usePrepareContractWrite({
+    address: nfPositionManager,
+    abi: nonfungiblePositionManagerABI,
+    functionName: 'increaseLiquidity',
+    args: [
+      {
+        tokenId: positionTokenId,
+        amount0Desired: isAmountAValid ? parseUnits(amountA.toString(), tokenA?.decimals ?? 18) : 0n,
+        amount1Desired: isAmountBValid ? parseUnits(amountB.toString(), tokenB?.decimals ?? 18) : 0n,
+        amount0Min: 0n,
+        amount1Min: 0n,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
+      },
+    ],
+    value: 0n,
+    enabled: address !== undefined,
+  });
+
+  const {
+    data: increaseLiquidityTxData,
+    write: increaseLiquidity,
+    isLoading: isIncreasingLiquidity,
+  } = useContractWrite(increaseLiquidityTxConfig);
+
+  const {
+    isLoading: isIncreaseLiquidityTxWaiting,
+    isSuccess: isIncreaseLiquiditySuccess,
+    isError: isIncreaseLiquidityError,
+  } = useWaitForTransaction({
+    hash: increaseLiquidityTxData?.hash,
+    enabled: increaseLiquidityTxData?.hash !== undefined,
+  });
+
+  useEffect(() => {
+    if (isIncreaseLiquiditySuccess) {
+      toast('Added liquidity successfully', { type: 'success' });
+      handleClose();
+      refetchPosition();
+    }
+
+    if (isIncreaseLiquidityError) {
+      toast('Error adding liquidity', { type: 'error' });
+    }
+  }, [isIncreaseLiquiditySuccess, isIncreaseLiquidityError]);
 
   return (
     <>
@@ -215,7 +274,7 @@ const AddLiquidity = ({
 
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               justifyContent="space-between"
               alignItems="center"
             >
@@ -223,7 +282,7 @@ const AddLiquidity = ({
                 variant="outlined"
                 sx={{
                   padding: 2,
-                  minWidth: '49%',
+                  minWidth: { xs: '47%', md: '49%' },
                 }}
               >
                 <Stack
@@ -349,7 +408,25 @@ const AddLiquidity = ({
               validPriceRange={validPriceRange}
               minPrice={minPrice}
               maxPrice={maxPrice}
+              showLabel={false}
+              layout="column"
             />
+
+            <LoadingButton
+              variant="contained"
+              color="primary"
+              size="large"
+              fullWidth
+              disabled={amountA === 0 && amountB === 0}
+              loading={isIncreasingLiquidity || isIncreaseLiquidityTxWaiting}
+              onClick={() => {
+                console.log('increase liquidity');
+                console.log(increaseLiquidity);
+                if (increaseLiquidity) increaseLiquidity();
+              }}
+            >
+              Add Liquidity
+            </LoadingButton>
           </Stack>
         </DialogContent>
       </Dialog>

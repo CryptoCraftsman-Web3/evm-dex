@@ -26,7 +26,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   const { address } = useAccount();
   const { nfPositionManager, poolFactory } = useSwapProtocolAddresses();
 
-  const { data: positionResult, isLoading: gettingPosition } = useContractRead({
+  const { data: positionResult, isLoading: gettingPosition, refetch: refetchPosition } = useContractRead({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'positions',
@@ -289,6 +289,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
               pt={{ xs: 2, md: 'initial' }}
             >
               <AddLiquidity
+                positionTokenId={tokenId}
                 tokenAAddress={position.token0}
                 tokenBAddress={position.token1}
                 tokenASymbol={tokenASymbol || ''}
@@ -301,6 +302,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 currentPrice={price}
+                refetchPosition={refetchPosition}
               />
 
               <Button
