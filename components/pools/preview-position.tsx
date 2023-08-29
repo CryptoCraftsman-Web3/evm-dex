@@ -1,17 +1,10 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { FeeTier, Token } from '@/types/common';
-import { BigintIsh, CurrencyAmount, Percent, Price, Token as UniswapToken } from '@uniswap/sdk-core';
+import { Token as UniswapToken } from '@uniswap/sdk-core';
 import {
-  Position,
-  Pool,
   nearestUsableTick,
-  MintOptions,
-  NonfungiblePositionManager,
-  priceToClosestTick,
   TickMath,
-  FeeAmount,
   computePoolAddress,
-  TICK_SPACINGS,
 } from '@uniswap/v3-sdk';
 import {
   Button,
@@ -25,7 +18,6 @@ import {
   Stack,
   Paper,
   Divider,
-  Grid,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { IoIosClose } from 'react-icons/io';
@@ -35,8 +27,6 @@ import {
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
-  usePrepareSendTransaction,
-  useSendTransaction,
   useWaitForTransaction,
 } from 'wagmi';
 import { iUniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
