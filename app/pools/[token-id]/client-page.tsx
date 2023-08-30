@@ -13,9 +13,9 @@ import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-
 import { IoLink } from 'react-icons/io5';
 import { useEthersProvider } from '@/lib/ethers';
 import { ethers, BigNumber } from 'ethers';
-import { isConstructorDeclaration } from 'typescript';
-import ClaimFees from '@/components/pools/claim-fees';
+import ClaimFees from '@/components/pools/claim-tokens';
 import AddLiquidity from '@/components/pools/add-liquidity';
+import RemoveLiquidity from '@/components/pools/remove-liquidity';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
@@ -305,12 +305,18 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 refetchPosition={refetchPosition}
               />
 
-              <Button
-                variant="contained"
-                size="large"
-              >
-                Remove Liquidity
-              </Button>
+              <RemoveLiquidity
+                positionTokenId={tokenId}
+                positionLiquidity={position.liquidity}
+                tokenASymbol={tokenASymbol || ''}
+                tokenBSymbol={tokenBSymbol || ''}
+                tokenADecimals={tokenADecimals || 18}
+                tokenBDecimals={tokenBDecimals || 18}
+                tokenALiquidity={amountAInWei}
+                tokenBLiquidity={amountBInWei}
+                refetchPosition={refetchPosition}
+                getUnclaimedFees={getUnclaimedFees}
+              />
             </Stack>
           </Stack>
 

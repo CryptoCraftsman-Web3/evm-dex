@@ -1,3 +1,5 @@
+'use client';
+
 import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Token } from '@/types/common';
