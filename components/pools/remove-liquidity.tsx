@@ -110,7 +110,7 @@ const RemoveLiquidity = ({
 
   useEffect(() => {
     if (decreaseLiquidityTxSuccess) {
-      toast('Liquidity removed successfully and credited to unclaimed fees', { type: 'success' });
+      toast('Liquidity removed successfully and credited to unclaimed tokens', { type: 'success' });
       handleClose();
       refetchPosition();
       getUnclaimedTokens();
@@ -275,7 +275,7 @@ const RemoveLiquidity = ({
                 width="100%"
               >
                 Removing liquidity will withdraw your liquidity from the pool and credit the tokens to your unclaimed
-                fees balance
+                tokens balance
               </Typography>
             </Alert>
           </Stack>
