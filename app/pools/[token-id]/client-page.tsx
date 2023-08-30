@@ -13,7 +13,7 @@ import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-
 import { IoLink } from 'react-icons/io5';
 import { useEthersProvider } from '@/lib/ethers';
 import { ethers, BigNumber } from 'ethers';
-import ClaimFees from '@/components/pools/claim-tokens';
+import ClaimTokens from '@/components/pools/claim-tokens';
 import AddLiquidity from '@/components/pools/add-liquidity';
 import RemoveLiquidity from '@/components/pools/remove-liquidity';
 
@@ -145,7 +145,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   const [tokenBUnclaimedFees, setTokenBUnclaimedFees] = useState<number>(0);
   const [gettingUnclaimedFees, setGettingUnclaimedFees] = useState<boolean>(false);
 
-  const getUnclaimedFees = () => {
+  const getUnclaimedTokens = () => {
     setGettingUnclaimedFees(true);
     nfPositionManagerContract.callStatic
       .collect({
@@ -162,7 +162,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   };
 
   useEffect(() => {
-    getUnclaimedFees();
+    getUnclaimedTokens();
   }, []);
 
   const tokenAUnclaimedFeesFormatted = tokenAUnclaimedFees.toLocaleString(undefined, {
@@ -315,7 +315,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 tokenALiquidity={amountAInWei}
                 tokenBLiquidity={amountBInWei}
                 refetchPosition={refetchPosition}
-                getUnclaimedFees={getUnclaimedFees}
+                getUnclaimedTokens={getUnclaimedTokens}
               />
             </Stack>
           </Stack>
@@ -403,15 +403,15 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h6">Unclaimed Fees</Typography>
+                <Typography variant="h6">Unclaimed Tokens</Typography>
 
-                <ClaimFees
+                <ClaimTokens
                   tokenASymbol={tokenASymbol || ''}
                   tokenBSymbol={tokenBSymbol || ''}
                   tokenAUnclaimedAmount={tokenAUnclaimedFees}
                   tokenBUnclaimedAmount={tokenBUnclaimedFees}
                   positionTokenId={tokenId}
-                  getUnclaimedFees={getUnclaimedFees}
+                  getUnclaimedTokens={getUnclaimedTokens}
                 />
               </Stack>
 

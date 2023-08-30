@@ -34,7 +34,7 @@ type RemoveLiquidityProps = {
   tokenALiquidity: number;
   tokenBLiquidity: number;
   refetchPosition: () => void;
-  getUnclaimedFees: () => void;
+  getUnclaimedTokens: () => void;
 };
 
 const RemoveLiquidity = ({
@@ -47,7 +47,7 @@ const RemoveLiquidity = ({
   tokenALiquidity,
   tokenBLiquidity,
   refetchPosition,
-  getUnclaimedFees,
+  getUnclaimedTokens,
 }: RemoveLiquidityProps) => {
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
@@ -113,7 +113,7 @@ const RemoveLiquidity = ({
       toast('Liquidity removed successfully and credited to unclaimed fees', { type: 'success' });
       handleClose();
       refetchPosition();
-      getUnclaimedFees();
+      getUnclaimedTokens();
     }
 
     if (decreaseLiquidityTxError) {

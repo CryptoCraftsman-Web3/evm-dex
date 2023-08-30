@@ -20,23 +20,23 @@ import { toast } from 'react-toastify';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
-type ClaimFeesProps = {
+type ClaimTokensProps = {
   tokenASymbol: string;
   tokenBSymbol: string;
   tokenAUnclaimedAmount: number;
   tokenBUnclaimedAmount: number;
   positionTokenId: bigint;
-  getUnclaimedFees: () => void;
+  getUnclaimedTokens: () => void;
 };
 
-const ClaimFees = ({
+const ClaimTokens = ({
   tokenASymbol,
   tokenBSymbol,
   tokenAUnclaimedAmount,
   tokenBUnclaimedAmount,
   positionTokenId,
-  getUnclaimedFees,
-}: ClaimFeesProps) => {
+  getUnclaimedTokens,
+}: ClaimTokensProps) => {
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -61,7 +61,7 @@ const ClaimFees = ({
   };
 
   const { nfPositionManager } = useSwapProtocolAddresses();
-  const { config: claimFeeTxConfig } = usePrepareContractWrite({
+  const { config: claimTokensTxConfig } = usePrepareContractWrite({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'collect',
@@ -77,28 +77,28 @@ const ClaimFees = ({
     enabled: address !== undefined,
   });
 
-  const { data: claimFeeTxData, write: claimFee, isLoading: isClaimingFee } = useContractWrite(claimFeeTxConfig);
+  const { data: claimTokensTxData, write: claimTokens, isLoading: isClaimingTokens } = useContractWrite(claimTokensTxConfig);
 
   const {
-    isLoading: isClaimingFeeWaiting,
-    isSuccess: isClaimingFeeSuccess,
-    isError: isClaimingFeeError,
+    isLoading: isClaimingTokensWaiting,
+    isSuccess: isClaimingTokensSuccess,
+    isError: isClaimingTokensError,
   } = useWaitForTransaction({
-    hash: claimFeeTxData?.hash,
-    enabled: claimFeeTxData?.hash !== undefined,
+    hash: claimTokensTxData?.hash,
+    enabled: claimTokensTxData?.hash !== undefined,
   });
 
   useEffect(() => {
-    if (isClaimingFeeSuccess) {
-      toast('Fees claimed successfully', { type: 'success' });
+    if (isClaimingTokensSuccess) {
+      toast('Tokens claimed successfully', { type: 'success' });
       handleClose();
-      getUnclaimedFees();
+      getUnclaimedTokens();
     }
 
-    if (isClaimingFeeError) {
-      toast('Error claiming fees', { type: 'error' });
+    if (isClaimingTokensError) {
+      toast('Error claiming tokens', { type: 'error' });
     }
-  }, [isClaimingFeeSuccess, isClaimingFeeError]);
+  }, [isClaimingTokensSuccess, isClaimingTokensError]);
 
   return (
     <>
@@ -108,7 +108,7 @@ const ClaimFees = ({
         onClick={handleOpen}
         size="large"
       >
-        Claim Fees
+        Claim Tokens
       </Button>
 
       <Dialog
@@ -121,7 +121,7 @@ const ClaimFees = ({
         }}
       >
         <DialogTitle>
-          <b>Claim Fees</b>
+          <b>Claim Tokens</b>
           <IconButton
             onClick={handleClose}
             sx={{
@@ -163,7 +163,7 @@ const ClaimFees = ({
                 variant="body1"
                 width="100%"
               >
-                Claiming fees will withdraw currently available fees to your wallet
+                Claiming tokens will withdraw currently available tokens to your wallet
               </Typography>
             </Alert>
 
@@ -172,10 +172,10 @@ const ClaimFees = ({
               color="primary"
               size="large"
               fullWidth
-              loading={isClaimingFee || isClaimingFeeWaiting}
-              onClick={claimFee}
+              loading={isClaimingTokens || isClaimingTokensWaiting}
+              onClick={claimTokens}
             >
-              Claim Fees
+              Claim Tokens
             </LoadingButton>
           </Stack>
         </DialogContent>
@@ -184,4 +184,4 @@ const ClaimFees = ({
   );
 };
 
-export default ClaimFees;
+export default ClaimTokens;
