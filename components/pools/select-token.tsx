@@ -6,7 +6,7 @@ import { isAddress } from 'viem';
 import { useToken } from 'wagmi';
 
 type SelectTokenProps = {
-  inputLabel: string;
+  inputLabel?: string;
   token: Token | null;
   setToken: (token: Token) => void;
 };
