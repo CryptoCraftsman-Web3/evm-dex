@@ -12,14 +12,14 @@ const Header = () => {
   return (
     <Box
       sx={{
-        position: 'fixed',
+        // position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         zIndex: 10,
         backgroundColor: 'background.default',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        // boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        // borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
       }}
     >
       <Grid

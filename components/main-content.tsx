@@ -11,7 +11,7 @@ const MainContent = ({ children }: MainContentProps) => {
     <Box sx={{ my: 8 }}>
       <Box
         px={{ xs: 2, md: 6 }}
-        pt={{ xs: 4, md: 8 }}
+        // pt={{ xs: 4, md: 8 }}
         display="flex"
         justifyContent="center"
         alignItems="center"
