@@ -2,7 +2,7 @@
 
 import { createTheme, ThemeProvider } from '@mui/material';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createConfig, sepolia, WagmiConfig } from 'wagmi';
 import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from 'connectkit';
@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { xrplDevnet } from '@/lib/xrpl-chains';
 import { lighten } from 'polished';
 
-const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({ subsets: ['latin'] });
 
 const wagmiConfig = createConfig(
   getDefaultConfig({
@@ -42,7 +42,7 @@ const Providers = ({ children }: ProvidersProps) => {
       }
     },
     typography: {
-      fontFamily: inter.style.fontFamily,
+      fontFamily: montserrat.style.fontFamily,
     },
     components: {
       MuiButton: {
@@ -85,7 +85,7 @@ const Providers = ({ children }: ProvidersProps) => {
   const ckBorderRadius = `${theme.shape.borderRadius}px`;
 
   const connectKitTheme = {
-    '--ck-font-family': inter.style.fontFamily,
+    '--ck-font-family': montserrat.style.fontFamily,
     '--ck-overlay-backdrop-filter': 'blur',
     '--ck-border-radius': ckBorderRadius,
     '--ck-connectbutton-border-radius': ckBorderRadius,
@@ -118,7 +118,7 @@ const Providers = ({ children }: ProvidersProps) => {
             position="bottom-center"
             autoClose={2500}
             bodyStyle={{
-              fontFamily: inter.style.fontFamily,
+              fontFamily: montserrat.style.fontFamily,
             }}
             closeButton={false}
           />
