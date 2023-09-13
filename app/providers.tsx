@@ -41,6 +41,9 @@ const Providers = ({ children }: ProvidersProps) => {
         },
       },
     },
+    shape: {
+      borderRadius: 0
+    }
   });
 
   const ckBorderRadius = `${theme.shape.borderRadius}px`;
