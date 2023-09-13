@@ -21,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           name="viewport"
           content="initial-scale=1, width=device-width"
         />
+        <link rel="icon" href="/serpent-swap-logo.svg" />
       </head>
       <body className={inter.className}>
         <Providers>
