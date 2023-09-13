@@ -42,7 +42,7 @@ const Header = () => {
           >
             <Link href="/">
               <Image
-                src="/logo.webp"
+                src="/serpent-swap-logo.svg"
                 alt="Logo"
                 width={48}
                 height={48}
