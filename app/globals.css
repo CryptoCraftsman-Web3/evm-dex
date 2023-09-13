@@ -1,6 +1,10 @@
 body {
-  background: linear-gradient(to bottom, #000000, #1a1a66) no-repeat fixed center;
+  background-color: '#080708';
+  background-image: url('/serpent-eye.svg');
   background-size: cover;
+  background-repeat: no-repeat;
+  background-position: lower right;
+  background-attachment: fixed;
 }
 
 /* Hide step buttons for number inputs in Chrome, Safari, Edge, Opera */
