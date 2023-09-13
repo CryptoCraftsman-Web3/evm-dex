@@ -8,7 +8,10 @@ type MainContentProps = {
 
 const MainContent = ({ children }: MainContentProps) => {
   return (
-    <Box sx={{ my: 8 }}>
+    <Box sx={{ my: {
+      xs: 2,
+      md: 4,
+    } }}>
       <Box
         px={{ xs: 2, md: 6 }}
         // pt={{ xs: 4, md: 8 }}

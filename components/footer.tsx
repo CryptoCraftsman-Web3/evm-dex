@@ -31,7 +31,14 @@ const Footer = () => {
               key={index}
               href={item.href}
             >
-              <Button key={item.label}>{item.label}</Button>
+              <Button
+                key={item.label}
+                sx={{
+                  color: 'text.primary',
+                }}
+              >
+                {item.label}
+              </Button>
             </Link>
           );
         })}
