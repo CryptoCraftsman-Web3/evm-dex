@@ -27,6 +27,7 @@ type ProvidersProps = {
 };
 
 const Providers = ({ children }: ProvidersProps) => {
+  const background = '#080708';
   const primary = '#3B0054';
   const primaryLight = lighten(0.3, primary);
   const theme = createTheme({
@@ -36,6 +37,9 @@ const Providers = ({ children }: ProvidersProps) => {
         main: primary,
         light: primaryLight,
       },
+      background: {
+        default: background
+      }
     },
     typography: {
       fontFamily: inter.style.fontFamily,
