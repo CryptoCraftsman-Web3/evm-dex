@@ -190,7 +190,7 @@ const RemoveLiquidity = ({
                 <Typography variant="h4">{percentToRemove}%</Typography>
 
                 <ButtonGroup
-                  variant="outlined"
+                  variant="contained"
                   size="medium"
                 >
                   <Button onClick={() => setPercentToRemove(25)}>25%</Button>

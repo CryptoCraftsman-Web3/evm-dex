@@ -67,7 +67,7 @@ const PoolsClientPage = () => {
             <Typography variant="body1">Your liquidity positions will appear here</Typography>
 
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => setConnectWalletOpen(true)}
             >
               Connect Wallet

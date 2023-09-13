@@ -182,7 +182,7 @@ const AddLiquidity = ({
   return (
     <>
       <Button
-        variant="outlined"
+        variant="contained"
         color="primary"
         size="large"
         onClick={handleOpen}

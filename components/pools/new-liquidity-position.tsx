@@ -104,7 +104,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
   return (
     <>
       <Button
-        variant="outlined"
+        variant="contained"
         onClick={handleOpen}
       >
         Add Liquidity
