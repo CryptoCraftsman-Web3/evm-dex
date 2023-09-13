@@ -28,6 +28,9 @@ const Providers = ({ children }: ProvidersProps) => {
   const theme = createTheme({
     palette: {
       mode: 'dark',
+      primary: {
+        main: '#3B0054',
+      },
     },
     typography: {
       fontFamily: inter.style.fontFamily,
@@ -36,14 +39,14 @@ const Providers = ({ children }: ProvidersProps) => {
       MuiButton: {
         styleOverrides: {
           root: {
-            textTransform: 'none'
+            textTransform: 'none',
           },
         },
       },
     },
     shape: {
-      borderRadius: 0
-    }
+      borderRadius: 0,
+    },
   });
 
   const ckBorderRadius = `${theme.shape.borderRadius}px`;
