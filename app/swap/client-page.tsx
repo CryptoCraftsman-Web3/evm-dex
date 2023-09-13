@@ -17,7 +17,7 @@ const SwapClientPage = () => {
       alignItems="center"
     >
       <Paper
-        variant="outlined"
+        variant="elevation"
         sx={{ p: 2, width: { xs: '100%', md: 500 } }}
       >
         <Stack
@@ -29,7 +29,7 @@ const SwapClientPage = () => {
           </Typography>
 
           <Paper
-            // variant="outlined"
+            variant="outlined"
             sx={{ p: 2 }}
           >
             <Stack
@@ -82,7 +82,7 @@ const SwapClientPage = () => {
           </Paper>
 
           <Paper
-            // variant="outlined"
+            variant="outlined"
             sx={{ p: 2 }}
           >
             <Stack
