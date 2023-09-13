@@ -1,6 +1,7 @@
 'use client';
 
 import { createTheme, ThemeProvider } from '@mui/material';
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { Inter } from 'next/font/google';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createConfig, sepolia, WagmiConfig } from 'wagmi';
@@ -8,6 +9,7 @@ import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from 'connectk
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { xrplDevnet } from '@/lib/xrpl-chains';
+import { lighten } from 'polished';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,11 +27,14 @@ type ProvidersProps = {
 };
 
 const Providers = ({ children }: ProvidersProps) => {
+  const primary = '#3B0054';
+  const primaryLight = lighten(0.3, primary);
   const theme = createTheme({
     palette: {
       mode: 'dark',
       primary: {
-        main: '#3B0054',
+        main: primary,
+        light: primaryLight,
       },
     },
     typography: {
@@ -40,6 +45,30 @@ const Providers = ({ children }: ProvidersProps) => {
         styleOverrides: {
           root: {
             textTransform: 'none',
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& label.Mui-focused': {
+              color: primaryLight,
+            },
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          // notchedOutline: {
+          //   borderColor: primaryLight,
+          // },
+          root: {
+            // [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+            //   borderColor: primaryLight,
+            // },
+            [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+              borderColor: primaryLight,
+            },
           },
         },
       },
