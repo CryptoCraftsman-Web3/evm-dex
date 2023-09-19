@@ -28,7 +28,8 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
 
       // Sepolia Testnet (uniswap deployed)
       poolFactory = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c';
-      nfPositionManager = '0x1238536071E1c677A632429e3655c799b22cDA52'
+      nfPositionManager = '0x1238536071E1c677A632429e3655c799b22cDA52';
+      serpentSwapUtility = '0x6C45c98B989058feF7e6d0701515Ad6238ac45C6';
       break;
     default:
       poolFactory = zeroAddress;
