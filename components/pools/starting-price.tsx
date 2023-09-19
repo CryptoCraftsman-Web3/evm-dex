@@ -7,6 +7,7 @@ import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-peripher
 import { zeroAddress } from 'viem';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { serpentSwapUtilityV1ABI } from '@/types/wagmi/serpent-swap';
 
 type StartingPriceProps = {
   startingPrice: number;
@@ -25,7 +26,7 @@ const StartingPrice = ({
   feeTier,
   refetchPool,
 }: StartingPriceProps) => {
-  const { nfPositionManager } = useSwapProtocolAddresses();
+  const { nfPositionManager, serpentSwapUtility } = useSwapProtocolAddresses();
 
   const tokenAAddress = tokenA?.address ?? zeroAddress;
   const tokenBAddress = tokenB?.address ?? zeroAddress;
@@ -33,11 +34,10 @@ const StartingPrice = ({
   const sqrtPriceX96: bigint = BigInt(Math.sqrt(startingPrice) * 2 ** 96);
 
   const { config: initializePoolTxConfig } = usePrepareContractWrite({
-    address: nfPositionManager,
-    abi: nonfungiblePositionManagerABI,
-    functionName: 'createAndInitializePoolIfNecessary',
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityV1ABI,
+    functionName: 'createAndInitializePool',
     args: [tokenAAddress, tokenBAddress, feeTier.value, sqrtPriceX96],
-    value: 0n,
   });
 
   const {
