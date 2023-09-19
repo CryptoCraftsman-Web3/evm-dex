@@ -4,19 +4,22 @@ import { useNetwork } from 'wagmi';
 type SwapProtocolAddresses = {
   poolFactory: `0x${string}`;
   nfPositionManager: `0x${string}`;
+  serpentSwapUtility: `0x${string}`;
 };
 
 export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
   const { chain } = useNetwork();
 
-  let poolFactory: `0x${string}` = '0x';
-  let nfPositionManager: `0x${string}` = '0x';
+  let poolFactory: `0x${string}` = zeroAddress;
+  let nfPositionManager: `0x${string}` = zeroAddress;
+  let serpentSwapUtility: `0x${string}` = zeroAddress;
 
   switch (chain?.id) {
     case 1440002:
       // XRPL Devnet
       poolFactory = '0x71992849909a5Ed0c8Cc3928F5F5287B13d08aBA';
       nfPositionManager = '0xd70B1Ac076ad3B7155735E3CfC8ED24DF37D3235';
+      serpentSwapUtility = '0x1f9dE68B808a758D5eB56EB10e62d6360B79d210';
       break;
     case 11155111:
       // Sepolia Testnet (our own deployments)
@@ -35,6 +38,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
 
   return {
     poolFactory,
-    nfPositionManager
+    nfPositionManager,
+    serpentSwapUtility,
   };
 };
