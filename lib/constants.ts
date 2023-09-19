@@ -1,3 +1,3 @@
 export const constants = {
-  appName: 'StaykX EVM',
+  appName: 'SerpentSwap DEX',
 }
