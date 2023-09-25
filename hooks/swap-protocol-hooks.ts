@@ -33,7 +33,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       poolFactory = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c';
       nfPositionManager = '0x1238536071E1c677A632429e3655c799b22cDA52';
       serpentSwapUtility = '0x6C45c98B989058feF7e6d0701515Ad6238ac45C6';
-      quoterV2 = '0xd96541ee98E931a712B3c2BE24f675E67F62E102';
+      quoterV2 = '0x7452004cf527EEf23f0C74fcdB159160E766700F';
       break;
     default:
       poolFactory = zeroAddress;
