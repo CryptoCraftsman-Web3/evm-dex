@@ -28,7 +28,7 @@ type ProvidersProps = {
 
 const Providers = ({ children }: ProvidersProps) => {
   const background = '#080708';
-  const primary = '#3B0054';
+  const primary = '#6B0099';
   const primaryLight = lighten(0.3, primary);
   const theme = createTheme({
     palette: {
