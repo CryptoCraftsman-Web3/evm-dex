@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material';
 import SelectToken from '@/components/pools/select-token';
 import { Token } from '@/types/common';
+import { ethers } from 'ethers';
+import { useEthersProvider } from '@/lib/ethers';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
 
 const SwapClientPage = () => {
   const [tokenA, setTokenA] = useState<Token | null>(null);
@@ -11,6 +15,43 @@ const SwapClientPage = () => {
 
   const [amountA, setAmountA] = useState<number>(0);
   const [amountB, setAmountB] = useState<number>(0);
+
+  const ethersProvider = useEthersProvider();
+  const { quoterV2 } = useSwapProtocolAddresses();
+  const quoterV2Contract = new ethers.Contract(quoterV2, quoterV2ABI, ethersProvider || ethers.getDefaultProvider());
+
+  const getQuote = async () => {
+    const tokenIn = tokenA?.address;
+    const tokenOut = tokenB?.address;
+
+    if (!tokenIn || !tokenOut) throw new Error('Invalid token addresses');
+
+    const amountIn = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18);
+    if (amountIn.isZero()) throw new Error('Invalid amount');
+
+    const fees = [500, 3000, 10000];
+
+    console.log(`Getting quotes for ${amountA} ${tokenA.symbol} -> ${tokenB.symbol}...`);
+    console.log(`Token In: ${tokenIn}`);
+    console.log(`Token Out: ${tokenOut}`);
+    console.log(`Amount In: ${amountIn.toString()}`);
+
+    const quotes = await Promise.all(
+      fees.map((fee) => {
+        const params = [tokenIn, tokenOut, amountIn, fee, 0];
+        return quoterV2Contract.callStatic.quoteExactInputSingle(params);
+      })
+    );
+
+    console.log(quotes);
+  };
+
+  useEffect(() => {
+    if (tokenA && tokenB) {
+      getQuote();
+    }
+  }, [tokenA, tokenB, amountA]);
+
   return (
     <Stack
       justifyContent="center"
