@@ -20,10 +20,16 @@ export const useErc20Tokens = () => {
 };
 
 const xrplDevnetTokens: Token[] = [
+  // {
+  //   name: 'Wrapped XRP',
+  //   symbol: 'WXRP',
+  //   address: '0xb560eF7E09609C939E09a1a15961043278D27b03',
+  //   decimals: 18,
+  // },
   {
     name: 'Wrapped XRP',
     symbol: 'WXRP',
-    address: '0xb560eF7E09609C939E09a1a15961043278D27b03',
+    address: '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d',
     decimals: 18,
   },
   {
@@ -39,6 +45,12 @@ const sepoliaTokens: Token[] = [
     name: 'Wrapped XRP',
     symbol: 'WXRP',
     address: '0x030bEE4bbB0D8504e5F9E215647796BE3951A422',
+    decimals: 18,
+  },
+  {
+    name: 'Wrapped Ether',
+    symbol: 'WETH',
+    address: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
     decimals: 18,
   },
   {
