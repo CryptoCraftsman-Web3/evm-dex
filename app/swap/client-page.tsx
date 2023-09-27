@@ -8,8 +8,15 @@ import { ethers } from 'ethers';
 import { useEthersProvider } from '@/lib/ethers';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { erc20ABI, useAccount, useContractReads, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { zeroAddress } from 'viem';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
 
 const SwapClientPage = () => {
+  const { address: userAddress } = useAccount();
+  const { swapRouter } = useSwapProtocolAddresses();
+
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
@@ -49,7 +56,7 @@ const SwapClientPage = () => {
     console.log(`Token Out: ${tokenOut}`);
     console.log(`Amount In: ${amountIn.toString()}`);
 
-    const quotes = await Promise.all(
+    const retrievedQuotes = await Promise.all(
       fees.map((fee) => {
         const params = [tokenIn, tokenOut, amountIn, fee, 0];
         return quoterV2Contract.callStatic.quoteExactInputSingle(params);
@@ -57,17 +64,19 @@ const SwapClientPage = () => {
     );
 
     let maxAmountOut = -Infinity;
-    for (const quote of quotes) {
+    let maxAmountOutIndex = -1;
+    retrievedQuotes.forEach((quote, i) => {
       const amountOut: ethers.BigNumber = quote.amountOut;
       const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
-      console.log(`Amount Out: ${amountOutParsed}`);
       if (amountOutParsed > maxAmountOut) {
         maxAmountOut = amountOutParsed;
+        maxAmountOutIndex = i;
       }
-    }
+    });
 
     setAmountB(maxAmountOut);
-    setQuotes(quotes.map((quote, i) => {
+
+    const mappedQuotes = retrievedQuotes.map((quote, i) => {
       return {
         tokenIn,
         tokenOut,
@@ -77,7 +86,9 @@ const SwapClientPage = () => {
         sqrtPriceX96: quote.sqrtPriceX96,
         sqrtPriceX96After: quote.sqrtPriceX96After,
       };
-    }));
+    });
+    setQuotes(mappedQuotes);
+    setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
   };
 
   useEffect(() => {
@@ -85,6 +96,69 @@ const SwapClientPage = () => {
       getQuote();
     }
   }, [tokenA, tokenB, amountA]);
+
+  // monitor tokenA allowance
+  // if user wallet's tokenA allowance is less than amountA, then call approve
+
+  const tokenAContract = {
+    address: tokenA?.address ?? zeroAddress,
+    abi: erc20ABI,
+  };
+
+  const {
+    data: tokenAUserDetails,
+    refetch: refetchTokenAUserDetails,
+    isRefetching: refetchingTokenAUserDetails,
+  } = useContractReads({
+    contracts: [
+      {
+        ...tokenAContract,
+        functionName: 'balanceOf',
+        args: [userAddress ?? zeroAddress],
+      },
+      {
+        ...tokenAContract,
+        functionName: 'allowance',
+        args: [userAddress ?? zeroAddress, swapRouter],
+      },
+    ],
+  });
+
+  const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
+  const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
+  const amountAInBaseUnits = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18).toBigInt();
+
+  const notEnoughTokenABalance = tokenAUserBalance < amountAInBaseUnits;
+  const notEnoughTokenAAllowance = tokenAUserAllowance < amountAInBaseUnits;
+
+  const { config: tokenAConfig } = usePrepareContractWrite({
+    ...tokenAContract,
+    functionName: 'approve',
+    args: [swapRouter, amountAInBaseUnits],
+  });
+
+  const {
+    data: approveTokenAResult,
+    status: approveTokenAStatus,
+    isLoading: isApprovingTokenA,
+    isSuccess: isTokenAApproved,
+    write: approveTokenA,
+  } = useContractWrite(tokenAConfig);
+
+  const {
+    data: approveTokenATxReceipt,
+    isLoading: isApproveTokenATxPending,
+    isSuccess: isApproveTokenATxSuccess,
+    isError: isApproveTokenATxError,
+  } = useWaitForTransaction({
+    hash: approveTokenAResult?.hash,
+  });
+
+  useEffect(() => {
+    refetchTokenAUserDetails();
+    if (isApproveTokenATxSuccess) toast.success(`Successfully approved ${tokenA?.symbol} allowance`);
+    if (isApproveTokenATxError) toast.error(`Failed to approve ${tokenA?.symbol} allowance`);
+  }, [isApproveTokenATxSuccess, isApproveTokenATxError]);
 
   return (
     <Stack
@@ -197,16 +271,49 @@ const SwapClientPage = () => {
             </Stack>
           </Paper>
 
-          {amountA === 0 || amountB === 0 || !tokenA || !tokenB ? (
-            <Alert severity="warning">Please enter valid amounts and select tokens</Alert>
+          {!userAddress ? (
+            <Alert severity="error">Please connect your wallet first</Alert>
           ) : (
-            <Button
-              variant="contained"
-              size="large"
-              fullWidth
-            >
-              Swap
-            </Button>
+            <>
+              {!tokenA && !tokenB ? (
+                <Alert severity="error">Please select tokens</Alert>
+              ) : (
+                <>
+                  {notEnoughTokenABalance ? (
+                    <Alert severity="error">You do not have enough {tokenA?.symbol} to swap</Alert>
+                  ) : (
+                    <>
+                      {notEnoughTokenAAllowance ? (
+                        <>
+                          <Alert severity="warning">
+                            You have not approved the SerpentSwap to spend and swap your {tokenA?.symbol}
+                          </Alert>
+
+                          <LoadingButton
+                            variant="contained"
+                            size="large"
+                            onClick={() => { if (approveTokenA) approveTokenA(); }}
+                            loading={isApprovingTokenA || isApproveTokenATxPending}
+                            fullWidth
+                          >
+                            Approve {tokenA?.symbol}
+                          </LoadingButton>
+                        </>
+                      ) : (
+                        <Button
+                          disabled={amountA === 0}
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                        >
+                          Swap
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </>
           )}
         </Stack>
       </Paper>
