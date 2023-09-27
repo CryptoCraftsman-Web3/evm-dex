@@ -20,6 +20,19 @@ const SwapClientPage = () => {
   const { quoterV2 } = useSwapProtocolAddresses();
   const quoterV2Contract = new ethers.Contract(quoterV2, quoterV2ABI, ethersProvider || ethers.getDefaultProvider());
 
+  type Quote = {
+    tokenIn: string;
+    tokenOut: string;
+    amountIn: ethers.BigNumber;
+    amountOut: ethers.BigNumber;
+    fee: number;
+    sqrtPriceX96: ethers.BigNumber;
+    sqrtPriceX96After: ethers.BigNumber;
+  };
+
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+
   const getQuote = async () => {
     const tokenIn = tokenA?.address;
     const tokenOut = tokenB?.address;
@@ -43,7 +56,28 @@ const SwapClientPage = () => {
       })
     );
 
-    console.log(quotes);
+    let maxAmountOut = -Infinity;
+    for (const quote of quotes) {
+      const amountOut: ethers.BigNumber = quote.amountOut;
+      const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
+      console.log(`Amount Out: ${amountOutParsed}`);
+      if (amountOutParsed > maxAmountOut) {
+        maxAmountOut = amountOutParsed;
+      }
+    }
+
+    setAmountB(maxAmountOut);
+    setQuotes(quotes.map((quote, i) => {
+      return {
+        tokenIn,
+        tokenOut,
+        fee: fees[i],
+        amountIn: quote.amountIn,
+        amountOut: quote.amountOut,
+        sqrtPriceX96: quote.sqrtPriceX96,
+        sqrtPriceX96After: quote.sqrtPriceX96After,
+      };
+    }));
   };
 
   useEffect(() => {
@@ -134,7 +168,7 @@ const SwapClientPage = () => {
                 variant="body1"
                 color="GrayText"
               >
-                You Receive
+                You Receive (Estimate)
               </Typography>
             </Stack>
 
@@ -148,19 +182,7 @@ const SwapClientPage = () => {
                 type="number"
                 value={amountB}
                 onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    setAmountB(0);
-                    return;
-                  }
-                  const parsed = parseFloat(value);
-                  if (isNaN(parsed)) setAmountB(0);
-
-                  if (parsed < 0) {
-                    setAmountB(0);
-                  }
-
-                  setAmountB(parsed);
+                  return;
                 }}
                 sx={{
                   '& fieldset': { border: 'none' },
