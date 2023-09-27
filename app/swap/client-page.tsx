@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material';
-import SelectToken from '@/components/pools/select-token';
+import SelectToken from '@/components/common/select-token';
 import { Token } from '@/types/common';
 import { ethers } from 'ethers';
 import { useEthersProvider } from '@/lib/ethers';

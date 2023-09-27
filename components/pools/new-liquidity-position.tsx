@@ -19,7 +19,7 @@ import {
   Divider,
 } from '@mui/material';
 import { config } from '../config';
-import SelectToken from './select-token';
+import SelectToken from '../common/select-token';
 import { FeeTier, Token } from '@/types/common';
 import { useAccount, useContractRead, useContractReads, useNetwork } from 'wagmi';
 import { toast } from 'react-toastify';
