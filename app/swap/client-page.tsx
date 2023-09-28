@@ -7,7 +7,7 @@ import { Token } from '@/types/common';
 import { ethers } from 'ethers';
 import { useEthersProvider } from '@/lib/ethers';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { erc20ABI, useAccount, useContractReads, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { zeroAddress } from 'viem';
 import { toast } from 'react-toastify';
@@ -28,8 +28,8 @@ const SwapClientPage = () => {
   const quoterV2Contract = new ethers.Contract(quoterV2, quoterV2ABI, ethersProvider || ethers.getDefaultProvider());
 
   type Quote = {
-    tokenIn: string;
-    tokenOut: string;
+    tokenIn: `0x${string}`;
+    tokenOut: `0x${string}`;
     amountIn: ethers.BigNumber;
     amountOut: ethers.BigNumber;
     fee: number;
@@ -159,6 +159,50 @@ const SwapClientPage = () => {
     if (isApproveTokenATxSuccess) toast.success(`Successfully approved ${tokenA?.symbol} allowance`);
     if (isApproveTokenATxError) toast.error(`Failed to approve ${tokenA?.symbol} allowance`);
   }, [isApproveTokenATxSuccess, isApproveTokenATxError]);
+
+  // the code section below deals with SwapRouter to swap ERC20 tokens
+  const { config: exactInputSingleConfig } = usePrepareContractWrite({
+    address: swapRouter,
+    abi: swapRouterABI,
+    functionName: 'exactInputSingle',
+    args: [
+      {
+        tokenIn: selectedQuote?.tokenIn ?? zeroAddress,
+        tokenOut: selectedQuote?.tokenOut ?? zeroAddress,
+        fee: selectedQuote?.fee ?? 0,
+        recipient: userAddress ?? zeroAddress,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10), // 10 minutes from the current Unix time
+        amountIn: amountAInBaseUnits,
+        amountOutMinimum: 0n,
+        sqrtPriceLimitX96: 0n,
+      },
+    ],
+    value: 0n,
+  });
+
+  const {
+    data: exactInputSingleResult,
+    status: exactInputSingleStatus,
+    isLoading: isExactInputSingle,
+    isSuccess: isExactInputSingleSuccess,
+    isError: isExactInputSingleError,
+    write: exactInputSingle,
+  } = useContractWrite(exactInputSingleConfig);
+
+  const {
+    data: exactInputSingleTxReceipt,
+    isLoading: isExactInputSingleTxPending,
+    isSuccess: isExactInputSingleTxSuccess,
+    isError: isExactInputSingleTxError,
+  } = useWaitForTransaction({
+    hash: exactInputSingleResult?.hash,
+  });
+
+  useEffect(() => {
+    refetchTokenAUserDetails();
+    if (isExactInputSingleTxSuccess) toast.success(`Successfully swapped ${tokenA?.symbol} for ${tokenB?.symbol}`);
+    if (isExactInputSingleTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
+  }, [isExactInputSingleTxSuccess, isExactInputSingleTxError]);
 
   return (
     <Stack
@@ -300,14 +344,16 @@ const SwapClientPage = () => {
                           </LoadingButton>
                         </>
                       ) : (
-                        <Button
+                        <LoadingButton
                           disabled={amountA === 0}
                           variant="contained"
                           size="large"
+                          onClick={() => { if (exactInputSingle) exactInputSingle(); }}
+                          loading={isExactInputSingle || isExactInputSingleTxPending}
                           fullWidth
                         >
                           Swap
-                        </Button>
+                        </LoadingButton>
                       )}
                     </>
                   )}
