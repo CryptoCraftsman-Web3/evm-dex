@@ -20,7 +20,7 @@ import {
 import { zeroAddress } from 'viem';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
-import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 
 const SwapClientPage = () => {
   const { address: userAddress } = useAccount();
@@ -149,7 +149,7 @@ const SwapClientPage = () => {
     ...tokenAContract,
     functionName: 'approve',
     args: [swapRouter, amountAInBaseUnits],
-    enabled: Boolean(tokenA) && Boolean(userAddress)
+    enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
   const {
@@ -237,9 +237,25 @@ const SwapClientPage = () => {
     address: poolFactory,
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
-    args: [tokenA?.address || zeroAddress, tokenB?.address || zeroAddress, 3000],
-    enabled: Boolean(tokenA) && Boolean(tokenB),
-  })
+    args: [selectedQuote?.tokenIn || zeroAddress, selectedQuote?.tokenOut || zeroAddress, selectedQuote?.fee || 500],
+    enabled: Boolean(selectedQuote),
+  });
+
+  const { data: slot0 } = useContractRead({
+    address: poolAddress || zeroAddress,
+    abi: uniswapV3PoolABI,
+    functionName: 'slot0',
+    enabled: Boolean(selectedQuote) && Boolean(poolAddress),
+  });
+
+  const sqrtPriceX96 = slot0?.[0] || 0n;
+  console.log('sqrtPriceX96', sqrtPriceX96);
+  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+  const expectedAmountOut = amountA * price;
+  console.log('expectedAmountOut', expectedAmountOut);
+  const amountOutDifferencePercentage =
+    amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
+  const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
   return (
     <Stack
@@ -337,16 +353,14 @@ const SwapClientPage = () => {
               {isFetchingQuotes ? (
                 <Typography
                   color="GrayText"
-                  sx={{ minWidth: '41%'}}
+                  sx={{ minWidth: '41%' }}
                 >
                   Fetching quotes...
                 </Typography>
               ) : (
                 <TextField
                   type="number"
-                  value={
-                    amountB.toFixed(4)
-                  }
+                  value={amountB.toFixed(4)}
                   onChange={(e) => {
                     return;
                   }}
@@ -395,18 +409,27 @@ const SwapClientPage = () => {
                           </LoadingButton>
                         </>
                       ) : (
-                        <LoadingButton
-                          disabled={amountA === 0}
-                          variant="contained"
-                          size="large"
-                          onClick={() => {
-                            if (exactInputSingle) exactInputSingle();
-                          }}
-                          loading={isExactInputSingle || isExactInputSingleTxPending}
-                          fullWidth
-                        >
-                          Swap
-                        </LoadingButton>
+                        <>
+                          {amountOutDiffTooGreat && (
+                            <Alert severity="warning">
+                              The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from the
+                              expected amount based on the current price. This may be due to lack of liquidity in the pool. Please proceed with caution.
+                            </Alert>
+                          )}
+
+                          <LoadingButton
+                            disabled={amountA === 0}
+                            variant="contained"
+                            size="large"
+                            onClick={() => {
+                              if (exactInputSingle) exactInputSingle();
+                            }}
+                            loading={isExactInputSingle || isExactInputSingleTxPending}
+                            fullWidth
+                          >
+                            Swap
+                          </LoadingButton>
+                        </>
                       )}
                     </>
                   )}
