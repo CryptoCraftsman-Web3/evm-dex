@@ -11,6 +11,7 @@ import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
 import {
   erc20ABI,
   useAccount,
+  useContractRead,
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
@@ -19,10 +20,11 @@ import {
 import { zeroAddress } from 'viem';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
+import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 
 const SwapClientPage = () => {
   const { address: userAddress } = useAccount();
-  const { swapRouter } = useSwapProtocolAddresses();
+  const { swapRouter, poolFactory } = useSwapProtocolAddresses();
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
@@ -133,6 +135,7 @@ const SwapClientPage = () => {
         args: [userAddress ?? zeroAddress, swapRouter],
       },
     ],
+    enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
@@ -146,6 +149,7 @@ const SwapClientPage = () => {
     ...tokenAContract,
     functionName: 'approve',
     args: [swapRouter, amountAInBaseUnits],
+    enabled: Boolean(tokenA) && Boolean(userAddress)
   });
 
   const {
@@ -163,6 +167,7 @@ const SwapClientPage = () => {
     isError: isApproveTokenATxError,
   } = useWaitForTransaction({
     hash: approveTokenAResult?.hash,
+    enabled: isTokenAApproved,
   });
 
   useEffect(() => {
@@ -189,6 +194,7 @@ const SwapClientPage = () => {
       },
     ],
     value: 0n,
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
   });
 
   const {
@@ -207,6 +213,7 @@ const SwapClientPage = () => {
     isError: isExactInputSingleTxError,
   } = useWaitForTransaction({
     hash: exactInputSingleResult?.hash,
+    enabled: isExactInputSingleSuccess,
   });
 
   useEffect(() => {
@@ -224,6 +231,15 @@ const SwapClientPage = () => {
       amountAInputRef.current?.select();
     }
   }, [tokenA, tokenB]);
+
+  // pool-related code
+  const { data: poolAddress } = useContractRead({
+    address: poolFactory,
+    abi: uniswapV3FactoryABI,
+    functionName: 'getPool',
+    args: [tokenA?.address || zeroAddress, tokenB?.address || zeroAddress, 3000],
+    enabled: Boolean(tokenA) && Boolean(tokenB),
+  })
 
   return (
     <Stack
