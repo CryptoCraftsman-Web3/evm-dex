@@ -1,14 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Alert, Button, CircularProgress, Paper, Stack, TextField, Typography } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { Token } from '@/types/common';
 import { ethers } from 'ethers';
 import { useEthersProvider } from '@/lib/ethers';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { erc20ABI, useAccount, useContractReads, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import {
+  erc20ABI,
+  useAccount,
+  useContractReads,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 import { zeroAddress } from 'viem';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
@@ -20,8 +27,8 @@ const SwapClientPage = () => {
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
-  const [amountA, setAmountA] = useState<number>(0);
-  const [amountB, setAmountB] = useState<number>(0);
+  const [amountA, setAmountA] = useState<number>(1);
+  const [amountB, setAmountB] = useState<number>(1);
 
   const ethersProvider = useEthersProvider();
   const { quoterV2 } = useSwapProtocolAddresses();
@@ -37,6 +44,7 @@ const SwapClientPage = () => {
     sqrtPriceX96After: ethers.BigNumber;
   };
 
+  const [isFetchingQuotes, setIsFetchingQuotes] = useState<boolean>(false);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
@@ -49,46 +57,49 @@ const SwapClientPage = () => {
     const amountIn = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18);
     if (amountIn.isZero()) throw new Error('Invalid amount');
 
-    const fees = [500, 3000, 10000];
+    setIsFetchingQuotes(true);
 
-    console.log(`Getting quotes for ${amountA} ${tokenA.symbol} -> ${tokenB.symbol}...`);
-    console.log(`Token In: ${tokenIn}`);
-    console.log(`Token Out: ${tokenOut}`);
-    console.log(`Amount In: ${amountIn.toString()}`);
+    try {
+      const fees = [500, 3000, 10000];
 
-    const retrievedQuotes = await Promise.all(
-      fees.map((fee) => {
-        const params = [tokenIn, tokenOut, amountIn, fee, 0];
-        return quoterV2Contract.callStatic.quoteExactInputSingle(params);
-      })
-    );
+      const retrievedQuotes = await Promise.all(
+        fees.map((fee) => {
+          const params = [tokenIn, tokenOut, amountIn, fee, 0];
+          return quoterV2Contract.callStatic.quoteExactInputSingle(params);
+        })
+      );
 
-    let maxAmountOut = -Infinity;
-    let maxAmountOutIndex = -1;
-    retrievedQuotes.forEach((quote, i) => {
-      const amountOut: ethers.BigNumber = quote.amountOut;
-      const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
-      if (amountOutParsed > maxAmountOut) {
-        maxAmountOut = amountOutParsed;
-        maxAmountOutIndex = i;
-      }
-    });
+      let maxAmountOut = -Infinity;
+      let maxAmountOutIndex = -1;
+      retrievedQuotes.forEach((quote, i) => {
+        const amountOut: ethers.BigNumber = quote.amountOut;
+        const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
+        if (amountOutParsed > maxAmountOut) {
+          maxAmountOut = amountOutParsed;
+          maxAmountOutIndex = i;
+        }
+      });
 
-    setAmountB(maxAmountOut);
+      setAmountB(maxAmountOut);
 
-    const mappedQuotes = retrievedQuotes.map((quote, i) => {
-      return {
-        tokenIn,
-        tokenOut,
-        fee: fees[i],
-        amountIn: quote.amountIn,
-        amountOut: quote.amountOut,
-        sqrtPriceX96: quote.sqrtPriceX96,
-        sqrtPriceX96After: quote.sqrtPriceX96After,
-      };
-    });
-    setQuotes(mappedQuotes);
-    setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
+      const mappedQuotes = retrievedQuotes.map((quote, i) => {
+        return {
+          tokenIn,
+          tokenOut,
+          fee: fees[i],
+          amountIn: quote.amountIn,
+          amountOut: quote.amountOut,
+          sqrtPriceX96: quote.sqrtPriceX96,
+          sqrtPriceX96After: quote.sqrtPriceX96After,
+        };
+      });
+      setQuotes(mappedQuotes);
+      setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsFetchingQuotes(false);
+    }
   };
 
   useEffect(() => {
@@ -204,6 +215,16 @@ const SwapClientPage = () => {
     if (isExactInputSingleTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
   }, [isExactInputSingleTxSuccess, isExactInputSingleTxError]);
 
+  // focus on respective amount input field when token is selected, and select all text
+  const amountAInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (tokenA) {
+      amountAInputRef.current?.focus();
+      amountAInputRef.current?.select();
+    }
+  }, [tokenA, tokenB]);
+
   return (
     <Stack
       justifyContent="center"
@@ -244,6 +265,7 @@ const SwapClientPage = () => {
               alignItems="center"
             >
               <TextField
+                inputRef={amountAInputRef}
                 type="number"
                 value={amountA}
                 onChange={(e) => {
@@ -296,16 +318,27 @@ const SwapClientPage = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <TextField
-                type="number"
-                value={amountB}
-                onChange={(e) => {
-                  return;
-                }}
-                sx={{
-                  '& fieldset': { border: 'none' },
-                }}
-              />
+              {isFetchingQuotes ? (
+                <Typography
+                  color="GrayText"
+                  sx={{ minWidth: '41%'}}
+                >
+                  Fetching quotes...
+                </Typography>
+              ) : (
+                <TextField
+                  type="number"
+                  value={
+                    amountB.toFixed(4)
+                  }
+                  onChange={(e) => {
+                    return;
+                  }}
+                  sx={{
+                    '& fieldset': { border: 'none' },
+                  }}
+                />
+              )}
 
               <SelectToken
                 token={tokenB}
@@ -336,7 +369,9 @@ const SwapClientPage = () => {
                           <LoadingButton
                             variant="contained"
                             size="large"
-                            onClick={() => { if (approveTokenA) approveTokenA(); }}
+                            onClick={() => {
+                              if (approveTokenA) approveTokenA();
+                            }}
                             loading={isApprovingTokenA || isApproveTokenATxPending}
                             fullWidth
                           >
@@ -348,7 +383,9 @@ const SwapClientPage = () => {
                           disabled={amountA === 0}
                           variant="contained"
                           size="large"
-                          onClick={() => { if (exactInputSingle) exactInputSingle(); }}
+                          onClick={() => {
+                            if (exactInputSingle) exactInputSingle();
+                          }}
                           loading={isExactInputSingle || isExactInputSingleTxPending}
                           fullWidth
                         >
