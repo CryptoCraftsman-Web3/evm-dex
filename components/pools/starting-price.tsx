@@ -33,11 +33,19 @@ const StartingPrice = ({
 
   const sqrtPriceX96: bigint = BigInt(Math.sqrt(startingPrice) * 2 ** 96);
 
+  // const { config: initializePoolTxConfig } = usePrepareContractWrite({
+  //   address: serpentSwapUtility,
+  //   abi: serpentSwapUtilityV1ABI,
+  //   functionName: 'createAndInitializePool',
+  //   args: [tokenAAddress, tokenBAddress, feeTier.value, sqrtPriceX96],
+  // });
+
   const { config: initializePoolTxConfig } = usePrepareContractWrite({
-    address: serpentSwapUtility,
-    abi: serpentSwapUtilityV1ABI,
-    functionName: 'createAndInitializePool',
+    address: nfPositionManager,
+    abi: nonfungiblePositionManagerABI,
+    functionName: 'createAndInitializePoolIfNecessary',
     args: [tokenAAddress, tokenBAddress, feeTier.value, sqrtPriceX96],
+    value: 0n,
   });
 
   const {
