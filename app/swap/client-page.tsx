@@ -1,27 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Alert, Button, CircularProgress, Paper, Stack, TextField, Typography } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { Token } from '@/types/common';
 import { ethers } from 'ethers';
 import { useEthersProvider } from '@/lib/ethers';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { erc20ABI, useAccount, useContractReads, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import {
+  erc20ABI,
+  useAccount,
+  useContractRead,
+  useContractReads,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 import { zeroAddress } from 'viem';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 
 const SwapClientPage = () => {
   const { address: userAddress } = useAccount();
-  const { swapRouter } = useSwapProtocolAddresses();
+  const { swapRouter, poolFactory } = useSwapProtocolAddresses();
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
-  const [amountA, setAmountA] = useState<number>(0);
-  const [amountB, setAmountB] = useState<number>(0);
+  const [amountA, setAmountA] = useState<number>(1);
+  const [amountB, setAmountB] = useState<number>(1);
 
   const ethersProvider = useEthersProvider();
   const { quoterV2 } = useSwapProtocolAddresses();
@@ -37,6 +46,7 @@ const SwapClientPage = () => {
     sqrtPriceX96After: ethers.BigNumber;
   };
 
+  const [isFetchingQuotes, setIsFetchingQuotes] = useState<boolean>(false);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
@@ -49,46 +59,49 @@ const SwapClientPage = () => {
     const amountIn = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18);
     if (amountIn.isZero()) throw new Error('Invalid amount');
 
-    const fees = [500, 3000, 10000];
+    setIsFetchingQuotes(true);
 
-    console.log(`Getting quotes for ${amountA} ${tokenA.symbol} -> ${tokenB.symbol}...`);
-    console.log(`Token In: ${tokenIn}`);
-    console.log(`Token Out: ${tokenOut}`);
-    console.log(`Amount In: ${amountIn.toString()}`);
+    try {
+      const fees = [500, 3000, 10000];
 
-    const retrievedQuotes = await Promise.all(
-      fees.map((fee) => {
-        const params = [tokenIn, tokenOut, amountIn, fee, 0];
-        return quoterV2Contract.callStatic.quoteExactInputSingle(params);
-      })
-    );
+      const retrievedQuotes = await Promise.all(
+        fees.map((fee) => {
+          const params = [tokenIn, tokenOut, amountIn, fee, 0];
+          return quoterV2Contract.callStatic.quoteExactInputSingle(params);
+        })
+      );
 
-    let maxAmountOut = -Infinity;
-    let maxAmountOutIndex = -1;
-    retrievedQuotes.forEach((quote, i) => {
-      const amountOut: ethers.BigNumber = quote.amountOut;
-      const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
-      if (amountOutParsed > maxAmountOut) {
-        maxAmountOut = amountOutParsed;
-        maxAmountOutIndex = i;
-      }
-    });
+      let maxAmountOut = -Infinity;
+      let maxAmountOutIndex = -1;
+      retrievedQuotes.forEach((quote, i) => {
+        const amountOut: ethers.BigNumber = quote.amountOut;
+        const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
+        if (amountOutParsed > maxAmountOut) {
+          maxAmountOut = amountOutParsed;
+          maxAmountOutIndex = i;
+        }
+      });
 
-    setAmountB(maxAmountOut);
+      setAmountB(maxAmountOut);
 
-    const mappedQuotes = retrievedQuotes.map((quote, i) => {
-      return {
-        tokenIn,
-        tokenOut,
-        fee: fees[i],
-        amountIn: quote.amountIn,
-        amountOut: quote.amountOut,
-        sqrtPriceX96: quote.sqrtPriceX96,
-        sqrtPriceX96After: quote.sqrtPriceX96After,
-      };
-    });
-    setQuotes(mappedQuotes);
-    setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
+      const mappedQuotes = retrievedQuotes.map((quote, i) => {
+        return {
+          tokenIn,
+          tokenOut,
+          fee: fees[i],
+          amountIn: quote.amountIn,
+          amountOut: quote.amountOut,
+          sqrtPriceX96: quote.sqrtPriceX96,
+          sqrtPriceX96After: quote.sqrtPriceX96After,
+        };
+      });
+      setQuotes(mappedQuotes);
+      setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsFetchingQuotes(false);
+    }
   };
 
   useEffect(() => {
@@ -122,6 +135,7 @@ const SwapClientPage = () => {
         args: [userAddress ?? zeroAddress, swapRouter],
       },
     ],
+    enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
@@ -135,6 +149,7 @@ const SwapClientPage = () => {
     ...tokenAContract,
     functionName: 'approve',
     args: [swapRouter, amountAInBaseUnits],
+    enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
   const {
@@ -152,6 +167,7 @@ const SwapClientPage = () => {
     isError: isApproveTokenATxError,
   } = useWaitForTransaction({
     hash: approveTokenAResult?.hash,
+    enabled: isTokenAApproved,
   });
 
   useEffect(() => {
@@ -178,6 +194,7 @@ const SwapClientPage = () => {
       },
     ],
     value: 0n,
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
   });
 
   const {
@@ -196,6 +213,7 @@ const SwapClientPage = () => {
     isError: isExactInputSingleTxError,
   } = useWaitForTransaction({
     hash: exactInputSingleResult?.hash,
+    enabled: isExactInputSingleSuccess,
   });
 
   useEffect(() => {
@@ -203,6 +221,41 @@ const SwapClientPage = () => {
     if (isExactInputSingleTxSuccess) toast.success(`Successfully swapped ${tokenA?.symbol} for ${tokenB?.symbol}`);
     if (isExactInputSingleTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
   }, [isExactInputSingleTxSuccess, isExactInputSingleTxError]);
+
+  // focus on respective amount input field when token is selected, and select all text
+  const amountAInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (tokenA) {
+      amountAInputRef.current?.focus();
+      amountAInputRef.current?.select();
+    }
+  }, [tokenA, tokenB]);
+
+  // pool-related code
+  const { data: poolAddress } = useContractRead({
+    address: poolFactory,
+    abi: uniswapV3FactoryABI,
+    functionName: 'getPool',
+    args: [selectedQuote?.tokenIn || zeroAddress, selectedQuote?.tokenOut || zeroAddress, selectedQuote?.fee || 500],
+    enabled: Boolean(selectedQuote),
+  });
+
+  const { data: slot0 } = useContractRead({
+    address: poolAddress || zeroAddress,
+    abi: uniswapV3PoolABI,
+    functionName: 'slot0',
+    enabled: Boolean(selectedQuote) && Boolean(poolAddress),
+  });
+
+  const sqrtPriceX96 = slot0?.[0] || 0n;
+  console.log('sqrtPriceX96', sqrtPriceX96);
+  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+  const expectedAmountOut = amountA * price;
+  console.log('expectedAmountOut', expectedAmountOut);
+  const amountOutDifferencePercentage =
+    amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
+  const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
   return (
     <Stack
@@ -244,6 +297,7 @@ const SwapClientPage = () => {
               alignItems="center"
             >
               <TextField
+                inputRef={amountAInputRef}
                 type="number"
                 value={amountA}
                 onChange={(e) => {
@@ -296,16 +350,25 @@ const SwapClientPage = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <TextField
-                type="number"
-                value={amountB}
-                onChange={(e) => {
-                  return;
-                }}
-                sx={{
-                  '& fieldset': { border: 'none' },
-                }}
-              />
+              {isFetchingQuotes ? (
+                <Typography
+                  color="GrayText"
+                  sx={{ minWidth: '41%' }}
+                >
+                  Fetching quotes...
+                </Typography>
+              ) : (
+                <TextField
+                  type="number"
+                  value={amountB.toFixed(4)}
+                  onChange={(e) => {
+                    return;
+                  }}
+                  sx={{
+                    '& fieldset': { border: 'none' },
+                  }}
+                />
+              )}
 
               <SelectToken
                 token={tokenB}
@@ -336,7 +399,9 @@ const SwapClientPage = () => {
                           <LoadingButton
                             variant="contained"
                             size="large"
-                            onClick={() => { if (approveTokenA) approveTokenA(); }}
+                            onClick={() => {
+                              if (approveTokenA) approveTokenA();
+                            }}
                             loading={isApprovingTokenA || isApproveTokenATxPending}
                             fullWidth
                           >
@@ -344,16 +409,27 @@ const SwapClientPage = () => {
                           </LoadingButton>
                         </>
                       ) : (
-                        <LoadingButton
-                          disabled={amountA === 0}
-                          variant="contained"
-                          size="large"
-                          onClick={() => { if (exactInputSingle) exactInputSingle(); }}
-                          loading={isExactInputSingle || isExactInputSingleTxPending}
-                          fullWidth
-                        >
-                          Swap
-                        </LoadingButton>
+                        <>
+                          {amountOutDiffTooGreat && (
+                            <Alert severity="warning">
+                              The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from the
+                              expected amount based on the current price. This may be due to lack of liquidity in the pool. Please proceed with caution.
+                            </Alert>
+                          )}
+
+                          <LoadingButton
+                            disabled={amountA === 0}
+                            variant="contained"
+                            size="large"
+                            onClick={() => {
+                              if (exactInputSingle) exactInputSingle();
+                            }}
+                            loading={isExactInputSingle || isExactInputSingleTxPending}
+                            fullWidth
+                          >
+                            Swap
+                          </LoadingButton>
+                        </>
                       )}
                     </>
                   )}
