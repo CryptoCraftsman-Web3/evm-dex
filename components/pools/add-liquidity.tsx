@@ -1,6 +1,5 @@
 'use client';
 
-import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Token } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
@@ -31,8 +30,7 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { computePoolAddress } from '@uniswap/v3-sdk';
-import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import DepositAmounts from './deposit-amounts';
 
 type AddLiquidityProps = {
