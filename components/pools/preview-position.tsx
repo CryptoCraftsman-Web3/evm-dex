@@ -1,11 +1,7 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { FeeTier, Token } from '@/types/common';
 import { Token as UniswapToken } from '@uniswap/sdk-core';
-import {
-  nearestUsableTick,
-  TickMath,
-  computePoolAddress,
-} from '@uniswap/v3-sdk';
+import { nearestUsableTick, TickMath, computePoolAddress } from '@uniswap/v3-sdk';
 import {
   Button,
   Dialog,
@@ -192,6 +188,13 @@ const PreviewPosition = ({
       },
     ],
     value: 0n,
+    enabled:
+      isAmountAValid &&
+      isAmountBValid &&
+      isPoolInitialized &&
+      tokenA !== null &&
+      tokenB !== null &&
+      tokenA?.address !== tokenB?.address,
   });
 
   const { data: mintTxData, write: mint, isLoading: minting } = useContractWrite(mintTxConfig);

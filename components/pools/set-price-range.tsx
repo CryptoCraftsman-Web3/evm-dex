@@ -72,6 +72,7 @@ const SetPriceRange = ({
     address: poolAddress,
     abi: uniswapV3PoolABI,
     functionName: 'slot0',
+    enabled: poolAddress !== zeroAddress,
   });
 
   useEffect(() => {

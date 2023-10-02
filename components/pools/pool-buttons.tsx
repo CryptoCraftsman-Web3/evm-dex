@@ -86,6 +86,7 @@ const PoolButtons = ({
     ...tokenAContract,
     functionName: 'approve',
     args: [nfPositionManager, amountAInWei],
+    enabled: tokenA !== null && tokenA?.address !== zeroAddress,
   });
 
   const {
@@ -103,12 +104,14 @@ const PoolButtons = ({
     isError: isApproveTokenATxError,
   } = useWaitForTransaction({
     hash: approveTokenAResult?.hash,
+    enabled: approveTokenAResult?.hash !== undefined,
   });
 
   const { config: tokenBConfig } = usePrepareContractWrite({
     ...tokenBContract,
     functionName: 'approve',
     args: [nfPositionManager, amountBInWei],
+    enabled: tokenB !== null && tokenB?.address !== zeroAddress,
   });
 
   const {
@@ -125,6 +128,7 @@ const PoolButtons = ({
     isError: isApproveTokenBTxError,
   } = useWaitForTransaction({
     hash: approveTokenBResult?.hash,
+    enabled: approveTokenBResult?.hash !== undefined,
   });
 
   useEffect(() => {
