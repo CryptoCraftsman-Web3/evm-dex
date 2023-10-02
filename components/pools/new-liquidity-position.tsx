@@ -80,7 +80,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
     args: [tokenA?.address ?? zeroAddress, tokenB?.address ?? zeroAddress, feeTier.value],
-    enabled: tokenA !== null && tokenB !== null,
+    enabled: tokenA !== null && tokenB !== null && tokenA.address !== tokenB.address && feeTier !== null,
   });
 
   const isPoolInitialized = pool !== zeroAddress && pool !== undefined;
@@ -117,6 +117,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
         fullWidth={!isMdAndUp}
         PaperProps={{
           variant: 'outlined',
+          elevation: 0,
         }}
       >
         <DialogTitle>
