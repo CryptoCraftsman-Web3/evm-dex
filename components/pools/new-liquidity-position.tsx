@@ -165,6 +165,15 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                     setToken={setTokenB}
                   />
                 </Stack>
+                {tokenA !== null && tokenB !== null && tokenA?.address === tokenB?.address && (
+                  <Alert
+                    severity="error"
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                  >
+                    Token A and Token B cannot be the same
+                  </Alert>
+                )}
               </FormControl>
 
               <SelectFeeTier
@@ -207,7 +216,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
               justifyContent="stretch"
               width="100%"
             >
-              {!isPoolInitialized && tokenA && tokenB && (
+              {!isPoolInitialized && tokenA && tokenB && tokenA?.address !== tokenB?.address && (
                 <StartingPrice
                   startingPrice={startingPrice}
                   setStartingPrice={setStartingPrice}

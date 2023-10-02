@@ -104,7 +104,7 @@ const PreviewPosition = ({
   );
 
   const poolAddress =
-    tokenA !== null && tokenB !== null
+    tokenA !== null && tokenB !== null && tokenA?.address !== tokenB?.address
       ? (computePoolAddress({
           factoryAddress: poolFactory,
           tokenA: uniswapTokenA,

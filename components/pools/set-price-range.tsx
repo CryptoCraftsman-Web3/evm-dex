@@ -53,12 +53,15 @@ const SetPriceRange = ({
     tokenB?.name || 'B'
   );
 
-  const poolAddress = (tokenA !== null && tokenB !== null) ? computePoolAddress({
-    factoryAddress: poolFactory,
-    tokenA: uniswapTokenA,
-    tokenB: uniswapTokenB,
-    fee: feeTier.value,
-  }) as `0x${string}` : zeroAddress;
+  const poolAddress =
+    tokenA !== null && tokenB !== null && tokenA?.address !== tokenB?.address
+      ? (computePoolAddress({
+          factoryAddress: poolFactory,
+          tokenA: uniswapTokenA,
+          tokenB: uniswapTokenB,
+          fee: feeTier.value,
+        }) as `0x${string}`)
+      : zeroAddress;
 
   const poolContract = {
     address: poolAddress,
@@ -74,7 +77,7 @@ const SetPriceRange = ({
   useEffect(() => {
     const _currentPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
     setCurrentPrice(_currentPrice);
-  }, [slot0])
+  }, [slot0]);
 
   return (
     <FormControl
@@ -89,7 +92,8 @@ const SetPriceRange = ({
         {isPoolInitialized && (
           <>
             <Typography textAlign="center">
-              Current Price: {currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenB?.symbol} / {tokenA?.symbol}
+              Current Price: {currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenB?.symbol} /{' '}
+              {tokenA?.symbol}
             </Typography>
             <Box
               p={1}
