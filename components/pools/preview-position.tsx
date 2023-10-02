@@ -141,7 +141,7 @@ const PreviewPosition = ({
         functionName: 'slot0',
       },
     ],
-    enabled: tokenA !== null && tokenB !== null && isPoolInitialized,
+    enabled: tokenA !== null && tokenB !== null && tokenA?.address && tokenB?.address && isPoolInitialized,
   });
   const tickSpacing = poolInfo?.[3].result ? (poolInfo[3].result as number) : 0;
   const liquidity = poolInfo?.[4].result ? (poolInfo[4].result as bigint) : 0n;
