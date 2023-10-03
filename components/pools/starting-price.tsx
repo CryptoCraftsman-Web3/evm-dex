@@ -15,7 +15,7 @@ type StartingPriceProps = {
   tokenA: Token | null;
   tokenB: Token | null;
   feeTier: FeeTier;
-  refetchPool: () => void;
+  isPairReversed: boolean;
 };
 
 const StartingPrice = ({
@@ -24,7 +24,7 @@ const StartingPrice = ({
   tokenA,
   tokenB,
   feeTier,
-  refetchPool,
+  isPairReversed,
 }: StartingPriceProps) => {
   const { nfPositionManager, serpentSwapUtility } = useSwapProtocolAddresses();
 
@@ -44,7 +44,12 @@ const StartingPrice = ({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'createAndInitializePoolIfNecessary',
-    args: [tokenAAddress, tokenBAddress, feeTier.value, sqrtPriceX96],
+    args: [
+      isPairReversed ? tokenBAddress : tokenAAddress,
+      isPairReversed ? tokenAAddress : tokenBAddress,
+      feeTier.value,
+      sqrtPriceX96,
+    ],
     value: 0n,
   });
 
@@ -65,7 +70,6 @@ const StartingPrice = ({
   useEffect(() => {
     if (initializePoolTxSuccess) {
       toast('Pool initialized successfully', { type: 'success' });
-      refetchPool();
     }
 
     if (initializePoolTxError) {
@@ -95,7 +99,8 @@ const StartingPrice = ({
           variant="outlined"
           icon={false}
         >
-          This pool has not been initialized yet. You will need to deploy and set the starting price. This is a separate and additional gas fee from adding liquidity.
+          This pool has not been initialized yet. You will need to deploy and set the starting price. This is a separate
+          and additional gas fee from adding liquidity.
         </Alert>
 
         <Stack
