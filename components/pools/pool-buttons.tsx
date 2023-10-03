@@ -26,6 +26,7 @@ type PoolButtonsProps = {
   startingPrice: number;
   currentPrice: number;
   isPoolInitialized: boolean;
+  isPairReversed: boolean;
   resetAndClose: () => void;
 };
 
@@ -40,6 +41,7 @@ const PoolButtons = ({
   startingPrice,
   currentPrice,
   isPoolInitialized,
+  isPairReversed,
   resetAndClose
 }: PoolButtonsProps) => {
   const { address: userAddress } = useAccount();
@@ -198,6 +200,7 @@ const PoolButtons = ({
         startingPrice={startingPrice}
         currentPrice={currentPrice}
         isPoolInitialized={isPoolInitialized}
+        isPairReversed={isPairReversed}
         resetAndClose={resetAndClose}
       />
     </Stack>

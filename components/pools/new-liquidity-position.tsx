@@ -300,6 +300,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                 startingPrice={startingPrice}
                 currentPrice={currentPrice}
                 isPoolInitialized={isPoolInitialized}
+                isPairReversed={isPairReversed}
                 resetAndClose={resetAndClose}
               />
             </Stack>

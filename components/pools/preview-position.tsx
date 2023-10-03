@@ -1,22 +1,28 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { FeeTier, Token } from '@/types/common';
-import { Token as UniswapToken } from '@uniswap/sdk-core';
-import { nearestUsableTick, TickMath, computePoolAddress } from '@uniswap/v3-sdk';
+import { iUniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { LoadingButton } from '@mui/lab';
 import {
   Button,
   Dialog,
-  useMediaQuery,
-  Theme,
-  DialogTitle,
-  IconButton,
   DialogContent,
-  Typography,
-  Stack,
-  Paper,
+  DialogTitle,
   Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Theme,
+  Typography,
+  useMediaQuery,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { Token as UniswapToken } from '@uniswap/sdk-core';
+import { TickMath, computePoolAddress, nearestUsableTick } from '@uniswap/v3-sdk';
+import JSBI from 'jsbi';
+import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
+import { toast } from 'react-toastify';
+import { parseUnits, zeroAddress } from 'viem';
 import {
   useAccount,
   useContractReads,
@@ -25,12 +31,6 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { iUniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
-import { parseUnits, zeroAddress } from 'viem';
-import JSBI from 'jsbi';
-import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { LoadingButton } from '@mui/lab';
-import { toast } from 'react-toastify';
 
 type PreviewPositionProps = {
   canSpendTokens: boolean;
@@ -44,6 +44,7 @@ type PreviewPositionProps = {
   startingPrice: number;
   currentPrice: number;
   isPoolInitialized: boolean;
+  isPairReversed: boolean;
   resetAndClose: () => void;
 };
 
@@ -59,6 +60,7 @@ const PreviewPosition = ({
   startingPrice,
   currentPrice,
   isPoolInitialized,
+  isPairReversed,
   resetAndClose,
 }: PreviewPositionProps) => {
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -168,19 +170,25 @@ const PreviewPosition = ({
   const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
   const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
 
+  const tokenAAddress = tokenA?.address || zeroAddress;
+  const tokenBAddress = tokenB?.address || zeroAddress;
+
+  const amountADesired = isAmountAValid ? parseUnits(amountA.toString(), tokenA?.decimals || 18) : 0n;
+  const amountBDesired = isAmountBValid ? parseUnits(amountB.toString(), tokenB?.decimals || 18) : 0n;
+
   const { config: mintTxConfig } = usePrepareContractWrite({
     address: nfPositionManager,
     abi: nonfungiblePositionManagerABI,
     functionName: 'mint',
     args: [
       {
-        token0: tokenA?.address ? tokenA.address : zeroAddress,
-        token1: tokenB?.address ? tokenB.address : zeroAddress,
+        token0: isPairReversed ? tokenBAddress : tokenAAddress,
+        token1: isPairReversed ? tokenAAddress : tokenBAddress,
         fee: feeTier.value,
         tickLower,
         tickUpper,
-        amount0Desired: isAmountAValid ? parseUnits(amountA.toString(), tokenA?.decimals || 18) : 0n,
-        amount1Desired: isAmountBValid ? parseUnits(amountB.toString(), tokenB?.decimals || 18) : 0n,
+        amount0Desired: isPairReversed ? amountBDesired : amountADesired,
+        amount1Desired: isPairReversed ? amountADesired : amountBDesired,
         amount0Min: 0n,
         amount1Min: 0n,
         recipient: address ? address : zeroAddress,
