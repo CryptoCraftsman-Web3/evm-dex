@@ -269,6 +269,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                 isPoolInitialized={isPoolInitialized}
                 currentPrice={currentPrice}
                 setCurrentPrice={setCurrentPrice}
+                isPairReversed={isPairReversed}
               />
 
               {!isMdAndUp && (

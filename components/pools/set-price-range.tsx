@@ -20,6 +20,7 @@ type SetPriceRangeProps = {
   isPoolInitialized: boolean;
   currentPrice: number;
   setCurrentPrice: (currentPrice: number) => void;
+  isPairReversed: boolean;
 };
 
 const SetPriceRange = ({
@@ -33,6 +34,7 @@ const SetPriceRange = ({
   isPoolInitialized,
   currentPrice,
   setCurrentPrice,
+  isPairReversed,
 }: SetPriceRangeProps) => {
   const disabled = tokenA === null || tokenB === null;
   const { poolFactory } = useSwapProtocolAddresses();
@@ -76,8 +78,9 @@ const SetPriceRange = ({
   });
 
   useEffect(() => {
-    const _currentPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
-    setCurrentPrice(_currentPrice);
+    const orderedPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
+    const reversedPrice = orderedPrice > 0 ? 1 / orderedPrice : 0;
+    setCurrentPrice(isPairReversed ? reversedPrice : orderedPrice);
   }, [slot0]);
 
   return (
