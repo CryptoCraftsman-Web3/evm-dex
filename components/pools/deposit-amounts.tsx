@@ -59,7 +59,7 @@ const DepositAmounts = ({
     (1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice)) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
   const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(minPrice));
 
-  const exchangeRate = isPoolInitialized ? amountBAtOneA : startingPrice;
+  const exchangeRate = isPoolInitialized ? 1 / amountBAtOneA : startingPrice;
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
