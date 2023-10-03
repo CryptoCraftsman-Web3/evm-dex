@@ -1,37 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { FeeTier, Token } from '@/types/common';
+import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import {
+  Alert,
   Button,
   Dialog,
   DialogContent,
-  Stack,
-  Typography,
-  useMediaQuery,
-  Theme,
-  Grid,
+  DialogTitle,
+  Divider,
   FormControl,
   FormLabel,
-  DialogTitle,
-  Alert,
-  TextField,
   IconButton,
-  Divider,
+  Stack,
+  Theme,
+  useMediaQuery,
 } from '@mui/material';
-import { config } from '../config';
-import SelectToken from '../common/select-token';
-import { FeeTier, Token } from '@/types/common';
-import { useAccount, useContractRead, useContractReads, useNetwork } from 'wagmi';
-import { toast } from 'react-toastify';
-import SelectFeeTier from './select-fee-tier';
-import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
-import { zeroAddress } from 'viem';
+import { Token as UniswapToken } from '@uniswap/sdk-core';
+import { computePoolAddress } from '@uniswap/v3-sdk';
+import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
-import StartingPrice from './starting-price';
-import SetPriceRange from './set-price-range';
+import { toast } from 'react-toastify';
+import { zeroAddress } from 'viem';
+import { useAccount, useContractRead, useNetwork } from 'wagmi';
+import SelectToken from '../common/select-token';
+import { config } from '../config';
 import DepositAmounts from './deposit-amounts';
 import PoolButtons from './pool-buttons';
+import SelectFeeTier from './select-fee-tier';
+import SetPriceRange from './set-price-range';
+import StartingPrice from './starting-price';
 
 type NewLiquidityPositionProps = {
   refetchPoolsCount: () => void;
@@ -39,6 +38,7 @@ type NewLiquidityPositionProps = {
 
 const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) => {
   const { isConnected } = useAccount();
+  const { chain } = useNetwork();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
@@ -75,15 +75,46 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
 
   const { poolFactory } = useSwapProtocolAddresses();
 
-  const { data: pool, refetch: refetchPool } = useContractRead({
+  const uniswapTokenA = new UniswapToken(
+    chain?.id || 1,
+    tokenA?.address || zeroAddress,
+    tokenA?.decimals || 18,
+    tokenA?.symbol || 'A',
+    tokenA?.name || 'A'
+  );
+
+  const uniswapTokenB = new UniswapToken(
+    chain?.id || 1,
+    tokenB?.address || zeroAddress,
+    tokenB?.decimals || 18,
+    tokenB?.symbol || 'B',
+    tokenB?.name || 'B'
+  );
+
+  const poolAddress =
+    tokenA !== null && tokenB !== null && tokenA?.address !== tokenB?.address
+      ? (computePoolAddress({
+          factoryAddress: poolFactory,
+          tokenA: uniswapTokenA,
+          tokenB: uniswapTokenB,
+          fee: feeTier.value,
+        }) as `0x${string}`)
+      : zeroAddress;
+
+  const { data: poolAddressFromFactory } = useContractRead({
     address: poolFactory,
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
-    args: [tokenA?.address ?? zeroAddress, tokenB?.address ?? zeroAddress, feeTier.value],
-    enabled: tokenA !== null && tokenB !== null && tokenA.address !== tokenB.address && feeTier !== null,
+    args: [tokenA?.address || zeroAddress, tokenB?.address || zeroAddress, feeTier.value],
   });
 
-  const isPoolInitialized = pool !== zeroAddress && pool !== undefined;
+  const isPoolInitialized =
+    poolAddressFromFactory === poolAddress && poolAddress !== zeroAddress && poolAddressFromFactory !== zeroAddress;
+
+  const tokenAAddressInt = BigInt(tokenA?.address ?? zeroAddress);
+  const tokenBAddressInt = BigInt(tokenB?.address ?? zeroAddress);
+
+  const isPairReversed = tokenAAddressInt > tokenBAddressInt;
   const validPriceRange = minPrice < maxPrice && minPrice > 0 && maxPrice > 0;
 
   const resetAndClose = () => {
@@ -223,7 +254,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                   tokenA={tokenA}
                   tokenB={tokenB}
                   feeTier={feeTier}
-                  refetchPool={refetchPool}
+                  isPairReversed={isPairReversed}
                 />
               )}
 
