@@ -51,8 +51,8 @@ const SwapClientPage = () => {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
   const getQuote = async () => {
-    const tokenIn = tokenA?.address;
-    const tokenOut = tokenB?.address;
+    const tokenIn = tokenA?.address || zeroAddress;
+    const tokenOut = tokenB?.address || zeroAddress;
 
     if (!tokenIn || !tokenOut) throw new Error('Invalid token addresses');
 
@@ -64,12 +64,25 @@ const SwapClientPage = () => {
     try {
       const fees = [500, 3000, 10000];
 
-      const retrievedQuotes = await Promise.all(
-        fees.map((fee) => {
-          const params = [tokenIn, tokenOut, amountIn, fee, 0];
-          return quoterV2Contract.callStatic.quoteExactInputSingle(params);
-        })
-      );
+      const retrievedQuotes: any[] = [];
+      for (const fee of fees) {
+        try {
+          const retrievedQuote = await quoterV2Contract.callStatic.quoteExactInputSingle([
+            tokenIn,
+            tokenOut,
+            amountIn,
+            fee,
+            0,
+          ]);
+          console.log('retrievedQuote', retrievedQuote);
+          retrievedQuotes.push(retrievedQuote);
+        } catch (err) {
+          // console.error(err);
+          console.log(`Pool or liquidity does not exist for fee ${fee}`);
+        }
+      }
+
+      console.log('retrievedQuotes', retrievedQuotes);
 
       let maxAmountOut = -Infinity;
       let maxAmountOutIndex = -1;
@@ -80,7 +93,7 @@ const SwapClientPage = () => {
           maxAmountOut = amountOutParsed;
           maxAmountOutIndex = i;
         }
-      });
+      }); console.log('maxAmountOut', maxAmountOut); console.log('maxAmountOutIndex', maxAmountOutIndex);
 
       setAmountB(maxAmountOut);
 
@@ -187,7 +200,7 @@ const SwapClientPage = () => {
         tokenOut: selectedQuote?.tokenOut ?? zeroAddress,
         fee: selectedQuote?.fee ?? 0,
         recipient: userAddress ?? zeroAddress,
-        deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 10), // 10 minutes from the current Unix time
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 60), // 10 minutes from the current Unix time
         amountIn: amountAInBaseUnits,
         amountOutMinimum: 0n,
         sqrtPriceLimitX96: 0n,
@@ -248,10 +261,17 @@ const SwapClientPage = () => {
     enabled: Boolean(selectedQuote) && Boolean(poolAddress),
   });
 
+  const tokenInAddress = tokenA?.address || zeroAddress;
+  const tokenOutAddress = tokenB?.address || zeroAddress;
+
+  const isPairReversed = BigInt(tokenInAddress) > BigInt(tokenOutAddress);
+
   const sqrtPriceX96 = slot0?.[0] || 0n;
-  console.log('sqrtPriceX96', sqrtPriceX96);
-  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+  let price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+  if (!isPairReversed) price = 1 / price;
   const expectedAmountOut = amountA * price;
+  console.log('quotes', quotes);
+  console.log('selectedQuote', selectedQuote);
   console.log('expectedAmountOut', expectedAmountOut);
   const amountOutDifferencePercentage =
     amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
@@ -413,7 +433,8 @@ const SwapClientPage = () => {
                           {amountOutDiffTooGreat && (
                             <Alert severity="warning">
                               The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from the
-                              expected amount based on the current price. This may be due to lack of liquidity in the pool. Please proceed with caution.
+                              expected amount based on the current price. This may be due to lack of liquidity in the
+                              pool. Please proceed with caution.
                             </Alert>
                           )}
 
