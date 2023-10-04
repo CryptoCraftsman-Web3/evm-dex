@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { Position } from '@/types/common';
-import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Button, Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
-import Link from 'next/link';
-import { formatUnits, zeroAddress } from 'viem';
-import { erc20ABI, useAccount, useContractRead, useNetwork, usePublicClient } from 'wagmi';
-import { IoMdArrowRoundBack } from 'react-icons/io';
-import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
-import { IoLink } from 'react-icons/io5';
-import { useEthersProvider } from '@/lib/ethers';
-import { ethers, BigNumber } from 'ethers';
-import ClaimTokens from '@/components/pools/claim-tokens';
 import AddLiquidity from '@/components/pools/add-liquidity';
+import ClaimTokens from '@/components/pools/claim-tokens';
 import RemoveLiquidity from '@/components/pools/remove-liquidity';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { useEthersProvider } from '@/lib/ethers';
+import { Position } from '@/types/common';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { BigNumber, ethers } from 'ethers';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { IoMdArrowRoundBack } from 'react-icons/io';
+import { IoLink } from 'react-icons/io5';
+import { formatUnits, zeroAddress } from 'viem';
+import { erc20ABI, useAccount, useContractRead, useNetwork } from 'wagmi';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
