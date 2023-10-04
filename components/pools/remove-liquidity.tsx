@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
@@ -19,7 +18,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
@@ -91,6 +90,7 @@ const RemoveLiquidity = ({
       },
     ],
     value: 0n,
+    enabled: isConnected && percentToRemove > 0,
   });
 
   const {
