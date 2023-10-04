@@ -40,9 +40,9 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
         renderOption={(props, option) => (
           <Box
             component="li"
-            key={option.address}
             sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
             {...props}
+            key={option.address}
           >
             <Stack
               direction="column"
