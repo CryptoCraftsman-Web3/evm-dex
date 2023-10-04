@@ -31,6 +31,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
     abi: nonfungiblePositionManagerABI,
     functionName: 'positions',
     args: [tokenId],
+    enabled: Boolean(tokenId)
   });
 
   const position: Position = {
@@ -53,36 +54,42 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
     address: position.token0,
     abi: erc20ABI,
     functionName: 'symbol',
+    enabled: Boolean(position) && Boolean(position.token0)
   });
 
   const { data: tokenADecimals, isLoading: gettingToken0Decimals } = useContractRead({
     address: position.token0,
     abi: erc20ABI,
     functionName: 'decimals',
+    enabled: Boolean(position) && Boolean(position.token0)
   });
 
   const { data: tokenAName, isLoading: gettingToken0Name } = useContractRead({
     address: position.token0,
     abi: erc20ABI,
     functionName: 'name',
+    enabled: Boolean(position) && Boolean(position.token0)
   });
 
   const { data: tokenBSymbol, isLoading: gettingToken1Symbol } = useContractRead({
     address: position.token1,
     abi: erc20ABI,
     functionName: 'symbol',
+    enabled: Boolean(position) && Boolean(position.token1)
   });
 
   const { data: tokenBDecimals, isLoading: gettingToken1Decimals } = useContractRead({
     address: position.token1,
     abi: erc20ABI,
     functionName: 'decimals',
+    enabled: Boolean(position) && Boolean(position.token1)
   });
 
   const { data: tokenBName, isLoading: gettingToken1Name } = useContractRead({
     address: position.token1,
     abi: erc20ABI,
     functionName: 'name',
+    enabled: Boolean(position) && Boolean(position.token1)
   });
 
   const { data: pool, isLoading: gettingPool } = useContractRead({
@@ -90,12 +97,14 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
     args: [position.token0, position.token1, position.fee],
+    enabled: Boolean(position) && Boolean(position.token0) && Boolean(position.token1) && Boolean(position.fee)
   });
 
   const { data: slot0, isLoading: gettingSlot0 } = useContractRead({
     address: pool,
     abi: uniswapV3PoolABI,
     functionName: 'slot0',
+    enabled: Boolean(pool)
   });
 
   const sqrtPriceX96 = slot0?.[0] || 0n;
