@@ -2,10 +2,10 @@
 
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Token } from '@/types/common';
+import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import {
-  Alert,
   Button,
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   Stack,
   Theme,
   Typography,
-  useMediaQuery,
+  useMediaQuery
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
@@ -30,7 +30,6 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { uniswapV3FactoryABI } from '@/types/wagmi/uniswap-v3-core';
 import DepositAmounts from './deposit-amounts';
 
 type AddLiquidityProps = {
@@ -71,7 +70,6 @@ const AddLiquidity = ({
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   const { address } = useAccount();
-  const { chain } = useNetwork();
 
   const { poolFactory, nfPositionManager } = useSwapProtocolAddresses();
 
@@ -147,7 +145,7 @@ const AddLiquidity = ({
       },
     ],
     value: 0n,
-    enabled: address !== undefined,
+    enabled: address !== undefined && amountA > 0 && amountB > 0,
   });
 
   const {
