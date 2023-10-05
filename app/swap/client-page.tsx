@@ -64,8 +64,9 @@ const SwapClientPage = () => {
     try {
       const fees = [500, 3000, 10000];
 
-      const retrievedQuotes: any[] = [];
-      for (const fee of fees) {
+      let maxAmountOut = -Infinity;
+      const mappedQuotes: Quote[] = [];
+      for (const [index, fee] of fees.entries()) {
         try {
           const retrievedQuote = await quoterV2Contract.callStatic.quoteExactInputSingle([
             tokenIn,
@@ -74,42 +75,34 @@ const SwapClientPage = () => {
             fee,
             0,
           ]);
-          console.log('retrievedQuote', retrievedQuote);
-          retrievedQuotes.push(retrievedQuote);
+
+          const amountOut: ethers.BigNumber = retrievedQuote.amountOut;
+          const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
+
+          const quote: Quote = {
+            tokenIn,
+            tokenOut,
+            fee,
+            amountIn: amountIn,
+            amountOut: amountOut,
+            sqrtPriceX96: retrievedQuote.sqrtPriceX96,
+            sqrtPriceX96After: retrievedQuote.sqrtPriceX96After,
+          };
+
+          if (amountOutParsed > maxAmountOut) {
+            maxAmountOut = amountOutParsed;
+            setSelectedQuote(quote);
+          }
+
+          mappedQuotes.push(quote);
         } catch (err) {
-          // console.error(err);
-          console.log(`Pool or liquidity does not exist for fee ${fee}`);
+          console.error(err);
+          console.error(`Pool or liquidity does not exist for fee ${fee}`);
         }
       }
 
-      console.log('retrievedQuotes', retrievedQuotes);
-
-      let maxAmountOut = -Infinity;
-      let maxAmountOutIndex = -1;
-      retrievedQuotes.forEach((quote, i) => {
-        const amountOut: ethers.BigNumber = quote.amountOut;
-        const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
-        if (amountOutParsed > maxAmountOut) {
-          maxAmountOut = amountOutParsed;
-          maxAmountOutIndex = i;
-        }
-      }); console.log('maxAmountOut', maxAmountOut); console.log('maxAmountOutIndex', maxAmountOutIndex);
-
       setAmountB(maxAmountOut);
-
-      const mappedQuotes = retrievedQuotes.map((quote, i) => {
-        return {
-          tokenIn,
-          tokenOut,
-          fee: fees[i],
-          amountIn: quote.amountIn,
-          amountOut: quote.amountOut,
-          sqrtPriceX96: quote.sqrtPriceX96,
-          sqrtPriceX96After: quote.sqrtPriceX96After,
-        };
-      });
       setQuotes(mappedQuotes);
-      setSelectedQuote(mappedQuotes[maxAmountOutIndex]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -268,11 +261,9 @@ const SwapClientPage = () => {
 
   const sqrtPriceX96 = slot0?.[0] || 0n;
   let price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
-  if (!isPairReversed) price = 1 / price;
+  if (isPairReversed) price = 1 / price;
   const expectedAmountOut = amountA * price;
-  console.log('quotes', quotes);
-  console.log('selectedQuote', selectedQuote);
-  console.log('expectedAmountOut', expectedAmountOut);
+
   const amountOutDifferencePercentage =
     amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
