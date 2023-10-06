@@ -3,7 +3,7 @@ import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { isAddress, zeroAddress } from 'viem';
-import { useAccount, useToken } from 'wagmi';
+import { useAccount, useNetwork, useToken } from 'wagmi';
 
 type SelectTokenProps = {
   inputLabel?: string;
@@ -13,6 +13,7 @@ type SelectTokenProps = {
 
 const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
   const { isConnected } = useAccount();
+  const { chain } = useNetwork();
   const tokens = useErc20Tokens();
   const nativeToken = useNativeToken();
 
@@ -64,14 +65,20 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
               <Typography variant="body1">
                 {option.symbol} {option.name !== option.symbol ? `(${option.name})` : ''}
               </Typography>
-              {option.address !== zeroAddress && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {option.address.slice(0, 6)}...{option.address.slice(-4)}
-                </Typography>
-              )}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+              >
+                {option.address === zeroAddress ? (
+                  <>
+                    {chain?.name}'s Native Token
+                  </>
+                ) : (
+                  <>
+                    {option.address.slice(0, 6)}...{option.address.slice(-4)}
+                  </>
+                )}
+              </Typography>
             </Stack>
           </Box>
         )}
