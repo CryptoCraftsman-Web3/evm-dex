@@ -2,6 +2,7 @@
 
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { nativeTokenAddress, useWrappedNativeToken } from '@/hooks/token-hooks';
 import { useEthersProvider } from '@/lib/ethers';
 import { Token } from '@/types/common';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
@@ -30,6 +31,11 @@ const SwapClientPage = () => {
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
+  const isTokenANative = tokenA?.address === nativeTokenAddress;
+  const isTokenBNative = tokenB?.address === nativeTokenAddress;
+
+  const wrappedNativeToken = useWrappedNativeToken();
+
   const [amountA, setAmountA] = useState<number>(1);
   const [amountB, setAmountB] = useState<number>(1);
 
@@ -52,8 +58,8 @@ const SwapClientPage = () => {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
   const getQuote = async () => {
-    const tokenIn = tokenA?.address || zeroAddress;
-    const tokenOut = tokenB?.address || zeroAddress;
+    const tokenIn = isTokenANative ? wrappedNativeToken.address : tokenA?.address || zeroAddress;
+    const tokenOut = isTokenBNative ? wrappedNativeToken.address : tokenB?.address || zeroAddress;
 
     if (!tokenIn || !tokenOut) throw new Error('Invalid token addresses');
 
