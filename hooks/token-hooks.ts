@@ -32,27 +32,31 @@ export const useNativeToken = () => {
   return token;
 };
 
+const wrappedSepoliaEther: Token = {
+  name: 'Wrapped Ether',
+  symbol: 'WETH',
+  address: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+  decimals: 18,
+};
+
+const wrappedXrpDevnet: Token = {
+  name: 'Wrapped XRP',
+  symbol: 'WXRP',
+  address: '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d',
+  decimals: 18,
+};
+
 export const useWrappedNativeToken = () => {
   const { chain } = useNetwork();
   let token: Token;
 
   switch (chain?.id) {
     case 11155111:
-      token = {
-        name: 'Wrapped Ether',
-        symbol: 'WETH',
-        address: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
-        decimals: 18,
-      };
+      return wrappedSepoliaEther;
       break;
     case 1440002:
     default:
-      token = {
-        name: 'Wrapped XRP',
-        symbol: 'WXRP',
-        address: '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d',
-        decimals: 18,
-      };
+      return wrappedXrpDevnet;
       break;
   }
 
@@ -82,7 +86,7 @@ export const useErc20Tokens = () => {
 };
 
 const xrplDevnetTokens: Token[] = [
-  useWrappedNativeToken(),
+  wrappedXrpDevnet,
   {
     name: 'USDX',
     symbol: 'USDX',
@@ -92,7 +96,7 @@ const xrplDevnetTokens: Token[] = [
 ];
 
 const sepoliaTokens: Token[] = [
-  useWrappedNativeToken(),
+  wrappedSepoliaEther,
   {
     name: 'USDX',
     symbol: 'USDX',
