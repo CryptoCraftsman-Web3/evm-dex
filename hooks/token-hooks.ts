@@ -2,7 +2,8 @@
 
 import { useNetwork } from 'wagmi';
 import { Token } from '../types/common';
-import { zeroAddress } from 'viem';
+
+export const nativeHexAddress = '0x6e6174697665';
 
 export const useNativeToken = () => {
   const { chain } = useNetwork();
@@ -13,7 +14,7 @@ export const useNativeToken = () => {
       token = {
         name: 'Ether',
         symbol: 'ETH',
-        address: zeroAddress,
+        address: nativeHexAddress,
         decimals: 18,
       };
       break;
@@ -22,7 +23,7 @@ export const useNativeToken = () => {
       token = {
         name: 'XRP',
         symbol: 'XRP',
-        address: zeroAddress,
+        address: nativeHexAddress,
         decimals: 18,
       };
       break;
