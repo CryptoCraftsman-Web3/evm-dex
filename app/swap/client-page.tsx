@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Alert, Button, CircularProgress, Paper, Stack, TextField, Typography } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
-import { Token } from '@/types/common';
-import { ethers } from 'ethers';
-import { useEthersProvider } from '@/lib/ethers';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { useEthersProvider } from '@/lib/ethers';
+import { Token } from '@/types/common';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { LoadingButton } from '@mui/lab';
+import { Alert, Paper, Stack, TextField, Typography } from '@mui/material';
+import { ethers } from 'ethers';
+import { useEffect, useRef, useState } from 'react';
+import { IoWalletSharp } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import { zeroAddress } from 'viem';
 import {
   erc20ABI,
   useAccount,
@@ -17,13 +22,9 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
-import { zeroAddress } from 'viem';
-import { toast } from 'react-toastify';
-import { LoadingButton } from '@mui/lab';
-import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 
 const SwapClientPage = () => {
-  const { address: userAddress } = useAccount();
+  const { address: userAddress, isConnected: isUserWalletConnected } = useAccount();
   const { swapRouter, poolFactory } = useSwapProtocolAddresses();
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
@@ -281,115 +282,123 @@ const SwapClientPage = () => {
           direction="column"
           spacing={2}
         >
-          <Typography variant="h6">
-            <strong>Swap</strong>
-          </Typography>
-
-          <Paper
-            variant="outlined"
-            sx={{ p: 2 }}
-          >
-            <Stack
-              direction="row"
-              spacing={2}
-            >
-              <Typography
-                variant="body1"
-                color="GrayText"
-              >
-                You Pay
+          {isUserWalletConnected ? (
+            <>
+              <Typography variant="h6">
+                <strong>Swap</strong>
               </Typography>
-            </Stack>
 
-            <Stack
-              direction="row"
-              spacing={2}
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <TextField
-                inputRef={amountAInputRef}
-                type="number"
-                value={amountA}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    setAmountA(0);
-                    return;
-                  }
-                  const parsed = parseFloat(value);
-                  if (isNaN(parsed)) setAmountA(0);
-
-                  if (parsed < 0) {
-                    setAmountA(0);
-                  }
-
-                  setAmountA(parsed);
-                }}
-                sx={{
-                  '& fieldset': { border: 'none' },
-                }}
-              />
-
-              <SelectToken
-                token={tokenA}
-                setToken={setTokenA}
-                inputLabel="Select a token"
-              />
-            </Stack>
-          </Paper>
-
-          <Paper
-            variant="outlined"
-            sx={{ p: 2 }}
-          >
-            <Stack
-              direction="row"
-              spacing={2}
-            >
-              <Typography
-                variant="body1"
-                color="GrayText"
+              <Paper
+                variant="outlined"
+                sx={{ p: 2 }}
               >
-                You Receive (Estimate)
-              </Typography>
-            </Stack>
-
-            <Stack
-              direction="row"
-              spacing={2}
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              {isFetchingQuotes ? (
-                <Typography
-                  color="GrayText"
-                  sx={{ minWidth: '41%' }}
+                <Stack
+                  direction="row"
+                  spacing={2}
                 >
-                  Fetching quotes...
-                </Typography>
-              ) : (
-                <TextField
-                  type="number"
-                  value={amountB.toFixed(4)}
-                  onChange={(e) => {
-                    return;
-                  }}
-                  sx={{
-                    '& fieldset': { border: 'none' },
-                  }}
-                />
-              )}
+                  <Typography
+                    variant="body1"
+                    color="GrayText"
+                  >
+                    You Pay
+                  </Typography>
+                </Stack>
 
-              <SelectToken
-                token={tokenB}
-                setToken={setTokenB}
-                inputLabel="Select a token"
-              />
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <TextField
+                    inputRef={amountAInputRef}
+                    type="number"
+                    value={amountA}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '') {
+                        setAmountA(0);
+                        return;
+                      }
+                      const parsed = parseFloat(value);
+                      if (isNaN(parsed)) setAmountA(0);
+
+                      if (parsed < 0) {
+                        setAmountA(0);
+                      }
+
+                      setAmountA(parsed);
+                    }}
+                    sx={{
+                      '& fieldset': { border: 'none' },
+                    }}
+                  />
+
+                  <SelectToken
+                    token={tokenA}
+                    setToken={setTokenA}
+                    inputLabel="Select a token"
+                  />
+                </Stack>
+              </Paper>
+
+              <Paper
+                variant="outlined"
+                sx={{ p: 2 }}
+              >
+                <Stack
+                  direction="row"
+                  spacing={2}
+                >
+                  <Typography
+                    variant="body1"
+                    color="GrayText"
+                  >
+                    You Receive (Estimate)
+                  </Typography>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  {isFetchingQuotes ? (
+                    <Typography
+                      color="GrayText"
+                      sx={{ minWidth: '41%' }}
+                    >
+                      Fetching quotes...
+                    </Typography>
+                  ) : (
+                    <TextField
+                      type="number"
+                      value={amountB.toFixed(4)}
+                      onChange={(e) => {
+                        return;
+                      }}
+                      sx={{
+                        '& fieldset': { border: 'none' },
+                      }}
+                    />
+                  )}
+
+                  <SelectToken
+                    token={tokenB}
+                    setToken={setTokenB}
+                    inputLabel="Select a token"
+                  />
+                </Stack>
+              </Paper>
+            </>
+          ) : (
+            <Stack alignItems="center" sx={{ p: 4 }}>
+              <IoWalletSharp size={256} />
             </Stack>
-          </Paper>
+          )}
 
-          {!userAddress ? (
+          {!isUserWalletConnected ? (
             <Alert severity="error">Please connect your wallet first</Alert>
           ) : (
             <>
