@@ -3,7 +3,7 @@ import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { isAddress, zeroAddress } from 'viem';
-import { useToken } from 'wagmi';
+import { useAccount, useToken } from 'wagmi';
 
 type SelectTokenProps = {
   inputLabel?: string;
@@ -12,6 +12,7 @@ type SelectTokenProps = {
 };
 
 const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
+  const { isConnected } = useAccount();
   const tokens = useErc20Tokens();
   const nativeToken = useNativeToken();
 
@@ -33,10 +34,20 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
         getOptionLabel={(option) => option.name}
         sx={{ width: { xs: 'auto', md: 300 } }}
         renderInput={(params) => (
-          <TextField
-            {...params}
-            label={inputLabel}
-          />
+          <>
+            {isConnected ? (
+              <TextField
+                {...params}
+                label={inputLabel}
+              />
+            ) : (
+              <TextField
+                size="small"
+                value={'Connect Wallet'}
+                disabled
+              />
+            )}
+          </>
         )}
         renderOption={(props, option) => (
           <Box
