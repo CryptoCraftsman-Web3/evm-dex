@@ -1,8 +1,8 @@
-import { useErc20Tokens } from '@/hooks/token-hooks';
+import { useErc20Tokens, useNativeToken } from '@/hooks/token-hooks';
 import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
-import { isAddress } from 'viem';
+import { isAddress, zeroAddress } from 'viem';
 import { useToken } from 'wagmi';
 
 type SelectTokenProps = {
@@ -13,6 +13,7 @@ type SelectTokenProps = {
 
 const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
   const tokens = useErc20Tokens();
+  const nativeToken = useNativeToken();
 
   const [inputValue, setInputValue] = useState<string>('');
   const {
@@ -28,7 +29,7 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
     <>
       <Autocomplete
         disablePortal
-        options={tokens}
+        options={[nativeToken, ...tokens]}
         getOptionLabel={(option) => option.name}
         sx={{ width: { xs: 'auto', md: 300 } }}
         renderInput={(params) => (
@@ -52,12 +53,14 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
               <Typography variant="body1">
                 {option.symbol} {option.name !== option.symbol ? `(${option.name})` : ''}
               </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
-                {option.address.slice(0, 6)}...{option.address.slice(-4)}
-              </Typography>
+              {option.address !== zeroAddress && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {option.address.slice(0, 6)}...{option.address.slice(-4)}
+                </Typography>
+              )}
             </Stack>
           </Box>
         )}
