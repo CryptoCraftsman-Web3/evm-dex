@@ -2,6 +2,34 @@
 
 import { useNetwork } from 'wagmi';
 import { Token } from '../types/common';
+import { zeroAddress } from 'viem';
+
+export const useNativeToken = () => {
+  const { chain } = useNetwork();
+  let token: Token;
+
+  switch (chain?.id) {
+    case 11155111:
+      token = {
+        name: 'Ether',
+        symbol: 'ETH',
+        address: zeroAddress,
+        decimals: 18,
+      };
+      break;
+    case 1440002:
+    default:
+      token = {
+        name: 'XRP',
+        symbol: 'XRP',
+        address: zeroAddress,
+        decimals: 18,
+      };
+      break;
+  }
+
+  return token;
+};
 
 export const useErc20Tokens = () => {
   // get current chain
@@ -11,9 +39,15 @@ export const useErc20Tokens = () => {
   let tokens: Token[] = [];
 
   switch (chain?.id) {
-    case 1440002: tokens = xrplDevnetTokens; break;
-    case 11155111: tokens = sepoliaTokens; break;
-    default: tokens = []; break;
+    case 1440002:
+      tokens = xrplDevnetTokens;
+      break;
+    case 11155111:
+      tokens = sepoliaTokens;
+      break;
+    default:
+      tokens = [];
+      break;
   }
 
   return tokens;
