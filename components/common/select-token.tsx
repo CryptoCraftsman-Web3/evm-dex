@@ -1,8 +1,8 @@
-import { useErc20Tokens, useNativeToken } from '@/hooks/token-hooks';
+import { nativeTokenAddress, useErc20Tokens, useNativeToken } from '@/hooks/token-hooks';
 import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
-import { isAddress, zeroAddress } from 'viem';
+import { isAddress } from 'viem';
 import { useAccount, useNetwork, useToken } from 'wagmi';
 
 type SelectTokenProps = {
@@ -69,10 +69,8 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
                 variant="caption"
                 color="text.secondary"
               >
-                {option.address === zeroAddress ? (
-                  <>
-                    {chain?.name}'s Native Token
-                  </>
+                {option.address === nativeTokenAddress ? (
+                  <>{chain?.name}'s Native Token</>
                 ) : (
                   <>
                     {option.address.slice(0, 6)}...{option.address.slice(-4)}
