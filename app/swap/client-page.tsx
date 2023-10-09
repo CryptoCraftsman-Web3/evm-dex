@@ -378,16 +378,18 @@ const SwapClientPage = () => {
                       Fetching quotes...
                     </Typography>
                   ) : (
-                    <TextField
-                      type="number"
-                      value={amountB.toFixed(4)}
-                      onChange={(e) => {
-                        return;
-                      }}
-                      sx={{
-                        '& fieldset': { border: 'none' },
-                      }}
-                    />
+                    <>
+                      <TextField
+                        type="number"
+                        value={Boolean(selectedQuote) ? amountB.toFixed(4) : null}
+                        onChange={(e) => {
+                          return;
+                        }}
+                        sx={{
+                          '& fieldset': { border: 'none' },
+                        }}
+                      />
+                    </>
                   )}
 
                   <SelectToken
@@ -399,7 +401,10 @@ const SwapClientPage = () => {
               </Paper>
             </>
           ) : (
-            <Stack alignItems="center" sx={{ p: 4 }}>
+            <Stack
+              alignItems="center"
+              sx={{ p: 4 }}
+            >
               <IoWalletSharp size={256} />
             </Stack>
           )}
