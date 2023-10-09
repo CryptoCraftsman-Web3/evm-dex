@@ -228,6 +228,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                   validPriceRange={validPriceRange}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
+                  isPairReversed={isPairReversed}
                 />
               )}
             </Stack>
@@ -286,6 +287,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                   validPriceRange={validPriceRange}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
+                  isPairReversed={isPairReversed}
                 />
               )}
 

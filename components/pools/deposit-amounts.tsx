@@ -17,6 +17,7 @@ type DepositAmountProps = {
   validPriceRange: boolean;
   minPrice: number;
   maxPrice: number;
+  isPairReversed: boolean;
   showLabel?: boolean;
   layout?: 'column' | 'row' | 'auto';
 };
@@ -34,8 +35,9 @@ const DepositAmounts = ({
   validPriceRange,
   minPrice,
   maxPrice,
+  isPairReversed,
   showLabel = true,
-  layout = 'auto'
+  layout = 'auto',
 }: DepositAmountProps) => {
   const { address: userAddress } = useAccount();
 
@@ -55,19 +57,26 @@ const DepositAmounts = ({
     enabled: tokenB !== null && userAddress !== undefined,
   });
 
+  console.log('isPairReversed', isPairReversed);
   const liquidityAtOneOfA =
     (1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice)) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
   const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(minPrice));
 
-  const exchangeRate = isPoolInitialized ? 1 / amountBAtOneA : startingPrice;
+  const initializedPrice = isPairReversed ? 1 / amountBAtOneA : amountBAtOneA;
+  const exchangeRate = isPoolInitialized ? 1 / initializedPrice : startingPrice;
+  console.log('exchangeRate', exchangeRate);
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
   const tokenABalanceParsed = parseFloat(tokenABalanceFormatted);
-  const tokenAMax = Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
+  const tokenAMax = isPairReversed
+    ? Math.min(tokenABalanceParsed, tokenABalanceParsed * exchangeRate)
+    : Math.min(tokenABalanceParsed, tokenABalanceParsed / exchangeRate);
 
   const tokenBBalanceFormatted = tokenBBalance ? formatUnits(tokenBBalance as bigint, tokenB?.decimals ?? 18) : '0';
   const tokenBBalanceParsed = parseFloat(tokenBBalanceFormatted);
-  const tokenBMax = Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate);
+  const tokenBMax = isPairReversed
+    ? Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate)
+    : Math.min(tokenBBalanceParsed, tokenBBalanceParsed / exchangeRate);
 
   useEffect(() => {
     const newAmountA = amountA > tokenAMax ? tokenAMax : amountA;
@@ -89,7 +98,7 @@ const DepositAmounts = ({
         spacing={2}
       >
         <Stack
-          direction={ layout === 'auto' ? { xs: 'column', md: 'row' } : layout }
+          direction={layout === 'auto' ? { xs: 'column', md: 'row' } : layout}
           spacing={2}
         >
           <Stack direction="column">

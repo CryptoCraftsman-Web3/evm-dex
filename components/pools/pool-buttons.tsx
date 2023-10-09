@@ -81,8 +81,10 @@ const PoolButtons = ({
   const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
   const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
 
-  const amountAInWei = isAmountAValid ? BigInt(amountA * 10 ** (tokenA?.decimals ?? 18)) : 0n;
-  const amountBInWei = isAmountBValid ? BigInt(amountB * 10 ** (tokenB?.decimals ?? 18)) : 0n;
+  const roundedAmountA = isAmountAValid ? amountA.toFixed(tokenA?.decimals ?? 18) : '0';
+  const roundedAmountB = isAmountBValid ? amountB.toFixed(tokenB?.decimals ?? 18) : '0';
+  const amountAInWei = isAmountAValid ? parseUnits(roundedAmountA, tokenA?.decimals ?? 18) : 0n;
+  const amountBInWei = isAmountBValid ? parseUnits(roundedAmountB, tokenA?.decimals ?? 18) : 0n;
 
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
