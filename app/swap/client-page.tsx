@@ -13,10 +13,12 @@ import { ethers } from 'ethers';
 import { useEffect, useRef, useState } from 'react';
 import { IoWalletSharp } from 'react-icons/io5';
 import { toast } from 'react-toastify';
+import { isToken } from 'typescript';
 import { zeroAddress } from 'viem';
 import {
   erc20ABI,
   useAccount,
+  useBalance,
   useContractRead,
   useContractReads,
   useContractWrite,
@@ -57,11 +59,11 @@ const SwapClientPage = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
-  const getQuote = async () => {
-    const tokenIn = isTokenANative ? wrappedNativeToken.address : tokenA?.address || zeroAddress;
-    const tokenOut = isTokenBNative ? wrappedNativeToken.address : tokenB?.address || zeroAddress;
+  const tokenInAddress = isTokenANative ? wrappedNativeToken.address : tokenA?.address || zeroAddress;
+  const tokenOutAddress = isTokenBNative ? wrappedNativeToken.address : tokenB?.address || zeroAddress;
 
-    if (!tokenIn || !tokenOut) throw new Error('Invalid token addresses');
+  const getQuote = async () => {
+    if (!tokenInAddress || !tokenOutAddress) throw new Error('Invalid token addresses');
 
     const amountIn = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18);
     if (amountIn.isZero()) throw new Error('Invalid amount');
@@ -76,8 +78,8 @@ const SwapClientPage = () => {
       for (const [index, fee] of fees.entries()) {
         try {
           const retrievedQuote = await quoterV2Contract.callStatic.quoteExactInputSingle([
-            tokenIn,
-            tokenOut,
+            tokenInAddress,
+            tokenOutAddress,
             amountIn,
             fee,
             0,
@@ -87,8 +89,8 @@ const SwapClientPage = () => {
           const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
 
           const quote: Quote = {
-            tokenIn,
-            tokenOut,
+            tokenIn: tokenInAddress,
+            tokenOut: tokenOutAddress,
             fee,
             amountIn: amountIn,
             amountOut: amountOut,
@@ -151,12 +153,21 @@ const SwapClientPage = () => {
     enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
+  const { data: userNativeTokenBalance, refetch: refetchUserNativeTokenBalance } = useBalance({
+    address: userAddress ?? zeroAddress,
+    enabled: Boolean(userAddress),
+  }); console.log('userNativeTokenBalance', userNativeTokenBalance);
+
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
   const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
   const amountAInBaseUnits = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18).toBigInt();
 
-  const notEnoughTokenABalance = tokenAUserBalance < amountAInBaseUnits;
-  const notEnoughTokenAAllowance = tokenAUserAllowance < amountAInBaseUnits;
+  const notEnoughTokenABalance = isTokenANative
+    ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
+    : tokenAUserBalance < amountAInBaseUnits; console.log('notEnoughTokenABalance', notEnoughTokenABalance);
+  const notEnoughTokenAAllowance = isTokenANative
+    ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
+    : tokenAUserAllowance < amountAInBaseUnits; console.log('notEnoughTokenAAllowance', notEnoughTokenAAllowance);
 
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
@@ -206,7 +217,7 @@ const SwapClientPage = () => {
         sqrtPriceLimitX96: 0n,
       },
     ],
-    value: 0n,
+    value: isTokenANative ? amountAInBaseUnits : 0n,
     enabled: Boolean(userAddress) && Boolean(selectedQuote),
   });
 
@@ -260,9 +271,6 @@ const SwapClientPage = () => {
     functionName: 'slot0',
     enabled: Boolean(selectedQuote) && Boolean(poolAddress),
   });
-
-  const tokenInAddress = tokenA?.address || zeroAddress;
-  const tokenOutAddress = tokenB?.address || zeroAddress;
 
   const isPairReversed = BigInt(tokenInAddress) > BigInt(tokenOutAddress);
 
