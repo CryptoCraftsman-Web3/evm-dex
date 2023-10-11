@@ -101,7 +101,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
         }) as `0x${string}`)
       : zeroAddress;
 
-  const { data: poolAddressFromFactory } = useContractRead({
+  const { data: poolAddressFromFactory, refetch: refetchPoolAddressFromFactory } = useContractRead({
     address: poolFactory,
     abi: uniswapV3FactoryABI,
     functionName: 'getPool',
@@ -256,6 +256,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                   tokenB={tokenB}
                   feeTier={feeTier}
                   isPairReversed={isPairReversed}
+                  refetchPoolAddressFromFactory={refetchPoolAddressFromFactory}
                 />
               )}
 

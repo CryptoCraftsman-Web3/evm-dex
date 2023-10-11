@@ -70,12 +70,16 @@ const SetPriceRange = ({
     abi: uniswapV3PoolABI,
   };
 
-  const { data: slot0 } = useContractRead({
+  const { data: slot0, refetch: refetchSlot0 } = useContractRead({
     address: poolAddress,
     abi: uniswapV3PoolABI,
     functionName: 'slot0',
     enabled: poolAddress !== zeroAddress,
   });
+
+  useEffect(() => {
+    refetchSlot0();
+  }, [isPoolInitialized]);
 
   useEffect(() => {
     const orderedPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
