@@ -84,8 +84,8 @@ const SetPriceRange = ({
   useEffect(() => {
     const orderedPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
     const reversedPrice = orderedPrice > 0 ? 1 / orderedPrice : 0;
-    // setCurrentPrice(isPairReversed ? reversedPrice : orderedPrice);
-    setCurrentPrice(orderedPrice);
+    setCurrentPrice(isPairReversed ? reversedPrice : orderedPrice);
+    // setCurrentPrice(orderedPrice);
   }, [slot0]);
 
   return (
