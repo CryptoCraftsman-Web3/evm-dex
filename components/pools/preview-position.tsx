@@ -182,13 +182,13 @@ const PreviewPosition = ({
     functionName: 'mint',
     args: [
       {
-        token0: isPairReversed ? tokenBAddress : tokenAAddress,
-        token1: isPairReversed ? tokenAAddress : tokenBAddress,
+        token0: tokenAAddress,
+        token1: tokenBAddress,
         fee: feeTier.value,
         tickLower,
         tickUpper,
-        amount0Desired: isPairReversed ? amountBDesired : amountADesired,
-        amount1Desired: isPairReversed ? amountADesired : amountBDesired,
+        amount0Desired: amountADesired,
+        amount1Desired: amountBDesired,
         amount0Min: 0n,
         amount1Min: 0n,
         recipient: address ? address : zeroAddress,
@@ -290,7 +290,11 @@ const PreviewPosition = ({
                   justifyContent="space-between"
                 >
                   <Typography variant="body1">{tokenA?.symbol}</Typography>
-                  <Typography variant="body1">{amountA.toLocaleString()} </Typography>
+                  <Typography variant="body1">
+                    {amountA.toLocaleString(undefined, {
+                      maximumFractionDigits: 10,
+                    })}{' '}
+                  </Typography>
                 </Stack>
 
                 <Stack
@@ -298,7 +302,11 @@ const PreviewPosition = ({
                   justifyContent="space-between"
                 >
                   <Typography variant="body1">{tokenB?.symbol}</Typography>
-                  <Typography variant="body1">{amountB.toLocaleString()} </Typography>
+                  <Typography variant="body1">
+                    {amountB.toLocaleString(undefined, {
+                      maximumFractionDigits: 10,
+                    })}{' '}
+                  </Typography>
                 </Stack>
 
                 <Divider />
@@ -341,7 +349,9 @@ const PreviewPosition = ({
                     variant="body1"
                     textAlign="center"
                   >
-                    {minPrice.toLocaleString()}
+                    {minPrice.toLocaleString(undefined, {
+                      maximumFractionDigits: 10,
+                    })}
                   </Typography>
                   <Typography
                     variant="body2"
@@ -372,7 +382,9 @@ const PreviewPosition = ({
                     variant="body1"
                     textAlign="center"
                   >
-                    {maxPrice.toLocaleString()}
+                    {maxPrice.toLocaleString(undefined, {
+                      maximumFractionDigits: 10,
+                    })}
                   </Typography>
                   <Typography
                     variant="body2"
