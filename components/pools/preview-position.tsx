@@ -154,8 +154,17 @@ const PreviewPosition = ({
   const sqrtPriceX96 = slot0[0] as bigint;
   const tick = slot0[1] as number;
 
-  const sqrtMinPriceX96 = Math.sqrt(minPrice) * 2 ** 96;
-  const sqrtMaxPriceX96 = Math.sqrt(maxPrice) * 2 ** 96;
+  const reciprocalMinPrice = 1 / (minPrice || 1);
+  const reciprocalMaxPrice = 1 / (maxPrice || 1);
+
+  const reversedMinPrice = Math.min(reciprocalMinPrice, reciprocalMaxPrice);
+  const reversedMaxPrice = Math.max(reciprocalMinPrice, reciprocalMaxPrice);
+
+  const minPriceToUse = isPairReversed ? minPrice : reversedMinPrice;
+  const maxPriceToUse = isPairReversed ? maxPrice : reversedMaxPrice;
+
+  const sqrtMinPriceX96 = Math.sqrt(minPriceToUse) * 2 ** 96;
+  const sqrtMaxPriceX96 = Math.sqrt(maxPriceToUse) * 2 ** 96;
 
   const minPriceTargetTick =
     sqrtMinPriceX96 !== 0 ? TickMath.getTickAtSqrtRatio(JSBI.BigInt(sqrtMinPriceX96)) : TickMath.MIN_TICK;
@@ -182,13 +191,13 @@ const PreviewPosition = ({
     functionName: 'mint',
     args: [
       {
-        token0: tokenAAddress,
-        token1: tokenBAddress,
+        token0: isPairReversed ? tokenBAddress : tokenAAddress,
+        token1: isPairReversed ? tokenAAddress : tokenBAddress,
         fee: feeTier.value,
         tickLower,
         tickUpper,
-        amount0Desired: amountADesired,
-        amount1Desired: amountBDesired,
+        amount0Desired: isPairReversed ? amountBDesired : amountADesired,
+        amount1Desired: isPairReversed ? amountADesired : amountBDesired,
         amount0Min: 0n,
         amount1Min: 0n,
         recipient: address ? address : zeroAddress,
@@ -416,14 +425,16 @@ const PreviewPosition = ({
                   variant="body1"
                   textAlign="center"
                 >
-                  {price.toLocaleString()}
+                  {(1 / price).toLocaleString(undefined, {
+                    maximumFractionDigits: 10,
+                  })}
                 </Typography>
                 <Typography
                   variant="body2"
                   color="GrayText"
                   textAlign="center"
                 >
-                  {tokenB?.symbol} / {tokenA?.symbol}
+                  {tokenA?.symbol} / {tokenB?.symbol}
                 </Typography>
               </Stack>
             </Paper>

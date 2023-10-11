@@ -57,14 +57,20 @@ const DepositAmounts = ({
     enabled: tokenB !== null && userAddress !== undefined,
   });
 
-  console.log('isPairReversed', isPairReversed);
-  console.log('startingPrice', startingPrice);
-  console.log('currentPrice', currentPrice);
-  console.log('minPrice', minPrice);
-  console.log('maxPrice', maxPrice);
+  const reciprocalMinPrice = 1 / (minPrice || 1);
+  const reciprocalMaxPrice = 1 / (maxPrice || 1);
+
+  const reversedMinPrice = Math.min(reciprocalMinPrice, reciprocalMaxPrice);
+  const reversedMaxPrice = Math.max(reciprocalMinPrice, reciprocalMaxPrice);
+
+  const currentPriceToUse = isPairReversed ? 1 / currentPrice : currentPrice;
+  const minPriceToUse = isPairReversed ? minPrice : reversedMinPrice;
+  const maxPriceToUse = isPairReversed ? maxPrice : reversedMaxPrice;
+
   const liquidityAtOneOfA =
-    (1 * Math.sqrt(currentPrice) * Math.sqrt(1 / maxPrice)) / (Math.sqrt(1 / maxPrice) - Math.sqrt(currentPrice));
-  const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(1 / minPrice));
+    (1 * Math.sqrt(currentPrice) * Math.sqrt(reversedMaxPrice)) /
+    (Math.sqrt(reversedMaxPrice) - Math.sqrt(currentPrice));
+  const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(reversedMinPrice));
 
   const initializedPrice = amountBAtOneA;
   const exchangeRate = isPoolInitialized ? initializedPrice : startingPrice;
