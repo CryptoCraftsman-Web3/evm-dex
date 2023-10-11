@@ -85,7 +85,6 @@ const SetPriceRange = ({
     const orderedPrice = slot0?.[0] ? Math.pow(Number(slot0[0]) / 2 ** 96, 2) : 0;
     const reversedPrice = orderedPrice > 0 ? 1 / orderedPrice : 0;
     setCurrentPrice(isPairReversed ? reversedPrice : orderedPrice);
-    // setCurrentPrice(orderedPrice);
   }, [slot0]);
 
   return (
@@ -101,8 +100,8 @@ const SetPriceRange = ({
         {isPoolInitialized && (
           <>
             <Typography textAlign="center">
-              Current Price: {currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenB?.symbol} /{' '}
-              {tokenA?.symbol}
+              Current Price: {(1 / currentPrice).toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenA?.symbol} per{' '}
+              {tokenB?.symbol}
             </Typography>
             <Box
               p={1}
@@ -129,7 +128,7 @@ const SetPriceRange = ({
               endAdornment:
                 tokenA && tokenB ? (
                   <>
-                    {tokenB.symbol} / {tokenA.symbol}
+                    {tokenA.symbol} / {tokenB.symbol}
                   </>
                 ) : null,
               inputProps: {
@@ -159,7 +158,7 @@ const SetPriceRange = ({
               endAdornment:
                 tokenA && tokenB ? (
                   <>
-                    {tokenB.symbol} / {tokenA.symbol}
+                    {tokenA.symbol} / {tokenB.symbol}
                   </>
                 ) : null,
               inputProps: {
