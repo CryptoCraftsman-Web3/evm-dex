@@ -16,6 +16,7 @@ type StartingPriceProps = {
   tokenB: Token | null;
   feeTier: FeeTier;
   isPairReversed: boolean;
+  refetchPoolAddressFromFactory: () => void;
 };
 
 const StartingPrice = ({
@@ -25,6 +26,7 @@ const StartingPrice = ({
   tokenB,
   feeTier,
   isPairReversed,
+  refetchPoolAddressFromFactory,
 }: StartingPriceProps) => {
   const { nfPositionManager, serpentSwapUtility } = useSwapProtocolAddresses();
 
@@ -32,6 +34,7 @@ const StartingPrice = ({
   const tokenBAddress = tokenB?.address ?? zeroAddress;
 
   const sqrtPriceX96: bigint = BigInt(Math.sqrt(startingPrice) * 2 ** 96);
+  const reversedSqrtPriceX96: bigint = startingPrice > 0 ? BigInt(Math.sqrt(1 / startingPrice) * 2 ** 96) : 0n;
 
   // const { config: initializePoolTxConfig } = usePrepareContractWrite({
   //   address: serpentSwapUtility,
@@ -48,7 +51,7 @@ const StartingPrice = ({
       isPairReversed ? tokenBAddress : tokenAAddress,
       isPairReversed ? tokenAAddress : tokenBAddress,
       feeTier.value,
-      sqrtPriceX96,
+      isPairReversed ? reversedSqrtPriceX96 : sqrtPriceX96,
     ],
     value: 0n,
   });
@@ -68,6 +71,7 @@ const StartingPrice = ({
   });
 
   useEffect(() => {
+    refetchPoolAddressFromFactory();
     if (initializePoolTxSuccess) {
       toast('Pool initialized successfully', { type: 'success' });
     }
