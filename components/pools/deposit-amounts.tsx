@@ -58,12 +58,16 @@ const DepositAmounts = ({
   });
 
   console.log('isPairReversed', isPairReversed);
+  console.log('startingPrice', startingPrice);
+  console.log('currentPrice', currentPrice);
+  console.log('minPrice', minPrice);
+  console.log('maxPrice', maxPrice);
   const liquidityAtOneOfA =
-    (1 * Math.sqrt(currentPrice) * Math.sqrt(maxPrice)) / (Math.sqrt(maxPrice) - Math.sqrt(currentPrice));
-  const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(minPrice));
+    (1 * Math.sqrt(currentPrice) * Math.sqrt(1 / maxPrice)) / (Math.sqrt(1 / maxPrice) - Math.sqrt(currentPrice));
+  const amountBAtOneA = liquidityAtOneOfA * (Math.sqrt(currentPrice) - Math.sqrt(1 / minPrice));
 
-  const initializedPrice = isPairReversed ? 1 / amountBAtOneA : amountBAtOneA;
-  const exchangeRate = isPoolInitialized ? 1 / initializedPrice : startingPrice;
+  const initializedPrice = amountBAtOneA;
+  const exchangeRate = isPoolInitialized ? initializedPrice : startingPrice;
   console.log('exchangeRate', exchangeRate);
 
   const tokenABalanceFormatted = tokenABalance ? formatUnits(tokenABalance as bigint, tokenA?.decimals ?? 18) : '0';
