@@ -84,8 +84,8 @@ const RemoveLiquidity = ({
       {
         tokenId: positionTokenId,
         liquidity: (positionLiquidity * BigInt(percentToRemove)) / 100n,
-        amount0Min: 1000n,
-        amount1Min: 1000n,
+        amount0Min: 0n,
+        amount1Min: 0n,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
       },
     ],
