@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, FormControl, FormLabel, Link, Stack, TextField, Typography } from '@mui/material';
 import { Token } from '@/types/common';
 import { useEffect } from 'react';
 import { erc20ABI, useAccount, useContractRead } from 'wagmi';
@@ -67,6 +67,8 @@ const DepositAmounts = ({
   const minPriceToUse = isPairReversed ? minPrice : reversedMinPrice;
   const maxPriceToUse = isPairReversed ? maxPrice : reversedMaxPrice;
 
+  console.log(currentPriceToUse, minPriceToUse, maxPriceToUse);
+
   const liquidityAtOneOfA =
     (1 * Math.sqrt(currentPrice) * Math.sqrt(reversedMaxPrice)) /
     (Math.sqrt(reversedMaxPrice) - Math.sqrt(currentPrice));
@@ -88,14 +90,23 @@ const DepositAmounts = ({
     ? Math.min(tokenBBalanceParsed, tokenBBalanceParsed * exchangeRate)
     : Math.min(tokenBBalanceParsed, tokenBBalanceParsed / exchangeRate);
 
-  useEffect(() => {
-    const newAmountA = amountA > tokenAMax ? tokenAMax : amountA;
-    let newAmountB = newAmountA * exchangeRate;
-    if (newAmountB > tokenBMax) newAmountB = tokenBMax;
+  const isMinPriceLargerThanMaxPrice = minPrice > maxPrice;
+  const isExchangeRateZeroOrLess = exchangeRate <= 0;
+  const enableDepositAmounts = !isMinPriceLargerThanMaxPrice && validPriceRange && !isExchangeRateZeroOrLess;
 
-    setAmountA(newAmountA);
-    setAmountB(newAmountB);
-  }, [exchangeRate, tokenABalance, tokenBBalance]);
+  useEffect(() => {
+    if (isExchangeRateZeroOrLess) {
+      setAmountA(0);
+      setAmountB(0);
+    } else {
+      const newAmountA = amountA > tokenAMax ? tokenAMax : amountA;
+      let newAmountB = newAmountA * exchangeRate;
+      if (newAmountB > tokenBMax) newAmountB = tokenBMax;
+
+      setAmountA(newAmountA);
+      setAmountB(newAmountB);
+    }
+  }, [exchangeRate, tokenABalance, tokenBBalance, isExchangeRateZeroOrLess]);
 
   return (
     <FormControl
@@ -121,8 +132,14 @@ const DepositAmounts = ({
                 },
               }}
               type="number"
-              value={amountA}
+              value={enableDepositAmounts ? amountA : ' '}
               onChange={(e) => {
+                if (isExchangeRateZeroOrLess) {
+                  setAmountA(0);
+                  setAmountB(0);
+                  return;
+                }
+
                 const value = e.target.value;
                 if (value === '') {
                   setAmountA(0);
@@ -139,10 +156,10 @@ const DepositAmounts = ({
                   setAmountB(Math.min(amountInB, tokenBMax));
                 }
               }}
-              disabled={!validPriceRange}
+              disabled={!enableDepositAmounts}
             />
 
-            {tokenA && validPriceRange && (
+            {tokenA && enableDepositAmounts && (
               <Stack
                 direction="row"
                 justifyContent="flex-end"
@@ -162,6 +179,12 @@ const DepositAmounts = ({
                 <Link
                   sx={{ cursor: 'pointer' }}
                   onClick={() => {
+                    if (isExchangeRateZeroOrLess) {
+                      setAmountA(0);
+                      setAmountB(0);
+                      return;
+                    }
+
                     setAmountA(tokenAMax);
                     const amountInB = tokenAMax * exchangeRate;
                     setAmountB(Math.min(amountInB, tokenBMax));
@@ -188,7 +211,7 @@ const DepositAmounts = ({
                 },
               }}
               type="number"
-              value={amountB}
+              value={enableDepositAmounts ? amountB : ' '}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === '') {
@@ -206,10 +229,10 @@ const DepositAmounts = ({
                   setAmountA(Math.min(amountInA, tokenAMax));
                 }
               }}
-              disabled={!validPriceRange}
+              disabled={!enableDepositAmounts}
             />
 
-            {tokenB && validPriceRange && (
+            {tokenB && enableDepositAmounts && (
               <Stack
                 direction="row"
                 justifyContent="flex-end"
@@ -245,6 +268,15 @@ const DepositAmounts = ({
             )}
           </Stack>
         </Stack>
+
+        {(isMinPriceLargerThanMaxPrice || isExchangeRateZeroOrLess || !validPriceRange) && (
+          <Alert
+            severity="error"
+            variant="outlined"
+          >
+            The price range you have selected is invalid. Please adjust the price range.
+          </Alert>
+        )}
       </Stack>
     </FormControl>
   );
