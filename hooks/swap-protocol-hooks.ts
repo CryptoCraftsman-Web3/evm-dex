@@ -21,11 +21,11 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
   switch (chain?.id) {
     case 1440002:
       // XRPL Devnet
-      poolFactory = '0x71992849909a5Ed0c8Cc3928F5F5287B13d08aBA';
-      nfPositionManager = '0xd70B1Ac076ad3B7155735E3CfC8ED24DF37D3235';
+      poolFactory = '0x123b5c88Cc98f8f73b686cd8bdEA213EAa4360e8';
+      nfPositionManager = '0x2Bd64c4C3C59b2f4B8f5A077c17eD9F9e816dF64';
       serpentSwapUtility = '0x1f9dE68B808a758D5eB56EB10e62d6360B79d210';
-      quoterV2 = '0x2abc3CFB89DE3685e10C61f0E763131D63aC14a6';
-      swapRouter = '0x96e311b2F8E6DE73a28025a5B18637193714Ba88';
+      quoterV2 = '0xDb3721EBB2CC650e4A41f685294b51406F6Ab5D4';
+      swapRouter = '0xD332359cd2AB1198ECfE355852d3bDE6EA59BeE2';
       break;
     case 11155111:
       // Sepolia Testnet (our own deployments)
@@ -33,11 +33,11 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       // nfPositionManager = '0x93D346dacC2878557d8fbb53D995A5317e9B9370';
 
       // Sepolia Testnet (uniswap deployed)
-      poolFactory = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c';
-      nfPositionManager = '0x1238536071E1c677A632429e3655c799b22cDA52';
+      poolFactory = '0x19f217A65E827f6fA955F89b7ABfACcCcf7c9860';
+      nfPositionManager = '0xd33dde75E3105e3506b437438fedDC27a2Dd7A95';
       serpentSwapUtility = '0x6C45c98B989058feF7e6d0701515Ad6238ac45C6';
-      quoterV2 = '0x7452004cf527EEf23f0C74fcdB159160E766700F';
-      swapRouter = '0x96424645Ca20d4c77b54CE1Afa5916BfD0737eC7';
+      quoterV2 = '0x1BF0070245CF5C9Ed97B6b41E8a087703fd76e1B';
+      swapRouter = '0x2Bd2Fa75C8D18fD0a7728E7fB196aE0C4f5B6d51';
       break;
     default:
       poolFactory = zeroAddress;
