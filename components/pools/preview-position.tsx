@@ -176,8 +176,8 @@ const PreviewPosition = ({
   const tickUpper =
     tick && tickSpacing ? nearestUsableTick(maxPriceTargetTick, tickSpacing) + tickSpacing * 2 : TickMath.MAX_TICK;
 
-  const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity;
-  const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity;
+  const isAmountAValid = !isNaN(amountA) && amountA !== -Infinity && amountA !== Infinity && amountA > 0;
+  const isAmountBValid = !isNaN(amountB) && amountB !== -Infinity && amountB !== Infinity && amountB > 0;
 
   const tokenAAddress = tokenA?.address || zeroAddress;
   const tokenBAddress = tokenB?.address || zeroAddress;
@@ -241,6 +241,8 @@ const PreviewPosition = ({
     if (mint) mint();
   };
 
+  const invalidAmounts = !isAmountAValid || !isAmountBValid;
+
   return (
     <>
       <Button
@@ -248,7 +250,7 @@ const PreviewPosition = ({
         color="primary"
         size="large"
         fullWidth
-        disabled={!canSpendTokens || !isPoolInitialized}
+        disabled={!canSpendTokens || !isPoolInitialized || invalidAmounts}
         onClick={handleOpen}
         sx={{ height: 56 }}
       >
