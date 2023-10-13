@@ -100,8 +100,8 @@ const SetPriceRange = ({
         {isPoolInitialized && (
           <>
             <Typography textAlign="center">
-              Current Price: {(1 / currentPrice).toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenA?.symbol} per{' '}
-              {tokenB?.symbol}
+              Current Price: {currentPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })} {tokenB?.symbol} per{' '}
+              {tokenA?.symbol}
             </Typography>
             <Box
               p={1}
@@ -128,7 +128,7 @@ const SetPriceRange = ({
               endAdornment:
                 tokenA && tokenB ? (
                   <>
-                    {tokenA.symbol} / {tokenB.symbol}
+                    {tokenB.symbol} / {tokenA.symbol}
                   </>
                 ) : null,
               inputProps: {
@@ -158,7 +158,7 @@ const SetPriceRange = ({
               endAdornment:
                 tokenA && tokenB ? (
                   <>
-                    {tokenA.symbol} / {tokenB.symbol}
+                    {tokenB.symbol} / {tokenA.symbol}
                   </>
                 ) : null,
               inputProps: {

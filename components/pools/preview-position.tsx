@@ -425,7 +425,7 @@ const PreviewPosition = ({
                   variant="body1"
                   textAlign="center"
                 >
-                  {(1 / price).toLocaleString(undefined, {
+                  {(price).toLocaleString(undefined, {
                     maximumFractionDigits: 10,
                   })}
                 </Typography>
@@ -434,7 +434,7 @@ const PreviewPosition = ({
                   color="GrayText"
                   textAlign="center"
                 >
-                  {tokenA?.symbol} / {tokenB?.symbol}
+                  {tokenB?.symbol} / {tokenA?.symbol}
                 </Typography>
               </Stack>
             </Paper>
