@@ -70,7 +70,7 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
                 color="text.secondary"
               >
                 {option.address === nativeTokenAddress ? (
-                  <>{chain?.name}'s Native Token</>
+                  <>{`${chain?.name}'s Native Token`}</>
                 ) : (
                   <>
                     {option.address.slice(0, 6)}...{option.address.slice(-4)}
