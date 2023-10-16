@@ -403,6 +403,7 @@ const AddLiquidity = ({
               startingPrice={0}
               currentPrice={currentPrice}
               isPoolInitialized={isPoolInitialized}
+              isPairReversed={false}
               validPriceRange={validPriceRange}
               minPrice={minPrice}
               maxPrice={maxPrice}
