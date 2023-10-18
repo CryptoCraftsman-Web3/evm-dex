@@ -23,9 +23,9 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       // XRPL Devnet
       poolFactory = '0x123b5c88Cc98f8f73b686cd8bdEA213EAa4360e8';
       nfPositionManager = '0x2Bd64c4C3C59b2f4B8f5A077c17eD9F9e816dF64';
-      serpentSwapUtility = '0x1f9dE68B808a758D5eB56EB10e62d6360B79d210';
+      serpentSwapUtility = '0x562830Aa75050D6f8bEE13c3f35000c5D2d97e29';
       quoterV2 = '0xDb3721EBB2CC650e4A41f685294b51406F6Ab5D4';
-      swapRouter = '0x8E839AA95Ab9EeA254373a722159D96D7DedAfaB';
+      swapRouter = '0xD332359cd2AB1198ECfE355852d3bDE6EA59BeE2';
       break;
     case 11155111:
       // Sepolia Testnet (our own deployments)

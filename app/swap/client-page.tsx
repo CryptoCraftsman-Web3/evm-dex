@@ -5,6 +5,7 @@ import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { nativeTokenAddress, useWrappedNativeToken } from '@/hooks/token-hooks';
 import { useEthersProvider } from '@/lib/ethers';
 import { Token } from '@/types/common';
+import { serpentSwapUtilityABI, serpentSwapUtilityV1ABI } from '@/types/wagmi/serpent-swap';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
@@ -22,13 +23,15 @@ import {
   useContractRead,
   useContractReads,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
 
 const SwapClientPage = () => {
+  const { chain } = useNetwork();
   const { address: userAddress, isConnected: isUserWalletConnected } = useAccount();
-  const { swapRouter, poolFactory } = useSwapProtocolAddresses();
+  const { serpentSwapUtility, poolFactory } = useSwapProtocolAddresses();
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
@@ -147,7 +150,7 @@ const SwapClientPage = () => {
       {
         ...tokenAContract,
         functionName: 'allowance',
-        args: [userAddress ?? zeroAddress, swapRouter],
+        args: [userAddress ?? zeroAddress, serpentSwapUtility],
       },
     ],
     enabled: Boolean(tokenA) && Boolean(userAddress),
@@ -156,23 +159,28 @@ const SwapClientPage = () => {
   const { data: userNativeTokenBalance, refetch: refetchUserNativeTokenBalance } = useBalance({
     address: userAddress ?? zeroAddress,
     enabled: Boolean(userAddress),
-  }); console.log('userNativeTokenBalance', userNativeTokenBalance);
+  });
+  console.log('userNativeTokenBalance', userNativeTokenBalance);
 
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
+  console.log('tokenAUserBalance', tokenAUserBalance);
   const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
+  console.log('tokenAUserAllowance', tokenAUserAllowance);
   const amountAInBaseUnits = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18).toBigInt();
 
   const notEnoughTokenABalance = isTokenANative
     ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
-    : tokenAUserBalance < amountAInBaseUnits; console.log('notEnoughTokenABalance', notEnoughTokenABalance);
+    : tokenAUserBalance < amountAInBaseUnits;
+  console.log('notEnoughTokenABalance', notEnoughTokenABalance);
   const notEnoughTokenAAllowance = isTokenANative
     ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
-    : tokenAUserAllowance < amountAInBaseUnits; console.log('notEnoughTokenAAllowance', notEnoughTokenAAllowance);
+    : tokenAUserAllowance < amountAInBaseUnits;
+  console.log('notEnoughTokenAAllowance', notEnoughTokenAAllowance);
 
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
     functionName: 'approve',
-    args: [swapRouter, amountAInBaseUnits],
+    args: [serpentSwapUtility, amountAInBaseUnits],
     enabled: Boolean(tokenA) && Boolean(userAddress),
   });
 
@@ -201,50 +209,121 @@ const SwapClientPage = () => {
   }, [isApproveTokenATxSuccess, isApproveTokenATxError]);
 
   // the code section below deals with SwapRouter to swap ERC20 tokens
-  const { config: exactInputSingleConfig } = usePrepareContractWrite({
-    address: swapRouter,
-    abi: swapRouterABI,
-    functionName: 'exactInputSingle',
+  const { config: swapTokensConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapTokens',
     args: [
-      {
-        tokenIn: selectedQuote?.tokenIn ?? zeroAddress,
-        tokenOut: selectedQuote?.tokenOut ?? zeroAddress,
-        fee: selectedQuote?.fee ?? 0,
-        recipient: userAddress ?? zeroAddress,
-        deadline: BigInt(Math.floor(Date.now() / 1000) + 60 * 60), // 10 minutes from the current Unix time
-        amountIn: amountAInBaseUnits,
-        amountOutMinimum: 0n,
-        sqrtPriceLimitX96: 0n,
-      },
+      selectedQuote?.tokenIn ?? zeroAddress,
+      selectedQuote?.tokenOut ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      amountAInBaseUnits,
+      0n,
+      0n,
     ],
-    value: isTokenANative ? amountAInBaseUnits : 0n,
     enabled: Boolean(userAddress) && Boolean(selectedQuote),
   });
 
   const {
-    data: exactInputSingleResult,
-    status: exactInputSingleStatus,
-    isLoading: isExactInputSingle,
-    isSuccess: isExactInputSingleSuccess,
-    isError: isExactInputSingleError,
-    write: exactInputSingle,
-  } = useContractWrite(exactInputSingleConfig);
+    data: swapTokensResult,
+    isLoading: isSwappingTokens,
+    isSuccess: isSwapTokensSuccess,
+    write: swapTokens,
+  } = useContractWrite(swapTokensConfig);
 
   const {
-    data: exactInputSingleTxReceipt,
-    isLoading: isExactInputSingleTxPending,
-    isSuccess: isExactInputSingleTxSuccess,
-    isError: isExactInputSingleTxError,
+    isLoading: isSwapTokensTxPending,
+    isSuccess: isSwapTokensTxSuccess,
+    isError: isSwapTokensTxError,
   } = useWaitForTransaction({
-    hash: exactInputSingleResult?.hash,
-    enabled: isExactInputSingleSuccess,
+    hash: swapTokensResult?.hash,
+    enabled: isSwapTokensSuccess,
   });
 
   useEffect(() => {
     refetchTokenAUserDetails();
-    if (isExactInputSingleTxSuccess) toast.success(`Successfully swapped ${tokenA?.symbol} for ${tokenB?.symbol}`);
-    if (isExactInputSingleTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
-  }, [isExactInputSingleTxSuccess, isExactInputSingleTxError]);
+    if (isSwapTokensTxSuccess) toast.success(`Successfully swapped ${tokenA?.symbol} for ${tokenB?.symbol}`);
+    if (isSwapTokensTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
+  }, [isSwapTokensTxSuccess, isSwapTokensTxError]);
+
+  const { config: swapNativeForTokenConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapNativeForToken',
+    args: [
+      selectedQuote?.tokenOut ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      0n,
+      0n,
+    ],
+    value: amountAInBaseUnits,
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
+  });
+
+  const {
+    data: swapNativeForTokenResult,
+    isLoading: isSwappingNativeForToken,
+    isSuccess: isSwapNativeForTokenSuccess,
+    write: swapNativeForToken,
+  } = useContractWrite(swapNativeForTokenConfig);
+
+  const {
+    isLoading: isSwapNativeForTokenTxPending,
+    isSuccess: isSwapNativeForTokenTxSuccess,
+    isError: isSwapNativeForTokenTxError,
+  } = useWaitForTransaction({
+    hash: swapNativeForTokenResult?.hash,
+    enabled: isSwapNativeForTokenSuccess,
+  });
+
+  useEffect(() => {
+    refetchTokenAUserDetails();
+    if (isSwapNativeForTokenTxSuccess)
+      toast.success(`Successfully swapped ${chain?.nativeCurrency.symbol} for ${tokenB?.symbol}`);
+    if (isSwapNativeForTokenTxError)
+      toast.error(`Failed to swap ${chain?.nativeCurrency.symbol} for ${tokenB?.symbol}`);
+  }, [isSwapNativeForTokenTxSuccess, isSwapNativeForTokenTxError]);
+
+  const { config: swapTokenForNativeConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapTokenForNative',
+    args: [
+      selectedQuote?.tokenIn ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      amountAInBaseUnits,
+      0n,
+      0n,
+    ],
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
+  });
+
+  const {
+    data: swapTokenForNativeResult,
+    isLoading: isSwappingTokenForNative,
+    isSuccess: isSwapTokenForNativeSuccess,
+    write: swapTokenForNative,
+  } = useContractWrite(swapTokenForNativeConfig);
+
+  const {
+    isLoading: isSwapTokenForNativeTxPending,
+    isSuccess: isSwapTokenForNativeTxSuccess,
+    isError: isSwapTokenForNativeTxError,
+  } = useWaitForTransaction({
+    hash: swapTokenForNativeResult?.hash,
+    enabled: isSwapTokenForNativeSuccess,
+  });
+
+  useEffect(() => {
+    refetchTokenAUserDetails();
+    if (isSwapTokenForNativeTxSuccess)
+      toast.success(`Successfully swapped ${tokenA?.symbol} for ${chain?.nativeCurrency.symbol}`);
+    if (isSwapTokenForNativeTxError)
+      toast.error(`Failed to swap ${tokenA?.symbol} for ${chain?.nativeCurrency.symbol}`);
+  }, [isSwapTokenForNativeTxSuccess, isSwapTokenForNativeTxError]);
 
   // focus on respective amount input field when token is selected, and select all text
   const amountAInputRef = useRef<HTMLInputElement>(null);
@@ -432,7 +511,7 @@ const SwapClientPage = () => {
                       {notEnoughTokenAAllowance ? (
                         <>
                           <Alert severity="warning">
-                            You have not approved the SerpentSwap to spend and swap your {tokenA?.symbol}
+                            You have not approved SerpentSwap to spend and swap your {tokenA?.symbol}
                           </Alert>
 
                           <LoadingButton
@@ -462,9 +541,23 @@ const SwapClientPage = () => {
                             variant="contained"
                             size="large"
                             onClick={() => {
-                              if (exactInputSingle) exactInputSingle();
+                              if (isTokenANative) {
+                                if (swapNativeForToken) swapNativeForToken();
+                              } else if (isTokenBNative) {
+                                console.log('swapTokenForNative', swapTokenForNative);
+                                if (swapTokenForNative) swapTokenForNative();
+                              } else {
+                                if (swapTokens) swapTokens();
+                              }
                             }}
-                            loading={isExactInputSingle || isExactInputSingleTxPending}
+                            loading={
+                              isSwappingTokens ||
+                              isSwapTokensTxPending ||
+                              isSwappingNativeForToken ||
+                              isSwapNativeForTokenTxPending ||
+                              isSwappingTokenForNative ||
+                              isSwapTokenForNativeTxPending
+                            }
                             fullWidth
                           >
                             Swap
