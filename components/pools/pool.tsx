@@ -54,6 +54,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
     symbol: tokenPairDetailsResult?.[0].result as string,
     decimals: tokenPairDetailsResult?.[1].result as number,
     name: tokenPairDetailsResult?.[2].result as string,
+    isNative: false,
   };
 
   const tokenB: Token = {
@@ -61,6 +62,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
     symbol: tokenPairDetailsResult?.[3].result as string,
     decimals: tokenPairDetailsResult?.[4].result as number,
     name: tokenPairDetailsResult?.[5].result as string,
+    isNative: false,
   };
 
   const minPrice = 1.0001 ** position.tickLower / 10 ** (tokenB.decimals - tokenA.decimals);

@@ -1,4 +1,4 @@
-import { nativeTokenAddress, useErc20Tokens, useNativeToken } from '@/hooks/token-hooks';
+import { useErc20Tokens, useNativeToken } from '@/hooks/token-hooks';
 import { Token } from '@/types/common';
 import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -69,7 +69,7 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
                 variant="caption"
                 color="text.secondary"
               >
-                {option.address === nativeTokenAddress ? (
+                {option.isNative ? (
                   <>{`${chain?.name}'s Native Token`}</>
                 ) : (
                   <>
@@ -90,6 +90,7 @@ const SelectToken = ({ inputLabel, token, setToken }: SelectTokenProps) => {
                   symbol: searchedToken?.symbol ?? '',
                   address: searchedToken?.address ?? '',
                   decimals: searchedToken?.decimals ?? 18,
+                  isNative: false,
                 },
               ];
             }

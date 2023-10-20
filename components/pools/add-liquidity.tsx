@@ -104,6 +104,7 @@ const AddLiquidity = ({
     symbol: tokenASymbol,
     decimals: tokenADecimals,
     name: tokenASymbol,
+    isNative: false,
   };
 
   const tokenB: Token = {
@@ -111,6 +112,7 @@ const AddLiquidity = ({
     symbol: tokenBSymbol,
     decimals: tokenBDecimals,
     name: tokenBSymbol,
+    isNative: false,
   };
 
   const [amountA, setAmountA] = useState<number>(0);
