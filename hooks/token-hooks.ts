@@ -3,8 +3,6 @@
 import { useNetwork } from 'wagmi';
 import { Token } from '../types/common';
 
-export const nativeTokenAddress = '0x6e6174697665';
-
 export const useNativeToken = () => {
   const { chain } = useNetwork();
   let token: Token;
@@ -14,8 +12,9 @@ export const useNativeToken = () => {
       token = {
         name: 'Ether',
         symbol: 'ETH',
-        address: nativeTokenAddress,
+        address: wrappedSepoliaEther.address,
         decimals: 18,
+        isNative: true,
       };
       break;
     case 1440002:
@@ -23,8 +22,9 @@ export const useNativeToken = () => {
       token = {
         name: 'XRP',
         symbol: 'XRP',
-        address: nativeTokenAddress,
+        address: wrappedXrpDevnet.address,
         decimals: 18,
+        isNative: true,
       };
       break;
   }
@@ -37,6 +37,7 @@ const wrappedSepoliaEther: Token = {
   symbol: 'WETH',
   address: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
   decimals: 18,
+  isNative: false,
 };
 
 const wrappedXrpDevnet: Token = {
@@ -44,6 +45,7 @@ const wrappedXrpDevnet: Token = {
   symbol: 'WXRP',
   address: '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d',
   decimals: 18,
+  isNative: false,
 };
 
 export const useWrappedNativeToken = () => {
@@ -92,6 +94,7 @@ const xrplDevnetTokens: Token[] = [
     symbol: 'USDX',
     address: '0x0c5C1D094f92eFfd9A6a9b0546b7b1B852B442a2',
     decimals: 18,
+    isNative: false,
   },
 ];
 
@@ -102,5 +105,6 @@ const sepoliaTokens: Token[] = [
     symbol: 'USDX',
     address: '0x71992849909a5Ed0c8Cc3928F5F5287B13d08aBA',
     decimals: 18,
+    isNative: false,
   },
 ];

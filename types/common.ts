@@ -3,6 +3,7 @@ export type Token = {
   symbol: string;
   address: `0x${string}`;
   decimals: number;
+  isNative: boolean;
 };
 
 export type FeeTier = {
