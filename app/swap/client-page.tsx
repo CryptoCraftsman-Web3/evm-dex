@@ -2,7 +2,7 @@
 
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
-import { nativeTokenAddress, useWrappedNativeToken } from '@/hooks/token-hooks';
+import { useWrappedNativeToken } from '@/hooks/token-hooks';
 import { useEthersProvider } from '@/lib/ethers';
 import { Token } from '@/types/common';
 import { serpentSwapUtilityABI, serpentSwapUtilityV1ABI } from '@/types/wagmi/serpent-swap';
@@ -36,8 +36,8 @@ const SwapClientPage = () => {
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
-  const isTokenANative = tokenA?.address === nativeTokenAddress;
-  const isTokenBNative = tokenB?.address === nativeTokenAddress;
+  const isTokenANative = tokenA?.isNative;
+  const isTokenBNative = tokenB?.isNative;
 
   const wrappedNativeToken = useWrappedNativeToken();
 
@@ -362,6 +362,8 @@ const SwapClientPage = () => {
     amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
+  console.log(tokenA, tokenB);
+
   return (
     <Stack
       justifyContent="center"
@@ -526,46 +528,52 @@ const SwapClientPage = () => {
                         </>
                       ) : (
                         <>
-                          {amountOutDiffTooGreat && (
-                            <Alert severity="warning">
-                              The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from the
-                              expected amount based on the current price. This may be due to lack of liquidity in the
-                              pool. Please proceed with caution.
-                            </Alert>
-                          )}
+                          {tokenA.address === tokenB.address ? (
+                            <Alert severity="error">You cannot swap the same token</Alert>
+                          ) : (
+                            <>
+                              {amountOutDiffTooGreat && !isFetchingQuotes && tokenA.address !== tokenB.address && (
+                                <Alert severity="warning">
+                                  The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from
+                                  the expected amount based on the current price. This may be due to lack of liquidity
+                                  in the pool. Please proceed with caution.
+                                </Alert>
+                              )}
 
-                          <LoadingButton
-                            disabled={amountA === 0}
-                            variant="contained"
-                            size="large"
-                            onClick={() => {
-                              if (isTokenANative) {
-                                if (swapNativeForToken) swapNativeForToken();
-                              } else if (isTokenBNative) {
-                                console.log('swapTokenForNative', swapTokenForNative);
-                                if (swapTokenForNative) swapTokenForNative();
-                              } else {
-                                if (swapTokens) swapTokens();
-                              }
-                            }}
-                            loading={
-                              isSwappingTokens ||
-                              isSwapTokensTxPending ||
-                              isSwappingNativeForToken ||
-                              isSwapNativeForTokenTxPending ||
-                              isSwappingTokenForNative ||
-                              isSwapTokenForNativeTxPending
-                            }
-                            fullWidth
-                          >
-                            Swap
-                          </LoadingButton>
+                              <LoadingButton
+                                disabled={amountA === 0}
+                                variant="contained"
+                                size="large"
+                                onClick={() => {
+                                  if (isTokenANative) {
+                                    if (swapNativeForToken) swapNativeForToken();
+                                  } else if (isTokenBNative) {
+                                    console.log('swapTokenForNative', swapTokenForNative);
+                                    if (swapTokenForNative) swapTokenForNative();
+                                  } else {
+                                    if (swapTokens) swapTokens();
+                                  }
+                                }}
+                                loading={
+                                  isSwappingTokens ||
+                                  isSwapTokensTxPending ||
+                                  isSwappingNativeForToken ||
+                                  isSwapNativeForTokenTxPending ||
+                                  isSwappingTokenForNative ||
+                                  isSwapTokenForNativeTxPending
+                                }
+                                fullWidth
+                              >
+                                Swap
+                              </LoadingButton>
+                            </>
+                          )}
                         </>
                       )}
                     </>
                   )}
                 </>
-                ) : (
+              ) : (
                 <Alert severity="error">Please select tokens</Alert>
               )}
             </>
