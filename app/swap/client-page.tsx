@@ -500,9 +500,7 @@ const SwapClientPage = () => {
             <Alert severity="error">Please connect your wallet first</Alert>
           ) : (
             <>
-              {!tokenA && !tokenB ? (
-                <Alert severity="error">Please select tokens</Alert>
-              ) : (
+              {tokenA && tokenB ? (
                 <>
                   {notEnoughTokenABalance ? (
                     <Alert severity="error">You do not have enough {tokenA?.symbol} to swap</Alert>
@@ -567,6 +565,8 @@ const SwapClientPage = () => {
                     </>
                   )}
                 </>
+                ) : (
+                <Alert severity="error">Please select tokens</Alert>
               )}
             </>
           )}
