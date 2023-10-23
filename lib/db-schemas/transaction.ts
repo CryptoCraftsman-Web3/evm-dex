@@ -17,6 +17,7 @@ export const transactions = mysqlTable('transactions', {
   type: varchar('type', { length: 12 }).notNull(),
   tx_type: mysqlEnum('tx_type', txTypes).notNull(),
   value: bigint('value', { mode: 'bigint' }).notNull(),
+  status: mysqlEnum('status', ['pending', 'success', 'failed', 'other'] as const).notNull(),
 });
 
 export type Transaction = typeof transactions.$inferSelect;
