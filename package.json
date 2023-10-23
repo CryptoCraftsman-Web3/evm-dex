@@ -7,7 +7,8 @@
     "dev-turbo": "next dev -p 3185 --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "drizzle-generate": "drizzle-kit generate:mysql"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -35,8 +36,8 @@
     "react-icons": "^4.10.1",
     "react-toastify": "^9.1.3",
     "typescript": "5.1.6",
-    "viem": "^1.5.0",
-    "wagmi": "^1.3.9"
+    "viem": "^1.16.6",
+    "wagmi": "^1.4.5"
   },
   "devDependencies": {
     "@wagmi/cli": "^1.3.0",
