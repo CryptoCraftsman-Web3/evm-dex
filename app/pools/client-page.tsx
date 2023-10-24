@@ -1,13 +1,13 @@
 'use client';
 
-import { Alert, Box, Button, Card, Paper, Stack, Typography } from '@mui/material';
-import { useAccount, useContractRead } from 'wagmi';
-import { IoFileTrayStackedOutline } from 'react-icons/io5';
-import { useModal } from 'connectkit';
 import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
 import PoolsList from '@/components/pools/pools-list';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { Button, Paper, Stack, Typography } from '@mui/material';
+import { useModal } from 'connectkit';
+import { IoFileTrayStackedOutline } from 'react-icons/io5';
+import { useAccount, useContractRead } from 'wagmi';
 
 const PoolsClientPage = () => {
   const { isConnected } = useAccount();
