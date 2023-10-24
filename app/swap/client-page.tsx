@@ -160,22 +160,17 @@ const SwapClientPage = () => {
     address: userAddress ?? zeroAddress,
     enabled: Boolean(userAddress),
   });
-  console.log('userNativeTokenBalance', userNativeTokenBalance);
 
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
-  console.log('tokenAUserBalance', tokenAUserBalance);
   const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
-  console.log('tokenAUserAllowance', tokenAUserAllowance);
   const amountAInBaseUnits = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18).toBigInt();
 
   const notEnoughTokenABalance = isTokenANative
     ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
     : tokenAUserBalance < amountAInBaseUnits;
-  console.log('notEnoughTokenABalance', notEnoughTokenABalance);
   const notEnoughTokenAAllowance = isTokenANative
     ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
     : tokenAUserAllowance < amountAInBaseUnits;
-  console.log('notEnoughTokenAAllowance', notEnoughTokenAAllowance);
 
   const { config: tokenAConfig } = usePrepareContractWrite({
     ...tokenAContract,
