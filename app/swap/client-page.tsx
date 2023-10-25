@@ -285,7 +285,11 @@ const SwapClientPage = () => {
     enabled: isSwapNativeForTokenSuccess,
   });
 
-
+  useEffect(() => {
+    if (swapNativeForTokenResult?.hash && chain?.id) {
+      syncTransaction(chain.id, swapNativeForTokenResult.hash, 'swapNativeForToken');
+    }
+  }, [swapNativeForTokenResult, chain]);
 
   useEffect(() => {
     refetchTokenAUserDetails();
