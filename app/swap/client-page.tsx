@@ -3,18 +3,18 @@
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useWrappedNativeToken } from '@/hooks/token-hooks';
+import { syncTransaction } from '@/lib/actions/transactions';
 import { useEthersProvider } from '@/lib/ethers';
 import { Token } from '@/types/common';
-import { serpentSwapUtilityABI, serpentSwapUtilityV1ABI } from '@/types/wagmi/serpent-swap';
+import { serpentSwapUtilityABI } from '@/types/wagmi/serpent-swap';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
-import { quoterV2ABI, swapRouterABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Paper, Stack, TextField, Typography } from '@mui/material';
 import { ethers } from 'ethers';
 import { useEffect, useRef, useState } from 'react';
 import { IoWalletSharp } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { isToken } from 'typescript';
 import { zeroAddress } from 'viem';
 import {
   erc20ABI,
@@ -187,6 +187,12 @@ const SwapClientPage = () => {
     write: approveTokenA,
   } = useContractWrite(tokenAConfig);
 
+  useEffect(() => {
+    if (approveTokenAResult?.hash && chain?.id) {
+      syncTransaction(chain.id, approveTokenAResult.hash, 'approve');
+    }
+  }, [approveTokenAResult, chain]);
+
   const {
     data: approveTokenATxReceipt,
     isLoading: isApproveTokenATxPending,
@@ -356,8 +362,6 @@ const SwapClientPage = () => {
   const amountOutDifferencePercentage =
     amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
-
-  console.log(tokenA, tokenB);
 
   return (
     <Stack
