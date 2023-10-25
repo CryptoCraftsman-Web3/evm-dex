@@ -1,7 +1,5 @@
 import { bigint, int, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-const txTypes = ['swap', 'mint_liquidity_pool', 'approve'] as const;
-
 export const transactions = mysqlTable('transactions', {
   hash: varchar('hash', { length: 66 }).notNull().primaryKey(),
   blockHash: varchar('block_hash', { length: 66 }).notNull(),
@@ -15,7 +13,6 @@ export const transactions = mysqlTable('transactions', {
   maxPriorityFeePerGas: bigint('max_priority_fee_per_gas', { mode: 'bigint' }).notNull(),
   nonce: int('nonce').notNull(),
   type: varchar('type', { length: 12 }).notNull(),
-  tx_type: mysqlEnum('tx_type', txTypes).notNull(),
   value: bigint('value', { mode: 'bigint' }).notNull(),
   status: mysqlEnum('status', ['pending', 'success', 'failed', 'other'] as const).notNull(),
   functionName: varchar('function_name', { length: 255 })

@@ -22,6 +22,27 @@
       "when": 1698189363967,
       "tag": "0002_curly_the_phantom",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1698209456613,
+      "tag": "0003_windy_echo",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1698209524181,
+      "tag": "0004_spicy_the_hunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1698209563183,
+      "tag": "0005_luxuriant_calypso",
+      "breakpoints": true
     }
   ]
 }
