@@ -14,8 +14,9 @@ export const transactions = mysqlTable('transactions', {
   nonce: int('nonce').notNull(),
   type: varchar('type', { length: 12 }).notNull(),
   value: bigint('value', { mode: 'bigint' }).notNull(),
-  status: mysqlEnum('status', ['pending', 'success', 'failed', 'other'] as const).notNull(),
-  functionName: varchar('function_name', { length: 255 })
+  status: mysqlEnum('status', ['pending', 'success', 'reverted', 'other'] as const).notNull(),
+  functionName: varchar('function_name', { length: 255 }),
 });
 
 export type Transaction = typeof transactions.$inferSelect;
+export type NewTransaction = typeof transactions.$inferInsert;
