@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` ADD `function_name` varchar(255);

@@ -15,6 +15,13 @@
       "when": 1698045242696,
       "tag": "0001_crazy_umar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1698189363967,
+      "tag": "0002_curly_the_phantom",
+      "breakpoints": true
     }
   ]
 }
