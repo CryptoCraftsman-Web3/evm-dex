@@ -5,6 +5,7 @@ import 'server-only';
 import { db } from '../database';
 import { NewTransaction, transactions } from '../db-schemas/transaction';
 import { publicClients } from '../viem-clients';
+import { and, eq } from 'drizzle-orm';
 
 // this function will usually be called from client-side code right after a transaction is sent
 export const saveNewTransaction = async (
@@ -77,4 +78,15 @@ export const syncTransaction = async (chainId: number, hash: `0x${string}`, func
         status: transactionRecord.status,
       },
     });
+};
+
+export const updatePendingTransactions = async (address: `0x${string}`) => {
+  const pendingTxs = await db
+    .select()
+    .from(transactions)
+    .where(and(eq(transactions.from, address), eq(transactions.status, 'pending')));
+
+  for (const tx of pendingTxs) {
+    await syncTransaction(tx.chainId, tx.hash as `0x${string}`, tx.functionName);
+  }
 };
