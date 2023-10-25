@@ -2,8 +2,8 @@ import { bigint, int, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-c
 
 export const transactions = mysqlTable('transactions', {
   hash: varchar('hash', { length: 66 }).notNull().primaryKey(),
-  blockHash: varchar('block_hash', { length: 66 }).notNull(),
-  blockNumber: bigint('block_number', { mode: 'bigint' }).notNull(),
+  blockHash: varchar('block_hash', { length: 66 }),
+  blockNumber: bigint('block_number', { mode: 'bigint' }),
   chainId: int('chain_id').notNull(),
   from: varchar('from', { length: 42 }).notNull(),
   to: varchar('to', { length: 42 }).notNull(),
