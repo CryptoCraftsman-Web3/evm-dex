@@ -243,6 +243,12 @@ const SwapClientPage = () => {
   });
 
   useEffect(() => {
+    if (swapTokensResult?.hash && chain?.id) {
+      syncTransaction(chain.id, swapTokensResult.hash, 'swapTokens');
+    }
+  }, [swapTokensResult, chain]);
+
+  useEffect(() => {
     refetchTokenAUserDetails();
     if (isSwapTokensTxSuccess) toast.success(`Successfully swapped ${tokenA?.symbol} for ${tokenB?.symbol}`);
     if (isSwapTokensTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
@@ -278,6 +284,8 @@ const SwapClientPage = () => {
     hash: swapNativeForTokenResult?.hash,
     enabled: isSwapNativeForTokenSuccess,
   });
+
+
 
   useEffect(() => {
     refetchTokenAUserDetails();
