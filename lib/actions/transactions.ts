@@ -23,28 +23,48 @@ export const syncTransaction = async (chainId: number, hash: `0x${string}`, func
 
   if (hash.length !== 66) throw new Error(`Invalid hash ${hash}`);
 
-  const transaction = await publicClient.getTransaction({
+  const tx = await publicClient.getTransaction({
     hash,
   });
 
-  const txReceipt = await publicClient.getTransactionReceipt({
+  if (tx.blockHash === null) {
+    const transactionRecord: NewTransaction = {
+      hash,
+      blockHash: tx.blockHash,
+      blockNumber: tx.blockNumber,
+      chainId,
+      from: tx.from,
+      to: tx.to as string,
+      gas: tx.gas,
+      gasPrice: tx.gasPrice || 0n,
+      maxFeePerGas: tx.maxFeePerGas || 0n,
+      maxPriorityFeePerGas: tx.maxPriorityFeePerGas || 0n,
+      nonce: tx.nonce,
+      type: tx.type,
+      value: tx.value,
+      status: 'pending',
+      functionName,
+    };
+  }
+
+  const txReceipt = await publicClient.waitForTransactionReceipt({
     hash,
   });
 
   const transactionRecord: NewTransaction = {
     hash,
-    blockHash: transaction.blockHash,
-    blockNumber: transaction.blockNumber,
+    blockHash: txReceipt.blockHash,
+    blockNumber: txReceipt.blockNumber,
     chainId,
-    from: transaction.from,
-    to: transaction.to as string,
-    gas: transaction.gas,
-    gasPrice: transaction.gasPrice || 0n,
-    maxFeePerGas: transaction.maxFeePerGas || 0n,
-    maxPriorityFeePerGas: transaction.maxPriorityFeePerGas || 0n,
-    nonce: transaction.nonce,
-    type: transaction.type,
-    value: transaction.value,
+    from: tx.from,
+    to: tx.to as string,
+    gas: tx.gas,
+    gasPrice: tx.gasPrice || 0n,
+    maxFeePerGas: tx.maxFeePerGas || 0n,
+    maxPriorityFeePerGas: tx.maxPriorityFeePerGas || 0n,
+    nonce: tx.nonce,
+    type: tx.type,
+    value: tx.value,
     status: txReceipt.status,
     functionName,
   };
