@@ -321,6 +321,12 @@ const SwapClientPage = () => {
     write: swapTokenForNative,
   } = useContractWrite(swapTokenForNativeConfig);
 
+  useEffect(() => {
+    if (swapTokenForNativeResult?.hash && chain?.id) {
+      syncTransaction(chain.id, swapTokenForNativeResult.hash, 'swapTokenForNative');
+    }
+  }, [swapTokenForNativeResult, chain]);
+
   const {
     isLoading: isSwapTokenForNativeTxPending,
     isSuccess: isSwapTokenForNativeTxSuccess,
