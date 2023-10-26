@@ -1,4 +1,5 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { syncTransaction } from '@/lib/actions/transactions';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -18,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import { zeroAddress } from 'viem';
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
 type ClaimTokensProps = {
   tokenASymbol: string;
@@ -37,6 +38,7 @@ const ClaimTokens = ({
   positionTokenId,
   getUnclaimedTokens,
 }: ClaimTokensProps) => {
+  const { chain } = useNetwork();
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -82,6 +84,12 @@ const ClaimTokens = ({
     write: claimTokens,
     isLoading: isClaimingTokens,
   } = useContractWrite(claimTokensTxConfig);
+
+  useEffect(() => {
+    if (claimTokensTxData?.hash && chain?.id) {
+      syncTransaction(chain.id, claimTokensTxData.hash, 'collect');
+    }
+  }, [claimTokensTxData, chain]);
 
   const {
     isLoading: isClaimingTokensWaiting,
