@@ -31,6 +31,7 @@ import {
   useWaitForTransaction,
 } from 'wagmi';
 import DepositAmounts from './deposit-amounts';
+import { syncTransaction } from '@/lib/actions/transactions';
 
 type AddLiquidityProps = {
   positionTokenId: bigint;
@@ -65,6 +66,7 @@ const AddLiquidity = ({
   currentPrice,
   refetchPosition,
 }: AddLiquidityProps) => {
+  const { chain } = useNetwork();
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -155,6 +157,12 @@ const AddLiquidity = ({
     write: increaseLiquidity,
     isLoading: isIncreasingLiquidity,
   } = useContractWrite(increaseLiquidityTxConfig);
+
+  useEffect(() => {
+    if (increaseLiquidityTxData?.hash && chain?.id) {
+      syncTransaction(chain.id, increaseLiquidityTxData.hash, 'increaseLiquidity');
+    }
+  }, [increaseLiquidityTxData, chain]);
 
   const {
     isLoading: isIncreaseLiquidityTxWaiting,
