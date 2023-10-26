@@ -77,7 +77,11 @@ const ClaimTokens = ({
     enabled: address !== undefined,
   });
 
-  const { data: claimTokensTxData, write: claimTokens, isLoading: isClaimingTokens } = useContractWrite(claimTokensTxConfig);
+  const {
+    data: claimTokensTxData,
+    write: claimTokens,
+    isLoading: isClaimingTokens,
+  } = useContractWrite(claimTokensTxConfig);
 
   const {
     isLoading: isClaimingTokensWaiting,
