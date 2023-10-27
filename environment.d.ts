@@ -7,6 +7,7 @@ global {
       DATABASE_HOST: string;
       DATABASE_USERNAME: string;
       DATABASE_PASSWORD: string;
+      IRON_SESSION_PWD: string;
     }
   }
 }
