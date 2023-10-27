@@ -16,18 +16,22 @@ export const config: AppConfig = {
       label: 'Swap',
       href: '/swap',
     },
-    {
-      label: 'Tokens',
-      href: '/tokens',
-    },
-    {
-      label: 'NFTs',
-      href: '/nfts',
-    },
+    // {
+    //   label: 'Tokens',
+    //   href: '/tokens',
+    // },
+    // {
+    //   label: 'NFTs',
+    //   href: '/nfts',
+    // },
     {
       label: 'Pools',
       href: '/pools',
     },
+    {
+      label: 'Transactions',
+      href: '/transactions',
+    }
   ],
   feeTiers: [
     {
