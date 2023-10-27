@@ -1,4 +1,5 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { syncTransaction } from '@/lib/actions/transactions';
 import { FeeTier, Token } from '@/types/common';
 import { iUniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
@@ -215,6 +216,12 @@ const PreviewPosition = ({
   });
 
   const { data: mintTxData, write: mint, isLoading: minting } = useContractWrite(mintTxConfig);
+
+  useEffect(() => {
+    if (mintTxData?.hash && chain?.id) {
+      syncTransaction(chain.id, mintTxData.hash, 'mint');
+    }
+  }, [mintTxData, chain]);
 
   const {
     isLoading: mintTxWaiting,
