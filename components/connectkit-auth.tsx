@@ -1,26 +1,40 @@
 'use client';
 
-import { signOut } from '@/lib/auth';
+import { signInWithSignature, signOut } from '@/lib/auth';
+import { getCookie } from 'cookies-next';
+import { sign } from 'crypto';
 import { useEffect } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 
 export default function ConnectKitAuth() {
   // wallet sign in hooks
-  const { isConnected, isConnecting, isReconnecting, address } = useAccount();
-  const { signMessage } = useSignMessage();
+  const { isConnected, isDisconnected, address } = useAccount();
+  const { signMessage, data: signature,  } = useSignMessage();
 
   useEffect(() => {
-    if (isConnecting || isReconnecting) return;
-
-    if (isConnected) {
-      const signature = signMessage({
-        message: `I am signing into Serpent Swap with my wallet address: ${address}`,
-      });
-      console.log('signature', signature);
-    } else {
-      console.log('signing out');
+    if (isDisconnected && !address) {
       signOut();
     }
-  }, [isConnected, isConnecting, isReconnecting, address]);
+  }, [isDisconnected, address]);
+
+  useEffect(() => {
+    console.log(isConnected, address);
+    if (isConnected && address) {
+      const authCookie = getCookie('serpent-swap-auth');
+      if (authCookie) return;
+
+      signMessage({
+        message: `I am signing into Serpent Swap with my wallet address: ${address}`,
+      });
+    }
+  }, [isConnected, address]);
+
+  useEffect(() => {
+    if (!address) return;
+    if (!signature) return;
+
+    signInWithSignature(address, signature);
+  }, [signature, address]);
+
   return <></>;
 }
