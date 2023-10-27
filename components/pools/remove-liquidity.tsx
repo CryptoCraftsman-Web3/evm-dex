@@ -1,6 +1,7 @@
 'use client';
 
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { syncTransaction } from '@/lib/actions/transactions';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -21,7 +22,7 @@ import {
 import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
 type RemoveLiquidityProps = {
   positionTokenId: bigint;
@@ -48,6 +49,7 @@ const RemoveLiquidity = ({
   refetchPosition,
   getUnclaimedTokens,
 }: RemoveLiquidityProps) => {
+  const { chain } = useNetwork();
   const { isConnected } = useAccount();
   const [open, setOpen] = useState(false);
   const isMdAndUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -98,6 +100,12 @@ const RemoveLiquidity = ({
     write: decreaseLiquidity,
     isLoading: decreasingLiquidity,
   } = useContractWrite(decreaseLiquidityTxConfig);
+
+  useEffect(() => {
+    if (decreaseLiquidityTxData?.hash && chain?.id) {
+      syncTransaction(chain.id, decreaseLiquidityTxData.hash, 'decreaseLiquidity');
+    }
+  }, [decreaseLiquidityTxData, chain]);
 
   const {
     data: decreaseLiquidityTxReceipt,
