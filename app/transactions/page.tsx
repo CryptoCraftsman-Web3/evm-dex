@@ -18,7 +18,7 @@ export default async function TransactionsPage() {
   return (
     <>
       {session ? (
-        <TransactionsClientPage />
+        <TransactionsClientPage userTransactions={userTxs} />
       ) : (
         <>
           <h1>Transactions</h1>
