@@ -28,6 +28,7 @@
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
     "ethers": "5.7.2",
+    "iron-session": "^6.3.1",
     "jsbi": "3.1.4",
     "lodash": "^4.17.21",
     "next": "^14.0.0",
