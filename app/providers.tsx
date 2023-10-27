@@ -1,15 +1,16 @@
 'use client';
 
+import ConnectKitAuth from '@/components/connectkit-auth';
+import { xrplDevnet } from '@/lib/xrpl-chains';
 import { createTheme, ThemeProvider } from '@mui/material';
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { Montserrat } from 'next/font/google';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createConfig, sepolia, WagmiConfig } from 'wagmi';
-import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from 'connectkit';
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
+import { Montserrat } from 'next/font/google';
+import { lighten } from 'polished';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { xrplDevnet } from '@/lib/xrpl-chains';
-import { lighten } from 'polished';
+import { createConfig, sepolia, WagmiConfig } from 'wagmi';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 
@@ -38,8 +39,8 @@ const Providers = ({ children }: ProvidersProps) => {
         light: primaryLight,
       },
       background: {
-        default: background
-      }
+        default: background,
+      },
     },
     typography: {
       fontFamily: montserrat.style.fontFamily,
@@ -123,6 +124,7 @@ const Providers = ({ children }: ProvidersProps) => {
             closeButton={false}
           />
         </ThemeProvider>
+        <ConnectKitAuth />
       </ConnectKitProvider>
     </WagmiConfig>
   );
