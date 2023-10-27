@@ -8,12 +8,14 @@ import {
   useAccount,
   useContractReads,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
 import PreviewPosition from './preview-position';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
+import { syncTransaction } from '@/lib/actions/transactions';
 
 type PoolButtonsProps = {
   tokenA: Token | null;
@@ -44,6 +46,7 @@ const PoolButtons = ({
   isPairReversed,
   resetAndClose
 }: PoolButtonsProps) => {
+  const { chain } = useNetwork();
   const { address: userAddress } = useAccount();
   const { nfPositionManager } = useSwapProtocolAddresses();
   const tokenAContract = {
@@ -101,6 +104,12 @@ const PoolButtons = ({
     write: approveTokenA,
   } = useContractWrite(tokenAConfig);
 
+  useEffect(() => {
+    if (approveTokenAResult?.hash && chain?.id) {
+      syncTransaction(chain.id, approveTokenAResult.hash, 'approve');
+    }
+  }, [approveTokenAResult, chain]);
+
   const {
     data: approveTokenATxReceipt,
     isLoading: isApproveTokenATxPending,
@@ -124,6 +133,12 @@ const PoolButtons = ({
     isSuccess: isTokenBApproved,
     write: approveTokenB,
   } = useContractWrite(tokenBConfig);
+
+  useEffect(() => {
+    if (approveTokenBResult?.hash && chain?.id) {
+      syncTransaction(chain.id, approveTokenBResult.hash, 'approve');
+    }
+  }, [approveTokenBResult, chain]);
 
   const {
     data: approveTokenBTxReceipt,
