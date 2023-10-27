@@ -1,13 +1,13 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { syncTransaction } from '@/lib/actions/transactions';
 import { FeeTier, Token } from '@/types/common';
-import { LoadingButton } from '@mui/lab';
-import { Alert, Button, FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { zeroAddress } from 'viem';
+import { LoadingButton } from '@mui/lab';
+import { Alert, FormControl, FormLabel, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { serpentSwapUtilityV1ABI } from '@/types/wagmi/serpent-swap';
+import { zeroAddress } from 'viem';
+import { useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
 type StartingPriceProps = {
   startingPrice: number;
@@ -28,6 +28,7 @@ const StartingPrice = ({
   isPairReversed,
   refetchPoolAddressFromFactory,
 }: StartingPriceProps) => {
+  const { chain } = useNetwork();
   const { nfPositionManager, serpentSwapUtility } = useSwapProtocolAddresses();
 
   const tokenAAddress = tokenA?.address ?? zeroAddress;
@@ -69,6 +70,12 @@ const StartingPrice = ({
   } = useWaitForTransaction({
     hash: initializePoolTxData?.hash,
   });
+
+  useEffect(() => {
+    if (initializePoolTxData?.hash && chain?.id) {
+      syncTransaction(chain.id, initializePoolTxData.hash, 'initializePool');
+    }
+  }, [initializePoolTxData, chain]);
 
   useEffect(() => {
     refetchPoolAddressFromFactory();
