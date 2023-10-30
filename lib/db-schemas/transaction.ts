@@ -1,9 +1,11 @@
-import { bigint, int, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
+import { bigint, datetime, int, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
 export const transactions = mysqlTable('transactions', {
   hash: varchar('hash', { length: 66 }).notNull().primaryKey(),
   blockHash: varchar('block_hash', { length: 66 }),
   blockNumber: bigint('block_number', { mode: 'bigint' }),
+  timestamp: datetime('timestamp', { mode: 'date' }).notNull().default(sql`CURRENT_TIMESTAMP`),
   chainId: int('chain_id').notNull(),
   from: varchar('from', { length: 42 }).notNull(),
   to: varchar('to', { length: 42 }).notNull(),
@@ -14,7 +16,7 @@ export const transactions = mysqlTable('transactions', {
   nonce: int('nonce').notNull(),
   type: varchar('type', { length: 12 }).notNull(),
   value: bigint('value', { mode: 'bigint' }).notNull(),
-  status: mysqlEnum('status', ['pending', 'success', 'reverted', 'other'] as const).notNull(),
+  status: mysqlEnum('status', ['pending', 'success', 'reverted', 'other']).notNull(),
   functionName: varchar('function_name', { length: 255 }),
 });
 
