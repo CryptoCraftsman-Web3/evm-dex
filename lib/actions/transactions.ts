@@ -3,14 +3,13 @@
 import 'server-only';
 
 import { TokenTransfers } from '@/types/xrpl-evm';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, ilike } from 'drizzle-orm';
+import { formatUnits } from 'viem';
 import { db } from '../database';
 import { NewTokenTransfer, tokenTransfers } from '../db-schemas/token-transfer';
 import { NewTransaction, transactions } from '../db-schemas/transaction';
 import { users } from '../db-schemas/user';
 import { publicClients } from '../viem-clients';
-import { formatUnits, parseUnits } from 'viem';
-import { format } from 'path';
 
 // this function will usually be called from client-side code right after a transaction is sent
 export const saveNewTransaction = async (
@@ -50,6 +49,7 @@ export const syncTransaction = async (chainId: number, hash: `0x${string}`, func
       value: tx.value,
       status: 'pending',
       functionName,
+      timestamp: new Date(),
     };
   }
 
@@ -73,6 +73,7 @@ export const syncTransaction = async (chainId: number, hash: `0x${string}`, func
     value: tx.value,
     status: txReceipt.status,
     functionName,
+    timestamp: new Date(),
   };
 
   await db
@@ -127,10 +128,17 @@ export const syncTokenTransfers = async (chainId: number, address: `0x${string}`
     tokenTransferRecords.push(tokenTransferRecord);
   }
 
+  if (tokenTransferRecords.length === 0) return;
+
   await db.insert(tokenTransfers).values(tokenTransferRecords);
   const lastTokenTransferTxHashFromApi = tokenTransfersFromApi.result[0]?.hash;
+  console.log('lastTokenTransferTxHashFromApi', lastTokenTransferTxHashFromApi);
   await db
-    .update(users)
-    .set({ lastTokenTransferTxHash: lastTokenTransferTxHashFromApi })
-    .where(eq(users.address, address));
+    .insert(users)
+    .values({ address, lastTokenTransferTxHash: lastTokenTransferTxHashFromApi })
+    .onDuplicateKeyUpdate({
+      set: {
+        lastTokenTransferTxHash: lastTokenTransferTxHashFromApi,
+      },
+    });
 };
