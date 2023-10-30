@@ -2,10 +2,15 @@
 
 import 'server-only';
 
-import { db } from '../database';
-import { NewTransaction, transactions } from '../db-schemas/transaction';
-import { publicClients } from '../viem-clients';
+import { TokenTransfers } from '@/types/xrpl-evm';
 import { and, eq } from 'drizzle-orm';
+import { db } from '../database';
+import { NewTokenTransfer, tokenTransfers } from '../db-schemas/token-transfer';
+import { NewTransaction, transactions } from '../db-schemas/transaction';
+import { users } from '../db-schemas/user';
+import { publicClients } from '../viem-clients';
+import { formatUnits, parseUnits } from 'viem';
+import { format } from 'path';
 
 // this function will usually be called from client-side code right after a transaction is sent
 export const saveNewTransaction = async (
@@ -78,6 +83,8 @@ export const syncTransaction = async (chainId: number, hash: `0x${string}`, func
         status: transactionRecord.status,
       },
     });
+
+  syncTokenTransfers(chainId, tx.from);
 };
 
 export const updatePendingTransactions = async (address: `0x${string}`) => {
@@ -89,4 +96,40 @@ export const updatePendingTransactions = async (address: `0x${string}`) => {
   for (const tx of pendingTxs) {
     await syncTransaction(tx.chainId, tx.hash as `0x${string}`, tx.functionName);
   }
+};
+
+export const syncTokenTransfers = async (chainId: number, address: `0x${string}`) => {
+  const user = (await db.select().from(users).where(eq(users.address, address)))[0];
+  const lastTokenTransferTxHash = user?.lastTokenTransferTxHash;
+
+  const apiEndpointUrl = `https://evm-sidechain.xrpl.org/api?module=account&action=tokentx&address=${address}`;
+
+  const tokenTransfersResponse = await fetch(apiEndpointUrl);
+  const tokenTransfersFromApi = (await tokenTransfersResponse.json()) as TokenTransfers;
+
+  let tokenTransferRecords: NewTokenTransfer[] = [];
+  for (const tokenTransfer of tokenTransfersFromApi.result) {
+    if (tokenTransfer.hash === lastTokenTransferTxHash) break;
+
+    const tokenTransferRecord: NewTokenTransfer = {
+      chainId,
+      address,
+      direction: tokenTransfer.from.toLowerCase() === address.toLowerCase() ? 'out' : 'in',
+      amount: parseFloat(formatUnits(BigInt(tokenTransfer.value || 1n), Number(tokenTransfer.tokenDecimal || 0))),
+      tokenContractAddress: tokenTransfer.contractAddress,
+      tokenDecimals: Number(tokenTransfer.tokenDecimal),
+      tokenName: tokenTransfer.tokenName,
+      tokenSymbol: tokenTransfer.tokenSymbol,
+      transactionIndex: Number(tokenTransfer.transactionIndex),
+    };
+
+    tokenTransferRecords.push(tokenTransferRecord);
+  }
+
+  await db.insert(tokenTransfers).values(tokenTransferRecords);
+  const lastTokenTransferTxHashFromApi = tokenTransfersFromApi.result[0]?.hash;
+  await db
+    .update(users)
+    .set({ lastTokenTransferTxHash: lastTokenTransferTxHashFromApi })
+    .where(eq(users.address, address));
 };
