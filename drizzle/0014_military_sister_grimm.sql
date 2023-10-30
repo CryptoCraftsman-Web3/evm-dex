@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` MODIFY COLUMN `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP;

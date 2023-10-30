@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` ADD `timestamp` int DEFAULT 0 NOT NULL;
