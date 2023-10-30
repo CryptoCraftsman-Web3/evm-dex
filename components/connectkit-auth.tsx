@@ -1,15 +1,19 @@
 'use client';
 
 import { getSession, signInWithSignature, signOut } from '@/lib/auth';
+import { xrplDevnet } from '@/lib/xrpl-chains';
 import { getCookie } from 'cookies-next';
 import { sign } from 'crypto';
 import { useEffect } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useNetwork, useSignMessage } from 'wagmi';
 
 export default function ConnectKitAuth() {
   // wallet sign in hooks
   const { isConnected, isDisconnected, address } = useAccount();
   const { signMessage, data: signature } = useSignMessage();
+  const { chain } = useNetwork();
+
+  const chainId = chain?.id || xrplDevnet.id;
 
   useEffect(() => {
     if (isDisconnected && !address) {
@@ -32,7 +36,7 @@ export default function ConnectKitAuth() {
     if (!address) return;
     if (!signature) return;
 
-    signInWithSignature(address, signature);
+    signInWithSignature(chainId, address, signature);
   }, [signature, address]);
 
   return <></>;
