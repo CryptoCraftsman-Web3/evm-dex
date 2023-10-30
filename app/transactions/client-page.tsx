@@ -42,7 +42,7 @@ export default function TransactionsClientPage({ userTransactions }: Transaction
           </TableHead>
           <TableBody>
             {userTransactions.map((tx) => (
-              <TransactionRow tx={tx} />
+              <TransactionRow tx={tx} key={tx.hash} />
             ))}
           </TableBody>
         </Table>
