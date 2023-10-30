@@ -1,13 +1,17 @@
 'use client';
 
 import { Transaction } from '@/lib/db-schemas/transaction';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Tab, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { useNetwork } from 'wagmi';
+import TransactionRow from './transaction-row';
 
 type TransactionsClientPageProps = {
   userTransactions: Transaction[];
 };
 
 export default function TransactionsClientPage({ userTransactions }: TransactionsClientPageProps) {
+  const { chain } = useNetwork();
+
   return (
     <>
       <Typography variant="h4">
@@ -17,61 +21,31 @@ export default function TransactionsClientPage({ userTransactions }: Transaction
       <Paper
         variant="outlined"
         sx={{
-          p: { xs: 2, md: 4 },
-          w: { xs: '100%', md: '600px', lg: '800px' },
+          padding: { xs: 2, md: 4 },
+          width: { xs: '100%', md: '100%', lg: '80%' },
+          overflowX: 'auto',
         }}
       >
         <Table
-          sx={{ minWidth: 650 }}
+          sx={{ minWidth: 650, width: '100%', display: 'block' }}
           aria-label="simple table"
         >
           <TableHead>
             <TableRow>
+              <TableCell>Tx Hash</TableCell>
+              <TableCell>Timestamp</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Function Name</TableCell>
-              <TableCell>Tx Hash</TableCell>
-              {/* <TableCell>From</TableCell> */}
               <TableCell>To</TableCell>
               <TableCell>Block Number</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {userTransactions.map((tx) => (
-              <TableRow
-                key={tx.hash}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  {tx.status}
-                </TableCell>
-                <TableCell
-                  component="th"
-                  scope="row"
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  {tx.functionName}
-                </TableCell>
-                <TableCell>
-                  {tx.hash.substring(0, 6)}...{tx.hash.substring(58, 66)}
-                </TableCell>
-                {/* <TableCell>
-                  {tx.from.substring(0, 6)}...{tx.from.substring(38, 42)}
-                </TableCell> */}
-                <TableCell>
-                  {tx.to.substring(0, 6)}...{tx.to.substring(38, 42)}
-                </TableCell>
-                <TableCell>{tx.blockNumber?.toString()}</TableCell>
-              </TableRow>
+              <TransactionRow tx={tx} />
             ))}
           </TableBody>
         </Table>
-        {userTransactions.map((tx) => (
-          <></>
-        ))}
       </Paper>
     </>
   );
