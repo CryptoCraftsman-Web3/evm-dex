@@ -4,6 +4,7 @@ export const tokenTransfers = mysqlTable('token_transfers', {
   id: int('id').notNull().autoincrement().primaryKey(),
   chainId: int('chain_id').notNull(),
   address: varchar('from', { length: 42 }).notNull(),
+  txHash: varchar('tx_hash', { length: 66 }).notNull(),
   direction: mysqlEnum('direction', ['in', 'out']).notNull(),
   amount: float('amount').notNull(),
   tokenContractAddress: varchar('token_contract_address', { length: 42 }).notNull(),

@@ -114,6 +114,7 @@ export const syncTokenTransfers = async (chainId: number, address: `0x${string}`
     const tokenTransferRecord: NewTokenTransfer = {
       chainId,
       address,
+      txHash: tokenTransfer.hash,
       direction: tokenTransfer.from.toLowerCase() === address.toLowerCase() ? 'out' : 'in',
       amount: parseFloat(formatUnits(BigInt(tokenTransfer.value || 1n), Number(tokenTransfer.tokenDecimal || 0))),
       tokenContractAddress: tokenTransfer.contractAddress,
