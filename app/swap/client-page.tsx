@@ -571,7 +571,7 @@ const SwapClientPage = () => {
                               )}
 
                               <LoadingButton
-                                disabled={debouncedAmountA === 0}
+                                disabled={debouncedAmountA === 0 || isFetchingQuotes}
                                 variant="contained"
                                 size="large"
                                 onClick={() => {
