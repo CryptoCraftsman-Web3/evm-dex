@@ -19,7 +19,6 @@ export default function TransactionRow({ tx }: TransactionRowProps) {
   useEffect(() => {
     getTokenTransfers(tx.hash as `0x${string}`).then((transfers) => {
       setTokenTransfers(transfers);
-      console.log(transfers);
     });
   }, []);
 
