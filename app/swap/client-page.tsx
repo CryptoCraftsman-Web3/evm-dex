@@ -11,6 +11,7 @@ import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-
 import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useDebounce } from '@uidotdev/usehooks';
 import { ethers } from 'ethers';
 import { useEffect, useRef, useState } from 'react';
 import { IoWalletSharp } from 'react-icons/io5';
@@ -42,6 +43,8 @@ const SwapClientPage = () => {
   const wrappedNativeToken = useWrappedNativeToken();
 
   const [amountA, setAmountA] = useState<number>(1);
+  const debouncedAmountA = useDebounce(amountA, 500);
+
   const [amountB, setAmountB] = useState<number>(1);
 
   const ethersProvider = useEthersProvider();
@@ -68,7 +71,7 @@ const SwapClientPage = () => {
   const getQuote = async () => {
     if (!tokenInAddress || !tokenOutAddress) throw new Error('Invalid token addresses');
 
-    const amountIn = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18);
+    const amountIn = ethers.utils.parseUnits(debouncedAmountA.toString(), tokenA?.decimals || 18);
     if (amountIn.isZero()) throw new Error('Invalid amount');
 
     setIsFetchingQuotes(true);
@@ -124,9 +127,15 @@ const SwapClientPage = () => {
 
   useEffect(() => {
     if (tokenA && tokenB) {
-      getQuote();
+      console.log(debouncedAmountA);
+      if (debouncedAmountA > 0) {
+        getQuote();
+      } else {
+        setAmountB(0);
+        setSelectedQuote(null);
+      }
     }
-  }, [tokenA, tokenB, amountA]);
+  }, [tokenA, tokenB, debouncedAmountA]);
 
   // monitor tokenA allowance
   // if user wallet's tokenA allowance is less than amountA, then call approve
@@ -163,7 +172,7 @@ const SwapClientPage = () => {
 
   const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
   const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
-  const amountAInBaseUnits = ethers.utils.parseUnits(amountA.toString(), tokenA?.decimals || 18).toBigInt();
+  const amountAInBaseUnits = ethers.utils.parseUnits(debouncedAmountA.toString(), tokenA?.decimals || 18).toBigInt();
 
   const notEnoughTokenABalance = isTokenANative
     ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
@@ -375,10 +384,10 @@ const SwapClientPage = () => {
   const sqrtPriceX96 = slot0?.[0] || 0n;
   let price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
   if (isPairReversed) price = 1 / price;
-  const expectedAmountOut = amountA * price;
+  const expectedAmountOut = debouncedAmountA * price;
 
   const amountOutDifferencePercentage =
-    amountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
+    debouncedAmountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
   return (
@@ -426,6 +435,7 @@ const SwapClientPage = () => {
                     inputRef={amountAInputRef}
                     type="number"
                     value={amountA}
+                    disabled={isFetchingQuotes}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (value === '') {
@@ -487,7 +497,10 @@ const SwapClientPage = () => {
                     <>
                       <TextField
                         type="number"
-                        value={Boolean(selectedQuote) ? amountB.toFixed(4) : null}
+                        value={Boolean(selectedQuote) ? amountB.toFixed(4) : 0}
+                        InputProps={{
+                          readOnly: true,
+                        }}
                         onChange={(e) => {
                           return;
                         }}
@@ -558,7 +571,7 @@ const SwapClientPage = () => {
                               )}
 
                               <LoadingButton
-                                disabled={amountA === 0}
+                                disabled={debouncedAmountA === 0}
                                 variant="contained"
                                 size="large"
                                 onClick={() => {
