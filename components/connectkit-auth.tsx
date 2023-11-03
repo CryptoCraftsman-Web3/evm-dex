@@ -2,15 +2,14 @@
 
 import { getSession, signInWithSignature, signOut } from '@/lib/auth';
 import { xrplDevnet } from '@/lib/xrpl-chains';
-import { getCookie } from 'cookies-next';
-import { sign } from 'crypto';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useNetwork, useSignMessage } from 'wagmi';
 
 export default function ConnectKitAuth() {
   // wallet sign in hooks
   const { isConnected, isDisconnected, address } = useAccount();
-  const { signMessage, data: signature } = useSignMessage();
+  const { signMessageAsync: signMessage } = useSignMessage();
+  const [signature, setSignature] = useState<`0x${string}` | null>(null);
   const { chain } = useNetwork();
 
   const chainId = chain?.id || xrplDevnet.id;
@@ -27,6 +26,8 @@ export default function ConnectKitAuth() {
         if (session?.address) return;
         signMessage({
           message: `I am signing into Serpent Swap with my wallet address: ${address}`,
+        }).then((signResult) => {
+          setSignature(signResult);
         });
       });
     }
