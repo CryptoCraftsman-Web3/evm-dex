@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { Avatar, ConnectKitButton } from 'connectkit';
 import ConnectButton from './connect-button';
 
-const Header = () => {
+const AppHeader = () => {
   return (
     <Box
       sx={{
@@ -73,13 +73,6 @@ const Header = () => {
           item
           xs={4}
         >
-          <TextField
-            size="small"
-            label="Search for tokens and NFTs"
-            sx={{
-              width: '100%',
-            }}
-          />
         </Grid>
 
         <Grid
@@ -122,10 +115,6 @@ const Header = () => {
           spacing={2}
           justifyContent="flex-end"
         >
-          <IconButton>
-            <CiSearch />
-          </IconButton>
-
           <ConnectButton />
         </Stack>
       </Stack>
@@ -133,4 +122,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default AppHeader;
