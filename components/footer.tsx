@@ -1,8 +1,8 @@
-import { Box, Button, IconButton, Stack } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { config } from './config';
 import Link from 'next/link';
 
-const AppFooter = () => {
+const Footer = () => {
   return (
     <Box
       sx={{
@@ -31,15 +31,14 @@ const AppFooter = () => {
               key={index}
               href={item.href}
             >
-              <IconButton
+              <Button
                 key={item.label}
                 sx={{
                   color: 'text.primary',
-                  p: 0,
                 }}
               >
-                {item.icon}
-              </IconButton>
+                {item.label}
+              </Button>
             </Link>
           );
         })}
@@ -48,4 +47,4 @@ const AppFooter = () => {
   );
 };
 
-export default AppFooter;
+export default Footer;

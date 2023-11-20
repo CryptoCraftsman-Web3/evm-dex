@@ -13,9 +13,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.14.18",
     "@mui/lab": "^5.0.0-alpha.140",
-    "@mui/material": "^5.14.18",
+    "@mui/material": "^5.14.3",
     "@planetscale/database": "^1.11.0",
     "@types/node": "20.4.5",
     "@types/react": "18.2.18",

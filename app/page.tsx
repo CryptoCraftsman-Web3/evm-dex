@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default function Home() {
-  //redirect('/swap'); // swap page is home page for now
+  redirect('/swap'); // swap page is home page for now
   return (
     <>
       <HomeClientPage />
