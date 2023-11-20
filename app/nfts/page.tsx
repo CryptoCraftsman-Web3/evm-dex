@@ -1,14 +1,14 @@
 import { getSession } from '@/lib/auth';
 import NFTsClientPage from './client-page';
 import NotSignedIn from '@/components/common/not-signed-in';
-import { AccountTokenListResponse } from '@/types/common';
+import { AccountToken, AccountTokenListResponse } from '@/types/common';
 
 export default async function NFTsPage() {
   const session = await getSession();
   if (!session) return <NotSignedIn />;
 
   const { address } = session;
-  const nfts = [];
+  const nfts: AccountToken[] = [];
 
   try {
     const response = await fetch(
@@ -17,12 +17,13 @@ export default async function NFTsPage() {
     if (!response.ok) throw new Error('Failed to fetch account token list');
 
     const data = (await response.json()) as AccountTokenListResponse;
-    if (data.message !== "OK") throw new Error(data.message);
+    if (data.message !== 'OK') throw new Error(data.message);
 
-    nfts.push(data.result.filter((token) => token.type === 'ERC721'));
+    const nftBalances = data.result.filter((token) => token.type === 'ERC-721');
+    nfts.push(...nftBalances);
   } catch (error) {
     console.error(error);
   }
 
-  return <NFTsClientPage />;
+  return <NFTsClientPage nftBalances={nfts} />;
 }
