@@ -28,3 +28,18 @@ export type Position = {
   tokensOwed0: bigint;
   tokensOwed1: bigint;
 };
+
+export interface AccountTokenListResponse {
+  message: string | "OK"
+  result: AccountToken[]
+  status: string
+}
+
+export interface AccountToken {
+  balance: string
+  contractAddress: string
+  decimals: string
+  name: string
+  symbol: string
+  type: 'ERC20' | 'ERC721' | 'ERC1155'
+}
