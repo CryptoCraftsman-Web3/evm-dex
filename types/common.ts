@@ -41,5 +41,5 @@ export interface AccountToken {
   decimals: string
   name: string
   symbol: string
-  type: 'ERC20' | 'ERC721' | 'ERC1155'
+  type: 'ERC-20' | 'ERC-721' | 'ERC-1155'
 }
