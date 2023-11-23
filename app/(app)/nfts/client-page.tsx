@@ -3,11 +3,9 @@
 import { AccountToken } from '@/types/common';
 
 type NFTsClientPageProps = {
-  nftBalances: AccountToken[];
 };
 
-export default function NFTsClientPage({ nftBalances }: NFTsClientPageProps) {
-  console.log(nftBalances);
+export default function NFTsClientPage({  }: NFTsClientPageProps) {
 
   return (
     <div>
