@@ -25,7 +25,7 @@ const AppFooter = () => {
         p={2}
         sx={{ width: '100%' }}
       >
-        {config.navItems.map((item, index) => {
+        {config.appNavItems.map((item, index) => {
           return (
             <Link
               key={index}

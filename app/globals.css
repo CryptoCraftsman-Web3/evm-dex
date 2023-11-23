@@ -1,10 +1,22 @@
+@font-face {
+  font-family: Kanit;
+  src: url('/fonts/Kanit-Regular.ttf');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: GeneralSans;
+  src: url('/fonts/GeneralSans-Regular.ttf');
+  font-display: swap;
+}
+
 body {
   background-color: '#080708';
-  background-image: url('/serpent-eye.svg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: lower right;
   background-attachment: fixed;
+  color: #fff;
 }
 
 /* Hide step buttons for number inputs in Chrome, Safari, Edge, Opera */
@@ -20,6 +32,46 @@ input[type=number] {
 }
 
 a {
-  color: unset;
   text-decoration: none;
+  display: inline-flex;
+  padding: var(--0, 0rem);
+  align-items: flex-start;
+  gap: var(--0, 0rem);
+  color: var(--White, #FFF);
+  text-align: center;
+  font-family: Inter;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem; /* 133.333% */
+}
+
+a:hover {
+  color: var(--Pink, #DB8BFE);
+  text-align: center;
+  font-family: Inter;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem;
+}
+
+a:active {
+  color: var(--White, #FFF);
+  text-align: center;
+  font-family: Inter;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem;
+}
+
+a:disabled {
+  color: var(--Sec-txt-2, #7F7F7F);
+  text-align: center;
+  font-family: Inter;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem;
 }

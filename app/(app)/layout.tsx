@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="icon" href="/serpent-swap-logo.svg" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} style={{ minHeight: '100vh' }}>
         <Providers>
           <AppHeader />
           <MainContent>{children}</MainContent>
