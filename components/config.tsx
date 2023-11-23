@@ -10,12 +10,27 @@ type NavItem = {
 };
 
 type AppConfig = {
-  navItems: NavItem[];
+  homeNavItems: NavItem[];
+  appNavItems: NavItem[];
   feeTiers: FeeTier[];
 };
 
 export const config: AppConfig = {
-  navItems: [
+  homeNavItems: [
+    {
+      label: 'Blog',
+      href: '/blog',
+    },
+    {
+      label: 'About',
+      href: '/about',
+    },
+    {
+      label: 'Help center',
+      href: '/help',
+    },
+  ],
+  appNavItems: [
     {
       label: 'Swap',
       href: '/swap',

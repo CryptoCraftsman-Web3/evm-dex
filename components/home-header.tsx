@@ -1,12 +1,9 @@
 'use client';
 
-import { Box, Typography, IconButton, Stack, TextField, Grid, InputAdornment } from '@mui/material';
-import { config } from './config';
-import Link from 'next/link';
-import { CiSearch } from 'react-icons/ci';
+import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { Avatar, ConnectKitButton } from 'connectkit';
-import ConnectButton from './connect-button';
+import Link from 'next/link';
+import { config } from './config';
 
 const AppHeader = () => {
   return (
@@ -18,49 +15,57 @@ const AppHeader = () => {
         width: '100%',
         zIndex: 10,
         backgroundColor: 'background.default',
-        // boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-        // borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
       }}
     >
       <Grid
         container
-        px={2}
-        py={1}
         sx={{
           alignItems: 'center',
           display: { xs: 'none', md: 'flex' },
+          px: '3.75rem',
+          height: '5rem',
         }}
       >
         <Grid
           item
-          xs={4}
+          xs={1}
         >
-          <Stack
-            direction="row"
-            spacing={2}
-            alignItems="center"
-          >
-            <Link href="/">
-              <Image
-                src="/serpent-swap-logo.svg"
-                alt="Logo"
-                width={48}
-                height={48}
-              />
-            </Link>
-            {config.appNavItems.map((item, index) => {
-              return (
-                <Link
-                  key={index}
-                  href={item.href}
-                >
-                  <Typography>
-                    {item.label}
-                  </Typography>
-                </Link>
-              );
-            })}
-          </Stack>
+          <Link href="/" style={{ marginRight: '85px' }}>
+            <Image
+              src="/serpent-swap-logo.svg"
+              priority
+              alt="Logo"
+              width={48}
+              height={48}
+            />
+          </Link>
+        </Grid>
+        <Grid
+          item
+          xs={7}
+          sm={4}
+          md={3}
+          display={'flex'}
+          alignItems={'flex-start'}
+          gap={'2.5rem'}
+          p={'0rem'}
+        >
+          {config.homeNavItems.map((item, index) => {
+            return (
+              <Link
+                key={index}
+                href={item.href}
+                style={{
+                  marginRight: index < config.homeNavItems.length - 1 ? '2.5rem' : 0,
+                  width: 'auto',
+                }}
+              >
+                <Typography sx={{ color: '#FFF' }}>
+                  {item.label}
+                </Typography>
+              </Link>
+            );
+          })}
         </Grid>
 
         <Grid
@@ -76,7 +81,9 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <ConnectButton />
+          <Link href={'/pools'}>
+            <Button variant='contained' color='primary' size='small'>Launch App</Button>
+          </Link>
         </Grid>
       </Grid>
 
@@ -109,7 +116,7 @@ const AppHeader = () => {
           spacing={2}
           justifyContent="flex-end"
         >
-          <ConnectButton />
+          <Button>Launch App</Button>
         </Stack>
       </Stack>
     </Box>

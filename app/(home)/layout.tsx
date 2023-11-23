@@ -1,11 +1,10 @@
 import MainContent from '@/components/main-content';
 import { constants } from '@/lib/constants';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import '../globals.css';
 import Providers from '../providers';
+import HomeHeader from '@/components/home-header';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: constants.appName,
@@ -21,9 +20,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="icon" href="/serpent-swap-logo.svg" />
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>
-          <MainContent>{children}</MainContent>
+          <HomeHeader />
+
+          {children}
         </Providers>
       </body>
     </html>

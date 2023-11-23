@@ -17,7 +17,7 @@ const ConnectButton = () => {
         return (
           <Button
             variant="contained"
-            size="large"
+            size="small"
             onClick={show}
             startIcon={
               isConnected ? (

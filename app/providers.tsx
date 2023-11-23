@@ -28,6 +28,12 @@ type ProvidersProps = {
   children: React.ReactNode;
 };
 
+const purple = '#6B0099';
+const hoverPurple = '#A000E5';
+const clickedPurple = '#56007A';
+const disabledPurple = '#252425';
+const textGrey = '#ADADAD';
+
 const Providers = ({ children }: ProvidersProps) => {
   const background = '#080708';
   const primary = '#6B0099';
@@ -42,17 +48,114 @@ const Providers = ({ children }: ProvidersProps) => {
       background: {
         default: background,
       },
+      text: {
+        primary: '#FFF'
+      }
     },
     typography: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: 'GeneralSans, sans-serif',
+      h1: {
+        fontFamily: 'Kanit, sans-serif ',
+        fontWeight: 500,
+        fontSize: '8.75rem',
+        lineHeight: '90%',
+        textTransform: 'uppercase',
+      },
+      h2: {
+        fontSize: '4.65rem',
+        fontWeight: 600,
+        lineHeight: '110%',
+      },
+      h3: {
+        fontSize: '3.5625rem',
+        fontWeight: 600,
+        lineHeight: '140%',
+      },
+      h4: {
+        fontSize: '3rem',
+        fontWeight: 600,
+        lineHeight: '120%',
+      },
+      subtitle1: {
+        fontSize: '1.625rem',
+        fontStyle: 'normal',
+        fontWeight: 400,
+        lineHeight: '150%',
+      },
+      subtitle2: {
+        fontSize: '1.625rem',
+        fontStyle: 'normal',
+        fontWeight: 500,
+        lineHeight: '150%',
+      },
+      body1: {
+        color: textGrey,
+        fontSize: '1.125rem',
+        fontStyle: 'normal',
+        fontWeight: 400,
+        lineHeight: '160%',
+      },
     },
     components: {
       MuiButton: {
+        defaultProps: {
+          disableElevation: true,
+          disableRipple: true,
+          disableFocusRipple: true,
+          style: {
+            transition: 'none'
+          }
+        },
         styleOverrides: {
           root: {
             textTransform: 'none',
           },
         },
+        variants: [
+          {
+            props: { variant: 'contained', size: 'large' },
+            style: {
+              fontSize: '1.125rem',
+              fontWeight: 600,
+              lineHeight: '1.5rem',
+              padding: '1rem 1.75rem',
+              backgroundColor: purple,
+              '&:hover': {
+                backgroundColor: hoverPurple,
+              },
+              '&:active': {
+                backgroundColor: clickedPurple,
+              },
+              '&:disabled': {
+                backgroundColor: disabledPurple,
+              },
+            }
+          },
+          {
+            props: { variant: 'contained', size: 'small' },
+            style: {
+              display: 'inline-flex',
+              padding: '0.63rem 1.75rem',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.75rem',
+              backgroundColor: purple,
+              fontSize: '1rem',
+              fontStyle: 'normal',
+              fontWeight: 600,
+              lineHeight: '1.5rem',
+              '&:hover': {
+                backgroundColor: hoverPurple,
+              },
+              '&:active': {
+                backgroundColor: clickedPurple,
+              },
+              '&:disabled': {
+                backgroundColor: disabledPurple,
+              },
+            }
+          },
+        ]
       },
       MuiTextField: {
         styleOverrides: {
@@ -80,7 +183,7 @@ const Providers = ({ children }: ProvidersProps) => {
       },
     },
     shape: {
-      borderRadius: 0,
+      borderRadius: 60,
     },
   });
 
