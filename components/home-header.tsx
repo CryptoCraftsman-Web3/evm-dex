@@ -24,6 +24,8 @@ const AppHeader = () => {
           display: { xs: 'none', md: 'flex' },
           px: '3.75rem',
           height: '5rem',
+          maxWidth: '1320px',
+          mx: 'auto',
         }}
       >
         <Grid
@@ -47,7 +49,7 @@ const AppHeader = () => {
           md={3}
           display={'flex'}
           alignItems={'flex-start'}
-          gap={'2.5rem'}
+          gap={'40px'}
           p={'0rem'}
         >
           {config.homeNavItems.map((item, index) => {
@@ -55,10 +57,6 @@ const AppHeader = () => {
               <Link
                 key={index}
                 href={item.href}
-                style={{
-                  marginRight: index < config.homeNavItems.length - 1 ? '2.5rem' : 0,
-                  width: 'auto',
-                }}
               >
                 <Typography sx={{ color: '#FFF' }}>
                   {item.label}
