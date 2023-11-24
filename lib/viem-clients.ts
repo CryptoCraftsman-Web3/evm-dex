@@ -2,7 +2,7 @@ import { createPublicClient, http } from 'viem';
 import { xrplDevnet } from './xrpl-chains';
 import { sepolia } from 'viem/chains';
 
-const xrplDevnetPublicClient = createPublicClient({
+export const xrplDevnetPublicClient = createPublicClient({
   ...xrplDevnet,
   transport: http(xrplDevnet.rpcUrls.public.http[0]),
 });
