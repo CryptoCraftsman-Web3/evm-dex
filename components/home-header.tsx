@@ -116,7 +116,9 @@ const AppHeader = () => {
           spacing={2}
           justifyContent="flex-end"
         >
-          <Button>Launch App</Button>
+          <Link href={'/pools'}>
+            <Button variant='contained' color='primary' size='small'>Launch App</Button>
+          </Link>
         </Stack>
       </Stack>
     </Box>

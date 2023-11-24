@@ -60,6 +60,9 @@ const Providers = ({ children }: ProvidersProps) => {
         fontSize: '8.75rem',
         lineHeight: '90%',
         textTransform: 'uppercase',
+        '@media (max-width: 600px)': {
+          fontSize: '5rem',
+        }
       },
       h2: {
         fontSize: '4.65rem',
