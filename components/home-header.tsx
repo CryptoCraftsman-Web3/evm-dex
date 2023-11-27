@@ -24,7 +24,7 @@ const AppHeader = () => {
           display: { xs: 'none', md: 'flex' },
           px: '3.75rem',
           height: '5rem',
-          maxWidth: '1320px',
+          maxWidth: '90%',
           mx: 'auto',
         }}
       >

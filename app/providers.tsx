@@ -184,6 +184,13 @@ const Providers = ({ children }: ProvidersProps) => {
           },
         },
       },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: '40px'
+          }
+        }
+      }
     },
     shape: {
       borderRadius: 60,
