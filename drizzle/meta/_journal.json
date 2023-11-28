@@ -120,6 +120,13 @@
       "when": 1700896292836,
       "tag": "0016_fast_lake",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1701165506590,
+      "tag": "0017_perpetual_chimera",
+      "breakpoints": true
     }
   ]
 }

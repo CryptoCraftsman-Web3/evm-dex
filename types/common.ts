@@ -43,3 +43,14 @@ export interface AccountToken {
   symbol: string;
   type: 'ERC-20' | 'ERC-721' | 'ERC-1155';
 }
+
+export interface TokenHoldersListResponse {
+  message: string;
+  result: TokenBalance[];
+  status: string;
+}
+
+export interface TokenBalance {
+  address: string;
+  value: string;
+}

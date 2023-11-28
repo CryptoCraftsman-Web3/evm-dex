@@ -9,7 +9,9 @@ export default async function NFTsPage() {
   if (!session) return <NotSignedIn />;
 
   const { address } = session;
-  await getNFTs(address);
+  const balances = await getNFTs(address);
+
+  console.log('NFTsPage', address, balances);
 
   return <NFTsClientPage />;
 }
