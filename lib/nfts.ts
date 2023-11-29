@@ -85,11 +85,12 @@ export async function cacheERC721Tokens(
   let totalSupply = 0;
   try {
     const response = await fetch(
-      `${sideChainRpcApiBaseUrl}?module=token&action=getToken&contractaddress=${contractAddress}`
+      `${sideChainRpcApiBaseUrl}?module=token&action=getTokenHolders&contractaddress=${contractAddress}`
     );
     if (!response.ok) throw new Error('Failed to fetch token supply');
 
     const data = (await response.json()) as TokenHoldersListResponse;
+    console.log('Token holders list', data);
     if (data.message !== 'OK') throw new Error(data.message);
 
     // reduce the array of token balances to a single number
@@ -98,34 +99,59 @@ export async function cacheERC721Tokens(
     console.error(error);
   }
 
+  console.log(contractAddress, erc721ABI, xrplDevnetPublicClient);
+
   const contract = getContract({
     address: contractAddress,
-    abi: erc721ABI,
+    abi: [
+      {
+        constant: true,
+        inputs: [{ name: '_tokenId', type: 'uint256' }],
+        name: 'ownerOf',
+        outputs: [{ name: 'owner', type: 'address' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        constant: true,
+        inputs: [{ name: '_tokenId', type: 'uint256' }],
+        name: 'tokenURI',
+        outputs: [{ name: '', type: 'string' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ],
     publicClient: xrplDevnetPublicClient,
   });
 
   // get owner of each token id via Viem publicClient
 
-  for (let i = 0; i < totalSupply; i++) {
-    const tokenId = BigInt(i);
-    const owner = await contract.read.ownerOf([tokenId]);
-    const tokenURI = await contract.read.tokenURI([tokenId]);
-    console.log(`Token ID ${tokenId} owned by ${owner}`);
+  for (let i = 0; i <= totalSupply; i++) {
+    try {
+      const tokenId = BigInt(i);
+      const owner = await contract.read.ownerOf([tokenId]);
+      const tokenURI = await contract.read.tokenURI([tokenId]);
+      console.log(`Token ID ${tokenId} owned by ${owner}`);
 
-    db.insert(nftCacheRecord)
-      .values({
-        nftContractAddress: contractAddress,
-        tokenId: i,
-        ownerAddress: owner,
-        tokenURI,
-        lastUpdated: new Date(),
-      })
-      .onDuplicateKeyUpdate({
-        set: {
+      db.insert(nftCacheRecord)
+        .values({
+          nftContractAddress: contractAddress,
+          tokenId: i,
           ownerAddress: owner,
           tokenURI,
           lastUpdated: new Date(),
-        },
-      });
+        })
+        .onDuplicateKeyUpdate({
+          set: {
+            ownerAddress: owner,
+            tokenURI,
+            lastUpdated: new Date(),
+          },
+        }).execute();
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
