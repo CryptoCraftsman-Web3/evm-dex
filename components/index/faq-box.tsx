@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { Box, Button, Paper, Typography } from '@mui/material'
 
-const FaqBox = () => {
+type FaqBoxProps = {
+  title: string
+  content: string
+}
+
+const FaqBox = ({ title, content }: FaqBoxProps) => {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper
@@ -22,7 +27,7 @@ const FaqBox = () => {
           zIndex: 1,
         }}
       >
-        <Typography variant='subtitle2'>How do I get started?</Typography>
+        <Typography variant='subtitle2'>{title}</Typography>
         <Button
           variant='contained'
           onClick={() => setIsOpen(!isOpen)}
@@ -72,7 +77,7 @@ const FaqBox = () => {
             transform: isOpen ? 'translateY(0)' : 'translateY(-100%)',
           }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. At ut quidem aliquid quod minima rerum facere? Dolorem voluptas tempore dolorum!
+          {content}
         </Typography>
       </Box>
     </Paper>

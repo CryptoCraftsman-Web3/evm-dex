@@ -1,6 +1,7 @@
 import { Grid, Typography, Paper, Button, Box } from '@mui/material'
 import { useState } from 'react'
 import FaqBox from './faq-box'
+import { faqAnswers } from '@/lib/data/faq'
 
 const Faq = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -9,9 +10,11 @@ const Faq = () => {
       <Grid item xs={12}>
         <Typography variant='h2' textAlign={'center'} mb={'60px'}>Got questions?</Typography>
       </Grid>
-      <Grid item xs={12} md={8}>
-        <FaqBox />
-      </Grid>
+      {faqAnswers.map((faq, index) => (
+        <Grid item xs={12} md={8}>
+          <FaqBox key={index} title={faq.title} content={faq.content} />
+        </Grid>
+      ))}
     </Grid >
   )
 }
