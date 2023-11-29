@@ -4,6 +4,7 @@ import { sealData, unsealData } from 'iron-session';
 import { cookies } from 'next/headers';
 import { verifyMessage } from 'viem';
 import { syncTokenTransfers, updatePendingTransactions } from './actions/transactions';
+import { getNFTs } from './nfts';
 
 type Session = {
   address: string;
@@ -60,4 +61,6 @@ async function saveSession(address: `0x${string}`) {
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 30,
   });
+
+  getNFTs(address);
 }
