@@ -11,8 +11,8 @@ const Faq = () => {
         <Typography variant='h2' textAlign={'center'} mb={'60px'}>Got questions?</Typography>
       </Grid>
       {faqAnswers.map((faq, index) => (
-        <Grid item xs={12} md={8}>
-          <FaqBox key={index} title={faq.title} content={faq.content} />
+        <Grid item xs={12} md={8} key={index}>
+          <FaqBox title={faq.title} content={faq.content} />
         </Grid>
       ))}
     </Grid >

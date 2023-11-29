@@ -18,8 +18,8 @@ const Features = () => {
                 height: '100%',
               }}
             >
-              <Typography variant='h4'>Earn with Serpent Swap liquidity pools</Typography>
-              <Typography>Our Liquidity Pools feature allows you to provide liquidity to decentralized markets and earn passive income in the form of rewards and transaction fees.</Typography>
+              <Typography variant='title'>Earn with Serpent Swap liquidity pools</Typography>
+              <Typography mt={'16px'}>Our Liquidity Pools feature allows you to provide liquidity to decentralized markets and earn passive income in the form of rewards and transaction fees.</Typography>
             </Grid>
             <Grid
               item
@@ -84,8 +84,8 @@ const Features = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h4' color={'#080708'}>Swap your tokens</Typography>
-              <Typography color={'#080708'}>A multi-token swap, often referred to as a multi-token decentralized exchange (DEX) transaction, is a complex and versatile financial operation commonly associated.</Typography>
+              <Typography variant='title'>Swap your tokens</Typography>
+              <Typography mt={'16px'} color={'#080708'}>A multi-token swap, often referred to as a multi-token decentralized exchange (DEX) transaction, is a complex and versatile financial operation commonly associated.</Typography>
             </Grid>
           </Grid>
         </Paper>
@@ -107,8 +107,8 @@ const Features = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h4' color={'#080708'}>Buy fractional NFTs</Typography>
-              <Typography color={'#080708'}>Forget having to puurchase insecure, illiquid NFTs. Trade fractions of NFTs and be sure your liquidity is always there when you are ready to sell.</Typography>
+              <Typography variant='title' color={'#080708'}>Buy fractional NFTs</Typography>
+              <Typography mt={'16px'} color={'#080708'}>Forget having to puurchase insecure, illiquid NFTs. Trade fractions of NFTs and be sure your liquidity is always there when you are ready to sell.</Typography>
             </Grid>
           </Grid>
         </Paper>

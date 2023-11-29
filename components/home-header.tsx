@@ -78,7 +78,7 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <Link href={'/pools'}>
+          <Link href={'http://app.localhost:3185'}>
             <Button variant='contained' color='primary' size='small'>Launch App</Button>
           </Link>
         </Grid>

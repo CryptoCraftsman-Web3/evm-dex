@@ -1,12 +1,12 @@
 'use client';
 
-import Elevator from '@/components/index/Elevator';
-import Features from '@/components/index/Features';
-import Hero from '@/components/index/Hero';
-import Statistics from '@/components/index/Statistics';
+import Elevator from '@/components/index/elevator';
+import Features from '@/components/index/features';
+import Hero from '@/components/index/hero';
+import Statistics from '@/components/index/statistics';
 import Faq from '@/components/index/faq';
 import { Box, Button, Grid, Typography } from '@mui/material';
-import Link from 'next/link';
+import EndCta from '@/components/index/end-cta';
 
 const HomeClientPage = () => {
   return (
@@ -17,7 +17,7 @@ const HomeClientPage = () => {
         <Statistics />
         <Features />
         <Faq />
-        <Box height={'300px'} />
+        <EndCta />
       </Box>
     </>
   );
