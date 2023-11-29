@@ -92,7 +92,6 @@ export async function cacheERC721Tokens(
     if (!response.ok) throw new Error('Failed to fetch token supply');
 
     const data = (await response.json()) as TokenHoldersListResponse;
-    console.log('Token holders list', data);
     if (data.message !== 'OK') throw new Error(data.message);
 
     // reduce the array of token balances to a single number
