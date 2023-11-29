@@ -1,15 +1,16 @@
 import { AccountToken, AccountTokenListResponse, TokenHoldersListResponse } from '@/types/common';
-import { db } from './database';
-import { nftContractCachedLog } from './db-schemas/nft-contract-cached-log';
 import { eq } from 'drizzle-orm';
 import { getContract } from 'viem';
-import { erc721ABI } from 'wagmi';
-import { xrplDevnetPublicClient } from './viem-clients';
+import { db } from './database';
 import { nftCacheRecord } from './db-schemas/nft-cache-record';
+import { nftContractCachedLog } from './db-schemas/nft-contract-cached-log';
+import { xrplDevnetPublicClient } from './viem-clients';
+import PQueue from 'p-queue';
 
 const sideChainRpcApiBaseUrl = 'https://evm-sidechain.xrpl.org/api';
 
 export async function getNFTs(address: string, doSync: boolean = true) {
+  console.log('Getting NFTs for address', address);
   let nftBalances: AccountToken[] = [];
 
   try {
@@ -29,6 +30,7 @@ export async function getNFTs(address: string, doSync: boolean = true) {
   }
 
   if (doSync) {
+    console.log(`Sync NFTs for ${address}`);
     for (const balance of nftBalances) {
       await cacheERC721Tokens(balance.contractAddress as `0x${string}`, balance.name, balance.symbol);
     }
@@ -99,8 +101,6 @@ export async function cacheERC721Tokens(
     console.error(error);
   }
 
-  console.log(contractAddress, erc721ABI, xrplDevnetPublicClient);
-
   const contract = getContract({
     address: contractAddress,
     abi: [
@@ -127,13 +127,12 @@ export async function cacheERC721Tokens(
   });
 
   // get owner of each token id via Viem publicClient
-
-  for (let i = 0; i <= totalSupply; i++) {
+  const cacheToken = async (i: number) => {
     try {
       const tokenId = BigInt(i);
       const owner = await contract.read.ownerOf([tokenId]);
       const tokenURI = await contract.read.tokenURI([tokenId]);
-      console.log(`Token ID ${tokenId} owned by ${owner}`);
+      // console.log(`Contract ${contractAddress} Token ID ${tokenId} owned by ${owner}`);
 
       db.insert(nftCacheRecord)
         .values({
@@ -149,9 +148,16 @@ export async function cacheERC721Tokens(
             tokenURI,
             lastUpdated: new Date(),
           },
-        }).execute();
+        })
+        .execute();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
+  };
+
+  const queue = new PQueue({concurrency: 25});
+
+  for (let i = 0; i <= totalSupply; i++) {
+    queue.add(() => cacheToken(i));
   }
 }
