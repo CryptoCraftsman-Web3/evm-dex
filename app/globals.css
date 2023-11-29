@@ -1,13 +1,11 @@
 @font-face {
   font-family: Kanit;
-  src: url('/fonts/Kanit-Regular.ttf');
-  font-display: swap;
+  src: url('/fonts/Kanit/Kanit-Regular.ttf');
 }
 
 @font-face {
   font-family: GeneralSans;
-  src: url('/fonts/GeneralSans-Regular.ttf');
-  font-display: swap;
+  src: url('/fonts/GeneralSans-Variable.ttf');
 }
 
 body {

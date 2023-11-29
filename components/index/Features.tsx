@@ -7,9 +7,9 @@ const Features = () => {
         <Typography variant='h2' textAlign={'center'} mb={'20px'}>Features</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Paper sx={{ p: '80px', backgroundColor: '#075400', height: '640px', overflow: 'hidden' }}>
-          <Grid container spacing={2} height={'100%'}>
-            <Grid item xs={12} md={6}
+        <Paper sx={{ p: '80px', height: '640px', overflow: 'hidden' }} variant='green'>
+          <Grid container spacing={2} height={'100%'} justifyContent={'space-between'}>
+            <Grid item xs={12} md={4.5}
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -65,9 +65,9 @@ const Features = () => {
         <Paper
           sx={{
             p: '60px',
-            backgroundColor: '#DB8BFE',
             overflow: 'hidden',
           }}
+          variant='pink'
         >
           <Grid container gap={'60px'}>
             <Grid item xs={12}>
@@ -91,7 +91,7 @@ const Features = () => {
         </Paper>
       </Grid >
       <Grid item xs={12} md={6}>
-        <Paper sx={{ p: '60px', backgroundColor: '#C2E95A', overflow: 'hidden' }}>
+        <Paper sx={{ p: '60px', overflow: 'hidden' }} variant='lightGreen'>
           <Grid container gap={'60px'}>
             <Grid item xs={12}>
               <Box

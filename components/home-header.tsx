@@ -22,9 +22,8 @@ const AppHeader = () => {
         sx={{
           alignItems: 'center',
           display: { xs: 'none', md: 'flex' },
-          px: '3.75rem',
-          height: '5rem',
-          maxWidth: '90%',
+          height: '80px',
+          maxWidth: '1320px',
           mx: 'auto',
         }}
       >
