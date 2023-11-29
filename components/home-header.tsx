@@ -22,9 +22,8 @@ const AppHeader = () => {
         sx={{
           alignItems: 'center',
           display: { xs: 'none', md: 'flex' },
-          px: '3.75rem',
-          height: '5rem',
-          maxWidth: '90%',
+          height: '80px',
+          maxWidth: '1320px',
           mx: 'auto',
         }}
       >
@@ -79,7 +78,7 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <Link href={'/pools'}>
+          <Link href={'http://app.localhost:3185'}>
             <Button variant='contained' color='primary' size='small'>Launch App</Button>
           </Link>
         </Grid>

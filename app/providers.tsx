@@ -28,10 +28,57 @@ type ProvidersProps = {
   children: React.ReactNode;
 };
 
-const purple = '#6B0099';
-const hoverPurple = '#A000E5';
-const clickedPurple = '#56007A';
-const disabledPurple = '#252425';
+declare module '@mui/material/Paper' {
+  interface PaperPropsVariantOverrides {
+    green: true;
+    lightGreen: true;
+    pink: true;
+  }
+}
+
+declare module "@mui/material/styles" {
+  interface TypographyVariants {
+    title: React.CSSProperties;
+    subtitle3: React.CSSProperties;
+    numbers: React.CSSProperties;
+    footnote: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    title?: React.CSSProperties;
+    subtitle3?: React.CSSProperties;
+    numbers?: React.CSSProperties;
+    footnote?: React.CSSProperties;
+  }
+}
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    title: true;
+    subtitle3: true;
+    numbers: true;
+    footnote: true;
+  }
+}
+
+const colors = {
+  cta: '#6B0099',
+  white: '#FFFFFF',
+  black: '#080708',
+  secBG: '#181718',
+  tertiaryBG: '#252425',
+  green: '#075400',
+  lightGreen: '#C2E95A',
+  pink: '#DB8BFE',
+  secText: '#595959',
+  tertiaryText: '#353135',
+  stroke: '#595959',
+  darkStroke: '#353135',
+  hoverPurple: '#A000E5',
+  clickedPurple: '#56007A',
+};
+
 const textGrey = '#ADADAD';
 
 const Providers = ({ children }: ProvidersProps) => {
@@ -42,20 +89,20 @@ const Providers = ({ children }: ProvidersProps) => {
     palette: {
       mode: 'dark',
       primary: {
-        main: primary,
+        main: colors.cta,
         light: primaryLight,
       },
       background: {
-        default: background,
+        default: colors.black,
       },
       text: {
-        primary: '#FFF'
+        primary: colors.white
       }
     },
     typography: {
       fontFamily: 'GeneralSans, sans-serif',
       h1: {
-        fontFamily: 'Kanit, sans-serif ',
+        fontFamily: 'Kanit, sans-serif',
         fontWeight: 500,
         fontSize: '8.75rem',
         lineHeight: '90%',
@@ -72,9 +119,10 @@ const Providers = ({ children }: ProvidersProps) => {
       h3: {
         fontSize: '3.5625rem',
         fontWeight: 600,
+        fontStyle: 'normal',
         lineHeight: '140%',
       },
-      h4: {
+      title: {
         fontSize: '3rem',
         fontWeight: 600,
         lineHeight: '120%',
@@ -91,6 +139,18 @@ const Providers = ({ children }: ProvidersProps) => {
         fontWeight: 500,
         lineHeight: '150%',
       },
+      subtitle3: {
+        fontSize: '1.625rem',
+        fontStyle: 'normal',
+        fontWeight: 600,
+        lineHeight: '150%',
+      },
+      numbers: {
+        fontSize: '1.25rem',
+        fontStyle: 'normal',
+        fontWeight: 500,
+        lineHeight: '160%',
+      },
       body1: {
         color: textGrey,
         fontSize: '1.125rem',
@@ -98,6 +158,20 @@ const Providers = ({ children }: ProvidersProps) => {
         fontWeight: 400,
         lineHeight: '160%',
       },
+      body2: {
+        color: textGrey,
+        fontSize: '1rem',
+        fontStyle: 'normal',
+        fontWeight: 400,
+        lineHeight: '160%',
+      },
+      footnote: {
+        fontSize: '0.8125rem',
+        color: '#ADADAD',
+        fontStyle: 'normal',
+        fontWeight: 400,
+        lineHeight: '130%'
+      }
     },
     components: {
       MuiButton: {
@@ -106,12 +180,14 @@ const Providers = ({ children }: ProvidersProps) => {
           disableRipple: true,
           disableFocusRipple: true,
           style: {
-            transition: 'none'
+            transition: 'none',
+            minWidth: '0px'
           }
         },
         styleOverrides: {
           root: {
             textTransform: 'none',
+            minWidth: '0px'
           },
         },
         variants: [
@@ -122,15 +198,15 @@ const Providers = ({ children }: ProvidersProps) => {
               fontWeight: 600,
               lineHeight: '1.5rem',
               padding: '1rem 1.75rem',
-              backgroundColor: purple,
+              backgroundColor: colors.cta,
               '&:hover': {
-                backgroundColor: hoverPurple,
+                backgroundColor: colors.hoverPurple,
               },
               '&:active': {
-                backgroundColor: clickedPurple,
+                backgroundColor: colors.clickedPurple,
               },
               '&:disabled': {
-                backgroundColor: disabledPurple,
+                backgroundColor: colors.tertiaryBG,
               },
             }
           },
@@ -142,19 +218,19 @@ const Providers = ({ children }: ProvidersProps) => {
               justifyContent: 'center',
               alignItems: 'center',
               gap: '0.75rem',
-              backgroundColor: purple,
+              backgroundColor: colors.cta,
               fontSize: '1rem',
               fontStyle: 'normal',
               fontWeight: 600,
               lineHeight: '1.5rem',
               '&:hover': {
-                backgroundColor: hoverPurple,
+                backgroundColor: colors.hoverPurple,
               },
               '&:active': {
-                backgroundColor: clickedPurple,
+                backgroundColor: colors.clickedPurple,
               },
               '&:disabled': {
-                backgroundColor: disabledPurple,
+                backgroundColor: colors.tertiaryBG,
               },
             }
           },
@@ -187,9 +263,33 @@ const Providers = ({ children }: ProvidersProps) => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            borderRadius: '40px'
+            backgroundColor: colors.secBG,
+            color: colors.white,
+            borderRadius: '40px',
           }
-        }
+        },
+        variants: [
+          {
+            props: { variant: 'green' },
+            style: {
+              backgroundColor: colors.green,
+            }
+          },
+          {
+            props: { variant: 'lightGreen' },
+            style: {
+              backgroundColor: colors.lightGreen,
+              color: colors.black,
+            }
+          },
+          {
+            props: { variant: 'pink' },
+            style: {
+              backgroundColor: colors.pink,
+              color: colors.black,
+            }
+          },
+        ]
       }
     },
     shape: {
