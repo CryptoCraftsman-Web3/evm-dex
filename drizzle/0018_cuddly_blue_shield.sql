@@ -1,0 +1,1 @@
+ALTER TABLE `nft_contract_cached_log` ADD PRIMARY KEY(`nft_contract_address`);
