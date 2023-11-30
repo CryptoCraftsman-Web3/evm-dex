@@ -1,4 +1,4 @@
-import { constants } from '@/lib/constants';
+import { appDomains, constants } from '@/lib/constants';
 import HomeClientPage from './client-page';
 import { redirect } from 'next/navigation';
 
@@ -7,7 +7,10 @@ export const metadata = {
 };
 
 export default function Home() {
-  //redirect('/swap'); // swap page is home page for now
+  if (appDomains.includes(process.env.VERCEL_URL)) {
+    redirect('/swap');
+  }
+
   return (
     <>
       <HomeClientPage />
