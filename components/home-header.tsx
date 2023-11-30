@@ -78,7 +78,7 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <Link href={'http://app.localhost:3185'}>
+          <Link href={`https://app.${process.env.VERCEL_URL}`}>
             <Button variant='contained' color='primary' size='small'>Launch App</Button>
           </Link>
         </Grid>
