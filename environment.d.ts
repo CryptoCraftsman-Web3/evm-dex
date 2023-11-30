@@ -8,8 +8,9 @@ global {
       DATABASE_USERNAME: string;
       DATABASE_PASSWORD: string;
       IRON_SESSION_PWD: string;
+      NEXT_PUBLIC_URL: string;
     }
   }
 }
 
-export {};
+export { };
