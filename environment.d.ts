@@ -8,8 +8,9 @@ global {
       DATABASE_USERNAME: string;
       DATABASE_PASSWORD: string;
       IRON_SESSION_PWD: string;
+      VERCEL_URL: string;
     }
   }
 }
 
-export {};
+export { };
