@@ -7,7 +7,8 @@ export const metadata = {
 };
 
 export default function Home() {
-  if (appDomains.includes(process.env.VERCEL_URL)) {
+  console.log(process.env.VERCEL_URL);
+  if (appDomains.includes(process.env.VERCEL_URL.toLowerCase())) {
     redirect('/swap');
   }
 
