@@ -2,6 +2,7 @@ import { FeeTier } from '@/types/common';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PoolIcon from '@mui/icons-material/Pool';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import TokenIcon from '@mui/icons-material/Token';
 
 type NavItem = {
   label: string;
@@ -33,27 +34,28 @@ export const config: AppConfig = {
   appNavItems: [
     {
       label: 'Swap',
-      href: '/swap',
-      icon: <SwapHorizIcon fontSize='large' />,
+      href: '/app/swap',
+      icon: <SwapHorizIcon fontSize="large" />,
     },
     // {
     //   label: 'Tokens',
     //   href: '/tokens',
     // },
-    // {
-    //   label: 'NFTs',
-    //   href: '/nfts',
-    // },
+    {
+      label: 'NFTs',
+      href: '/app/nfts',
+      icon: <TokenIcon fontSize="large" />,
+    },
     {
       label: 'Pools',
-      href: '/pools',
-      icon: <PoolIcon fontSize='large' />,
+      href: '/app/pools',
+      icon: <PoolIcon fontSize="large" />,
     },
     {
       label: 'Transactions',
-      href: '/transactions',
-      icon: <ReceiptLongIcon fontSize='large' />,
-    }
+      href: '/app/transactions',
+      icon: <ReceiptLongIcon fontSize="large" />,
+    },
   ],
   feeTiers: [
     {
