@@ -6,7 +6,7 @@ const EndCta = () => {
     <Grid
       container
       spacing={2}
-      py={'70px'}
+      pt={'70px'}
     >
       <Grid item xs={12}>
         <Paper

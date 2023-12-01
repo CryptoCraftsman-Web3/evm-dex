@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import '../globals.css';
 import Providers from '../providers';
 import HomeHeader from '@/components/home-header';
+import Footer from '@/components/footer';
 
 
 export const metadata: Metadata = {
@@ -25,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <HomeHeader />
 
           {children}
+
+          <Footer />
         </Providers>
       </body>
     </html>
