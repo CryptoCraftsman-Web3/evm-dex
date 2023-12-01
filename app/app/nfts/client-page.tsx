@@ -2,15 +2,15 @@
 
 import NFTItem from '@/components/nfts/nft-item';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
+import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { Grid, Paper, Stack, Typography } from '@mui/material';
 
 type NFTsClientPageProps = {
   userNFTs: NFTCacheRecord[];
+  nftContracts: { [key: string]: NFTContractCachedLog };
 };
 
-export default function NFTsClientPage({ userNFTs }: NFTsClientPageProps) {
-  console.log(userNFTs);
-
+export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPageProps) {
   return (
     <Stack spacing={4}>
       <Typography variant="h4">
@@ -19,7 +19,7 @@ export default function NFTsClientPage({ userNFTs }: NFTsClientPageProps) {
 
       <Paper
         variant="outlined"
-        sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4  }}
+        sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}
       >
         <Typography variant="h5">Your NFTs</Typography>
         <Grid
@@ -29,12 +29,15 @@ export default function NFTsClientPage({ userNFTs }: NFTsClientPageProps) {
           {userNFTs.map((nft) => (
             <Grid
               item
-              key={nft.tokenId}
+              key={`${nft.nftContractAddress}-${nft.tokenId}`}
               xs={6}
               md={3}
               lg={2}
             >
-              <NFTItem nftCacheRecord={nft} />
+              <NFTItem
+                nftCacheRecord={nft}
+                nftContract={nftContracts[nft.nftContractAddress]}
+              />
             </Grid>
           ))}
         </Grid>
