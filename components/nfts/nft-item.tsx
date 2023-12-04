@@ -2,22 +2,14 @@
 
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
+import { NFTMetadata } from '@/types/common';
 import { Skeleton, Stack, Typography, Button } from '@mui/material';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type NFTItemProps = {
   nftCacheRecord: NFTCacheRecord;
   nftContract: NFTContractCachedLog;
-};
-
-type NFTMetadata = {
-  name: string;
-  description: string;
-  image: string;
-  attributes?: {
-    trait_type: string;
-    value: string;
-  }[];
 };
 
 export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
@@ -156,13 +148,18 @@ export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
             </Typography>
           </Stack>
 
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ width: '100%' }}
+          <Link
+            href={`/app/nfts/fractionalize/${nftCacheRecord.nftContractAddress}/${nftCacheRecord.tokenId}`}
+            passHref
           >
-            Fractionalize
-          </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ width: '100%' }}
+            >
+              Fractionalize
+            </Button>
+          </Link>
         </>
       )}
     </Stack>
