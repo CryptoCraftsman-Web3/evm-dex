@@ -1,11 +1,16 @@
 'use client';
 
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { NFTMetadata } from '@/types/common';
-import { Box, Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
+import { serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { zeroAddress } from 'viem';
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -16,8 +21,6 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const [loading, setLoading] = useState<boolean>(true);
   const [metadata, setMetadata] = useState<NFTMetadata>();
   const [imageUrl, setImageUrl] = useState<string>();
-
-  console.log(loading, metadata, imageUrl);
 
   useEffect(() => {
     // load nft from metadata
@@ -57,6 +60,52 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
     fetchMetadata(metadataUri);
   }, []);
+
+  const [name, setName] = useState<string>('');
+  const [symbol, setSymbol] = useState<string>('');
+  const [supply, setSupply] = useState<string>('');
+
+  const { serpentSwapNFTManager } = useSwapProtocolAddresses();
+  const { address: owner } = useAccount();
+
+  const { config } = usePrepareContractWrite({
+    address: serpentSwapNFTManager,
+    abi: serpentSwapNftManagerABI,
+    functionName: 'deployAndFractionalize',
+    args: [
+      name,
+      symbol,
+      BigInt(supply),
+      owner || zeroAddress,
+      contract.nftContractAddress as `0x${string}`,
+      BigInt(nft.tokenId),
+    ],
+  });
+
+  const { data: fractionalizeData, isLoading: isSubmittingFractionalizeTx } = useContractWrite(config);
+
+  const {
+    isLoading: isFractionalizing,
+    isSuccess: fractionalizeSucceeded,
+    isError: fractionalizeFailed,
+  } = useWaitForTransaction({
+    hash: fractionalizeData?.hash,
+  });
+
+  useEffect(() => {
+    if (fractionalizeSucceeded) {
+      toast.success(`Fractionalized ${metadata?.name} successfully`);
+    }
+
+    if (fractionalizeFailed) {
+      toast.error(`Failed to fractionalize ${metadata?.name}`);
+    }
+  }, [fractionalizeSucceeded, fractionalizeFailed]);
+
+  const { data: isApproved, isLoading: isCheckingApproval } = useContractRead({
+    address: contract.nftContractAddress as `0x${string}`,
+    abi: ['function ']
+  });
 
   return (
     <>
@@ -150,10 +199,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
             </Typography>
           </Stack>
 
-          <Grid
-            container
-            spacing={6}
-          >
+          <Grid container>
             <Grid
               item
               xs={12}
@@ -182,24 +228,30 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
             >
               <Stack
                 direction="column"
-                spacing={3}
+                spacing={{ xs: 1, md: 3 }}
               >
                 <TextField
                   label="Fractional Token Name"
                   variant="outlined"
                   fullWidth
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
 
                 <TextField
                   label="Fractional Token Symbol"
                   variant="outlined"
                   fullWidth
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value)}
                 />
 
                 <TextField
                   label="Fractional Token Supply"
                   variant="outlined"
                   fullWidth
+                  value={supply}
+                  onChange={(e) => setSupply(e.target.value)}
                 />
 
                 <Button

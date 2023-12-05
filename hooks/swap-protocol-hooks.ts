@@ -7,6 +7,7 @@ type SwapProtocolAddresses = {
   serpentSwapUtility: `0x${string}`;
   quoterV2: `0x${string}`;
   swapRouter: `0x${string}`;
+  serpentSwapNFTManager: `0x${string}`;
 };
 
 export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
@@ -17,6 +18,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
   let serpentSwapUtility: `0x${string}` = zeroAddress;
   let quoterV2: `0x${string}` = zeroAddress;
   let swapRouter: `0x${string}` = zeroAddress;
+  let serpentSwapNFTManager: `0x${string}` = zeroAddress;
 
   switch (chain?.id) {
     case 1440002:
@@ -26,6 +28,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       serpentSwapUtility = '0x23eaF388008861D4649D393A1C9b12F69BFd632B';
       quoterV2 = '0xDb3721EBB2CC650e4A41f685294b51406F6Ab5D4';
       swapRouter = '0xD332359cd2AB1198ECfE355852d3bDE6EA59BeE2';
+      serpentSwapNFTManager = '0xf94d9E26c164f5Ba2A36d706F487C69f6AD2A9a9';
       break;
     case 11155111:
       // Sepolia Testnet (our own deployments)
@@ -38,6 +41,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       serpentSwapUtility = '0x2ed67E3587D9Cd3B85d0025949C4383F58bb9074';
       quoterV2 = '0x1BF0070245CF5C9Ed97B6b41E8a087703fd76e1B';
       swapRouter = '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d';
+      serpentSwapNFTManager = '0xf94d9E26c164f5Ba2A36d706F487C69f6AD2A9a9';
       break;
     default:
       poolFactory = zeroAddress;
@@ -45,6 +49,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       serpentSwapUtility = zeroAddress;
       quoterV2 = zeroAddress;
       swapRouter = zeroAddress;
+      serpentSwapNFTManager = zeroAddress;
       break;
   }
 
@@ -54,5 +59,6 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
     serpentSwapUtility,
     quoterV2,
     swapRouter,
+    serpentSwapNFTManager,
   };
 };
