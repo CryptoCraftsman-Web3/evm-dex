@@ -4,7 +4,8 @@ import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { NFTMetadata } from '@/types/common';
-import { serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { erc721ABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { LoadingButton } from '@mui/lab';
 import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -102,10 +103,46 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
-  const { data: isApproved, isLoading: isCheckingApproval } = useContractRead({
+  const { data: getApprovedData, refetch: checkApproval } = useContractRead({
     address: contract.nftContractAddress as `0x${string}`,
-    abi: ['function ']
+    abi: erc721ABI,
+    functionName: 'getApproved',
+    args: [BigInt(nft.tokenId)],
   });
+
+  const isApproved = getApprovedData === serpentSwapNFTManager;
+
+  const { config: approveConfig } = usePrepareContractWrite({
+    address: contract.nftContractAddress as `0x${string}`,
+    abi: erc721ABI,
+    functionName: 'approve',
+    args: [serpentSwapNFTManager, BigInt(nft.tokenId)],
+  });
+
+  const {
+    data: approveData,
+    writeAsync: approveNft,
+    isLoading: isSubmittingApproval,
+  } = useContractWrite(approveConfig);
+  const {
+    isLoading: isApproving,
+    isSuccess: approvalSucceeded,
+    isError: approvalFailed,
+  } = useWaitForTransaction({
+    hash: approveData?.hash,
+  });
+
+  useEffect(() => {
+    if (approvalSucceeded) {
+      toast.success(`Approved ${metadata?.name} successfully`);
+    }
+
+    if (approvalFailed) {
+      toast.error(`Failed to approve ${metadata?.name}`);
+    }
+
+    checkApproval();
+  }, [approvalSucceeded, approvalFailed]);
 
   return (
     <>
@@ -199,11 +236,15 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
             </Typography>
           </Stack>
 
-          <Grid container>
+          <Grid
+            container
+            alignItems="stretch"
+          >
             <Grid
               item
               xs={12}
               md={6}
+              sx={{ height: '100%' }}
             >
               <Paper
                 variant="outlined"
@@ -225,42 +266,80 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
               item
               xs={12}
               md={6}
+              sx={{ height: '100%' }}
             >
               <Stack
                 direction="column"
                 spacing={{ xs: 1, md: 3 }}
+                justifyContent="center"
+                alignContent="center"
+                sx={{ height: '100%' }}
               >
-                <TextField
-                  label="Fractional Token Name"
-                  variant="outlined"
-                  fullWidth
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                {!isApproved && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ textAlign: 'center' }}
+                    >
+                      This NFT needs to be approved for fractionalization
+                    </Typography>
 
-                <TextField
-                  label="Fractional Token Symbol"
-                  variant="outlined"
-                  fullWidth
-                  value={symbol}
-                  onChange={(e) => setSymbol(e.target.value)}
-                />
+                    <Typography
+                      variant="body1"
+                      sx={{ textAlign: 'center' }}
+                    >
+                      This will allow the SerpentSwap NFT Manager contract to transfer this NFT on your behalf and mint
+                      fractional tokens for you.
+                    </Typography>
 
-                <TextField
-                  label="Fractional Token Supply"
-                  variant="outlined"
-                  fullWidth
-                  value={supply}
-                  onChange={(e) => setSupply(e.target.value)}
-                />
+                    <LoadingButton
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      onClick={() => {
+                        if (approveNft) approveNft();
+                      }}
+                      loading={isSubmittingApproval || isApproving}
+                    >
+                      Approve NFT for Fractionalization
+                    </LoadingButton>
+                  </>
+                )}
 
-                <Button
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                >
-                  Fractionalize
-                </Button>
+                {isApproved && (
+                  <>
+                    <TextField
+                      label="Fractional Token Name"
+                      variant="outlined"
+                      fullWidth
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+
+                    <TextField
+                      label="Fractional Token Symbol"
+                      variant="outlined"
+                      fullWidth
+                      value={symbol}
+                      onChange={(e) => setSymbol(e.target.value)}
+                    />
+
+                    <TextField
+                      label="Fractional Token Supply"
+                      variant="outlined"
+                      fullWidth
+                      value={supply}
+                      onChange={(e) => setSupply(e.target.value)}
+                    />
+                    <Button
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                    >
+                      Fractionalize
+                    </Button>
+                  </>
+                )}
 
                 <Link
                   href="/app/nfts"
