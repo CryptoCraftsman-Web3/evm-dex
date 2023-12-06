@@ -1,9 +1,12 @@
 'use client';
 
 import NFTItem from '@/components/nfts/nft-item';
+import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
+import { serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { Grid, Paper, Stack, Typography } from '@mui/material';
+import { useAccount, useContractRead } from 'wagmi';
 
 type NFTsClientPageProps = {
   userNFTs: NFTCacheRecord[];
@@ -11,6 +14,17 @@ type NFTsClientPageProps = {
 };
 
 export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPageProps) {
+  const { address: userAddress } = useAccount();
+  const { serpentSwapNFTManager } = useSwapProtocolAddresses();
+  const { data: fracContracts } = useContractRead({
+    address: serpentSwapNFTManager,
+    abi: serpentSwapNftManagerABI,
+    functionName: 'getUserSerpentSwapNFTContracts',
+    args: [userAddress!],
+    enabled: Boolean(userAddress)
+  });
+
+
   return (
     <Stack spacing={4}>
       <Typography variant="h4">
@@ -40,6 +54,19 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
               />
             </Grid>
           ))}
+        </Grid>
+      </Paper>
+
+      <Paper
+        variant="outlined"
+        sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}
+      >
+        <Typography variant="h5">NFTs you have fractionalized</Typography>
+        <Grid
+          container
+          spacing={3}
+        >
+
         </Grid>
       </Paper>
     </Stack>
