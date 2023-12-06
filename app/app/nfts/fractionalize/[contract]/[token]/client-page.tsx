@@ -64,44 +64,10 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
   const [name, setName] = useState<string>('');
   const [symbol, setSymbol] = useState<string>('');
-  const [supply, setSupply] = useState<string>('');
+  const [supply, setSupply] = useState<number>(100);
 
   const { serpentSwapNFTManager } = useSwapProtocolAddresses();
   const { address: owner } = useAccount();
-
-  const { config } = usePrepareContractWrite({
-    address: serpentSwapNFTManager,
-    abi: serpentSwapNftManagerABI,
-    functionName: 'deployAndFractionalize',
-    args: [
-      name,
-      symbol,
-      BigInt(supply),
-      owner || zeroAddress,
-      contract.nftContractAddress as `0x${string}`,
-      BigInt(nft.tokenId),
-    ],
-  });
-
-  const { data: fractionalizeData, isLoading: isSubmittingFractionalizeTx } = useContractWrite(config);
-
-  const {
-    isLoading: isFractionalizing,
-    isSuccess: fractionalizeSucceeded,
-    isError: fractionalizeFailed,
-  } = useWaitForTransaction({
-    hash: fractionalizeData?.hash,
-  });
-
-  useEffect(() => {
-    if (fractionalizeSucceeded) {
-      toast.success(`Fractionalized ${metadata?.name} successfully`);
-    }
-
-    if (fractionalizeFailed) {
-      toast.error(`Failed to fractionalize ${metadata?.name}`);
-    }
-  }, [fractionalizeSucceeded, fractionalizeFailed]);
 
   const { data: getApprovedData, refetch: checkApproval } = useContractRead({
     address: contract.nftContractAddress as `0x${string}`,
@@ -143,6 +109,45 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
     checkApproval();
   }, [approvalSucceeded, approvalFailed]);
+
+  const { config } = usePrepareContractWrite({
+    address: serpentSwapNFTManager,
+    abi: serpentSwapNftManagerABI,
+    functionName: 'deployAndFractionalize',
+    args: [
+      name,
+      symbol,
+      BigInt(supply),
+      owner || zeroAddress,
+      contract.nftContractAddress as `0x${string}`,
+      BigInt(nft.tokenId),
+    ],
+    enabled: isApproved && Boolean(name) && Boolean(symbol) && supply > 0,
+  });
+
+  const {
+    data: fractionalizeData,
+    isLoading: isSubmittingFractionalizeTx,
+    writeAsync: fractionalize,
+  } = useContractWrite(config);
+
+  const {
+    isLoading: isFractionalizing,
+    isSuccess: fractionalizeSucceeded,
+    isError: fractionalizeFailed,
+  } = useWaitForTransaction({
+    hash: fractionalizeData?.hash,
+  });
+
+  useEffect(() => {
+    if (fractionalizeSucceeded) {
+      toast.success(`Fractionalized ${metadata?.name} successfully`);
+    }
+
+    if (fractionalizeFailed) {
+      toast.error(`Failed to fractionalize ${metadata?.name}`);
+    }
+  }, [fractionalizeSucceeded, fractionalizeFailed]);
 
   return (
     <>
@@ -329,15 +334,19 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                       variant="outlined"
                       fullWidth
                       value={supply}
-                      onChange={(e) => setSupply(e.target.value)}
+                      onChange={(e) => setSupply(parseInt(e.target.value))}
                     />
-                    <Button
+                    <LoadingButton
                       variant="contained"
                       size="large"
                       fullWidth
+                      loading={isSubmittingFractionalizeTx || isFractionalizing}
+                      onClick={() => {
+                        if (fractionalize) fractionalize();
+                      }}
                     >
                       Fractionalize
-                    </Button>
+                    </LoadingButton>
                   </>
                 )}
 
