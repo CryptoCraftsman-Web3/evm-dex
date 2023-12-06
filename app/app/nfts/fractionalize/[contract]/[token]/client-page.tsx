@@ -10,7 +10,7 @@ import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mu
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { zeroAddress } from 'viem';
+import { parseUnits, zeroAddress } from 'viem';
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 
 type FractionalizeNFTClientPageProps = {
@@ -117,7 +117,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     args: [
       name,
       symbol,
-      BigInt(supply),
+      parseUnits(supply.toString(), 18),
       owner || zeroAddress,
       contract.nftContractAddress as `0x${string}`,
       BigInt(nft.tokenId),
