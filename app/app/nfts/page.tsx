@@ -5,11 +5,13 @@ import { db } from '@/lib/database';
 import { nftCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { eq, inArray } from 'drizzle-orm';
 import { NFTContractCachedLog, nftContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
+import { getNFTs } from '@/lib/nfts';
 
 export default async function NFTsPage() {
   const session = await getSession();
   if (!session) return <NotSignedIn />;
 
+  getNFTs(session.address, true);
   const userNFTs = await db.select().from(nftCacheRecord).where(eq(nftCacheRecord.ownerAddress, session.address));
 
   // get set of nft contract addresses
