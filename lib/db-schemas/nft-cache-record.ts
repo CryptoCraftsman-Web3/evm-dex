@@ -12,7 +12,7 @@ export const nftCacheRecord = mysqlTable(
   (table) => {
     return {
       primaryKey: primaryKey({
-        columns: [table.nftContractAddress, table.tokenId, table.ownerAddress],
+        columns: [table.nftContractAddress, table.tokenId],
       }),
     };
   }
