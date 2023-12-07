@@ -6,6 +6,7 @@ import { nftCacheRecord } from './db-schemas/nft-cache-record';
 import { nftContractCachedLog } from './db-schemas/nft-contract-cached-log';
 import { xrplDevnetPublicClient } from './viem-clients';
 import PQueue from 'p-queue';
+import { erc721ABI } from '@/types/wagmi/serpent-swap';
 
 const sideChainRpcApiBaseUrl = 'https://evm-sidechain.xrpl.org/api';
 
@@ -154,9 +155,44 @@ export async function cacheERC721Tokens(
     }
   };
 
-  const queue = new PQueue({concurrency: 25});
+  const queue = new PQueue({ concurrency: 25 });
 
   for (let i = 0; i <= totalSupply; i++) {
     queue.add(() => cacheToken(i));
+  }
+}
+
+export async function cacheERC721Token(contractAddress: `0x${string}`, tokenId: number) {
+  const contract = getContract({
+    address: contractAddress,
+    abi: erc721ABI,
+    publicClient: xrplDevnetPublicClient,
+  });
+
+  try {
+    const owner = await contract.read.ownerOf([BigInt(tokenId)]);
+    const tokenURI = await contract.read.tokenURI([BigInt(tokenId)]);
+
+    const updateResult = await db
+      .insert(nftCacheRecord)
+      .values({
+        nftContractAddress: contractAddress,
+        tokenId,
+        ownerAddress: owner,
+        tokenURI,
+        lastUpdated: new Date(),
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          ownerAddress: owner,
+          tokenURI,
+          lastUpdated: new Date(),
+        },
+      })
+      .execute();
+    console.log(updateResult);
+    console.log(`Contract ${contractAddress} Token ID ${tokenId} owned by ${owner}`);
+  } catch (error) {
+    console.error(error);
   }
 }
