@@ -3,6 +3,7 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
+import { cacheERC721Token } from '@/lib/nfts';
 import { NFTMetadata } from '@/types/common';
 import { erc721ABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
@@ -100,11 +101,11 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
   useEffect(() => {
     if (approvalSucceeded) {
-      toast.success(`Approved ${metadata?.name} successfully`);
+      toast.success(`Approved ${metadata?.name || 'Unknown NFT'} successfully`);
     }
 
     if (approvalFailed) {
-      toast.error(`Failed to approve ${metadata?.name}`);
+      toast.error(`Failed to approve ${metadata?.name || 'Unknown NFT'}`);
     }
 
     checkApproval();
@@ -141,11 +142,15 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
   useEffect(() => {
     if (fractionalizeSucceeded) {
-      toast.success(`Fractionalized ${metadata?.name} successfully`);
+      toast.success(`Fractionalized ${metadata?.name || 'Unknown NFT'} successfully`);
+      setTimeout(() => {
+        // wait for 3 seconds before caching nft so that we can fetch updated NFT data
+        cacheERC721Token(contract.nftContractAddress as `0x${string}`, nft.tokenId);
+      }, 3000);
     }
 
     if (fractionalizeFailed) {
-      toast.error(`Failed to fractionalize ${metadata?.name}`);
+      toast.error(`Failed to fractionalize ${metadata?.name || 'Unknown NFT'}`);
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
