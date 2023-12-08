@@ -29,11 +29,14 @@ const FaqBox = ({ title, content }: FaqBoxProps) => {
       >
         <Typography variant='subtitle2'>{title}</Typography>
         <Button
+          aria-label='Expand FAQ box'
           variant='contained'
           onClick={() => setIsOpen(!isOpen)}
           sx={{
             width: '40px',
             height: '40px',
+            maxWidth: '40px',
+            maxHeight: '40px',
             p: '10px',
             position: 'relative',
           }}

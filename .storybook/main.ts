@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/nextjs";
+import path from "path";
 
 const config: StorybookConfig = {
   stories: [
@@ -10,7 +11,8 @@ const config: StorybookConfig = {
     "@storybook/addon-essentials",
     "@storybook/addon-onboarding",
     "@storybook/addon-interactions",
-    "@storybook/addon-themes"
+    "@storybook/addon-themes",
+    '@storybook/addon-a11y',
   ],
   framework: {
     name: "@storybook/nextjs",
@@ -23,5 +25,16 @@ const config: StorybookConfig = {
   docs: {
     autodocs: "tag",
   },
+  staticDirs: ["../public"], // This loads images at localhost:6006/next.svg e.t.c.
+  async webpackFinal(config, { configType }) {
+    if (config?.resolve?.alias) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "@": path.resolve(__dirname, "../"),
+      }
+    }
+    return config
+  },
 };
+
 export default config;
