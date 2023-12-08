@@ -184,7 +184,7 @@ export default function FractionalizedNFTItem({ nftContractAddress, tokenId }: F
               color="primary"
               sx={{ width: '100%' }}
             >
-              Fractionalize
+              Go To Token Page
             </Button>
           </Link>
         </>

@@ -47,9 +47,14 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
     enabled: Boolean(userAddress),
   });
 
-  const fractionalNFTs: { nftContractAddress: `0x${string}`; tokenId: bigint }[] = [];
+  const fractionalNFTs: {
+    fractionalContractAddress: `0x${string}`;
+    nftContractAddress: `0x${string}`;
+    tokenId: bigint;
+  }[] = [];
   for (let i = 0; i < fractionalContractsCount; i++) {
     fractionalNFTs.push({
+      fractionalContractAddress: fractionalContracts?.[i] as `0x${string}`,
       nftContractAddress: fractionalNFTsData?.[i].result as `0x${string}`,
       tokenId: fractionalNFTsData?.[i + fractionalContractsCount].result as bigint,
     });
