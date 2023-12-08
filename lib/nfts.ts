@@ -1,3 +1,5 @@
+'use server';
+
 import { AccountToken, AccountTokenListResponse, TokenHoldersListResponse } from '@/types/common';
 import { eq } from 'drizzle-orm';
 import { getContract } from 'viem';
@@ -7,11 +9,12 @@ import { nftContractCachedLog } from './db-schemas/nft-contract-cached-log';
 import { xrplDevnetPublicClient } from './viem-clients';
 import PQueue from 'p-queue';
 import { erc721ABI } from '@/types/wagmi/serpent-swap';
+import { revalidatePath } from 'next/cache';
 
 const sideChainRpcApiBaseUrl = 'https://evm-sidechain.xrpl.org/api';
 
-export async function getNFTs(address: string, doSync: boolean = true) {
-  console.log('Getting NFTs for address', address);
+export async function getNFTs(address: string, doSync: boolean = true, forceSync: boolean = false) {
+  console.log('Getting NFTs for address', address, doSync, forceSync);
   let nftBalances: AccountToken[] = [];
 
   try {
@@ -33,10 +36,11 @@ export async function getNFTs(address: string, doSync: boolean = true) {
   if (doSync) {
     console.log(`Sync NFTs for ${address}`);
     for (const balance of nftBalances) {
-      await cacheERC721Tokens(balance.contractAddress as `0x${string}`, balance.name, balance.symbol);
+      await cacheERC721Tokens(balance.contractAddress as `0x${string}`, balance.name, balance.symbol, forceSync);
     }
   }
 
+  revalidatePath(`/app/nfts`, 'page');
   return nftBalances;
 }
 
@@ -67,6 +71,7 @@ export async function cacheERC721Tokens(
     }
   }
 
+  console.log(`forceSync: ${forceSync} doSync: ${doSync}`);
   if (!doSync && !forceSync) return;
 
   // set last cached to now at this point so that any other requests will not trigger a sync

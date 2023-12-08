@@ -5,8 +5,12 @@ import NFTItem from '@/components/nfts/nft-item';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
+import { getNFTs } from '@/lib/nfts';
 import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { LoadingButton } from '@mui/lab';
 import { Grid, Paper, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useContractRead, useContractReads } from 'wagmi';
 
 type NFTsClientPageProps = {
@@ -60,6 +64,19 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
     });
   }
 
+  const [refreshingNFTs, setRefreshingNFTs] = useState<boolean>(false);
+  const refreshNFTs = async () => {
+    setRefreshingNFTs(true);
+    try {
+      await getNFTs(userAddress!, true, true);
+      toast.success('Initiated NFT refresh. It may take a while for your NFTs to appear.');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshingNFTs(false);
+    }
+  };
+
   return (
     <Stack spacing={4}>
       <Typography variant="h4">
@@ -70,7 +87,20 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
         variant="outlined"
         sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}
       >
-        <Typography variant="h5">Your NFTs</Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Typography variant="h5">Your NFTs</Typography>
+          <LoadingButton
+            variant="contained"
+            loading={refreshingNFTs}
+            onClick={refreshNFTs}
+          >
+            Refresh NFTs
+          </LoadingButton>
+        </Stack>
         <Grid
           container
           spacing={3}
