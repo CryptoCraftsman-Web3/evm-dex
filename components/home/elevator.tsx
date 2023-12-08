@@ -21,6 +21,7 @@ const Elevator = () => {
               background: 'conic-gradient(from 200deg at 55.62% 52.65%, #C2E95A 55.566471219062805deg, #C2E95A 154.42988991737366deg, #C2E95A 205.1064419746399deg, #DF9FF5 281.5150237083435deg, #E19AFF 359.5929479598999deg)',
               mixBlendMode: 'overlay',
               filter: 'blur(50px)',
+              overflow: 'hidden'
             }}
           />
           <span style={{ color: '#519E4A' }}>Introducing Serpent swap</span> - your companion in navigating the XRPL EVM and it&apos;s technology. Manage your account, provide liquidity, swap your tokens and earn rewards.

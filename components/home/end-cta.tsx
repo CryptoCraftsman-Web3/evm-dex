@@ -24,7 +24,7 @@ const EndCta = () => {
               </Link>
             </Grid>
             <Grid item xs={12}>
-              <img src={'/illustrations/plug.png'} alt={'cta'} />
+              <img src={'/illustrations/plug.png'} alt={'cta'} style={{ maxWidth: '100%' }} />
             </Grid>
           </Grid>
         </Paper>
