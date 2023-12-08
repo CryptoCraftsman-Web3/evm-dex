@@ -3,23 +3,48 @@
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { NFTMetadata } from '@/types/common';
+import { erc721ABI } from '@/types/wagmi/serpent-swap';
 import { Skeleton, Stack, Typography, Button, Paper } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useAccount, useContractRead } from 'wagmi';
 
-type NFTItemProps = {
-  nftCacheRecord: NFTCacheRecord;
-  nftContract: NFTContractCachedLog;
+type FractionalizedNFTItemProps = {
+  nftContractAddress: `0x${string}`;
+  tokenId: bigint;
 };
 
-export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
+export default function FractionalizedNFTItem({ nftContractAddress, tokenId }: FractionalizedNFTItemProps) {
+  const { address: userAddress } = useAccount();
+
+  const { data: tokenURI, isLoading: gettingTokenURI } = useContractRead({
+    address: nftContractAddress,
+    abi: erc721ABI,
+    functionName: 'tokenURI',
+    args: [tokenId],
+    enabled: Boolean(userAddress),
+  });
+
+  const { data: nftContractName, isLoading: gettingNFTContractName } = useContractRead({
+    address: nftContractAddress,
+    abi: erc721ABI,
+    functionName: 'name',
+    enabled: Boolean(userAddress),
+  });
+
+  const { data: nftContractSymbol, isLoading: gettingNFTContractSymbol } = useContractRead({
+    address: nftContractAddress,
+    abi: erc721ABI,
+    functionName: 'symbol',
+    enabled: Boolean(userAddress),
+  });
+
   const [loading, setLoading] = useState<boolean>(true);
   const [metadata, setMetadata] = useState<NFTMetadata>();
   const [imageUrl, setImageUrl] = useState<string>();
 
   useEffect(() => {
     // load nft from metadata
-    const { tokenURI } = nftCacheRecord;
     if (!tokenURI) {
       setLoading(false);
       return;
@@ -54,7 +79,7 @@ export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
     };
 
     fetchMetadata(metadataUri);
-  }, []);
+  }, [tokenURI, nftContractName, nftContractSymbol]);
 
   return (
     <Stack
@@ -139,19 +164,19 @@ export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
               variant="body2"
               sx={{ textAlign: 'center' }}
             >
-              {nftContract?.nftContractName || 'Unknown Contract'}
+              {nftContractName || 'Unknown Contract'}
             </Typography>
 
             <Typography
               variant="body2"
               sx={{ textAlign: 'center' }}
             >
-              {nftContract?.nftContractSymbol || 'Unknown Symbol'} #{nftCacheRecord.tokenId}
+              {nftContractSymbol || 'Unknown Symbol'} #{tokenId.toString()}
             </Typography>
           </Stack>
 
           <Link
-            href={`/app/nfts/fractionalize/${nftCacheRecord.nftContractAddress}/${nftCacheRecord.tokenId}`}
+            href={`/app/nfts/fractionalize/${nftContractAddress}/${tokenId}`}
             passHref
           >
             <Button
