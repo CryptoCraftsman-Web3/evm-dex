@@ -29,20 +29,37 @@ const Footer = () => {
           />
         </Link>
       </Grid>
-      <Grid item xs={12} sx={{ display: 'inline-flex', mb: '40px' }}>
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '40px', margin: '0px auto' }}>
-          {config.homeNavItems.map((item, index) => {
-            return (
-              <Link
-                key={index}
-                href={item.href}
-              >
-                <Typography sx={{ color: '#FFF' }}>
-                  {item.label}
-                </Typography>
-              </Link>
-            );
-          })}
+      <Grid item xs={12}>
+        {/* 
+          So many grid containers because I need to center a 4x grid col and then have a 2x grid col below it.
+          without this setup the grid become inline instead of stacked.
+        */}
+        <Grid container spacing={0}>
+          <Grid item xs={12} md={4} sx={{ display: 'inline-flex', mb: '40px', mx: 'auto' }}>
+            <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-evenly', width: '100%' }}>
+              {config.homeNavItems.map((item, index) => {
+                return (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    style={{
+                      width: '100%',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography sx={{ color: '#FFF', mx: 'auto' }}>
+                      {item.label}
+                    </Typography>
+                  </Link>
+                );
+              })}
+            </Box>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sx={{ display: 'inline-flex', mb: '40px', mx: 'auto' }}>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-evenly', width: '100%' }}>
+
         </Box>
       </Grid>
     </Grid>
