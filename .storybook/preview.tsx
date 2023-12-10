@@ -3,7 +3,8 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { withThemeFromJSXProvider } from '@storybook/addon-themes';
 
 /* TODO: update import for your custom Material UI themes */
-import { theme } from '../app/providers';
+import Providers, { theme } from '../app/providers';
+import { Provider } from "react";
 
 const preview: Preview = {
   parameters: {
@@ -25,7 +26,7 @@ export const decorators = [
     defaultTheme: 'dark',
     Provider: ThemeProvider,
     GlobalStyles: CssBaseline,
-  }),
+  })
 ];
 
 export default preview;
