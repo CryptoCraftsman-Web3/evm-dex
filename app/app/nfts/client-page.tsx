@@ -46,8 +46,10 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
     enabled: Boolean(userAddress),
   }));
 
+  const nftReads = [...(nftContractReads || []), ...(tokenIdReads || [])];
+
   const { data: fractionalNFTsData } = useContractReads({
-    contracts: [...nftContractReads!, ...tokenIdReads!],
+    contracts: nftReads,
     enabled: Boolean(userAddress),
   });
 
