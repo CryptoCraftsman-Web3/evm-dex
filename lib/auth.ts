@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { verifyMessage } from 'viem';
 import { syncTokenTransfers, updatePendingTransactions } from './actions/transactions';
 import { getNFTs } from './nfts';
+import { revalidatePath } from 'next/cache';
 
 type Session = {
   address: string;
@@ -23,6 +24,9 @@ export async function signInWithSignature(chainId: number, address: `0x${string}
   updatePendingTransactions(address).then(() => {
     syncTokenTransfers(chainId, address);
   });
+
+  await revalidatePath('/app', 'layout');
+  await revalidatePath('/app', 'page');
 }
 
 export async function getSession() {
@@ -45,6 +49,8 @@ export async function getSession() {
 
 export async function signOut() {
   cookies().delete('serpent-swap-auth');
+  await revalidatePath('/app', 'layout');
+  await revalidatePath('/app', 'page');
 }
 
 async function saveSession(address: `0x${string}`) {
