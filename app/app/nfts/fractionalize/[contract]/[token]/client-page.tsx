@@ -359,13 +359,12 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                   href="/app/nfts"
                   passHref
                 >
-                  <Button
-                    variant="text"
-                    size="large"
-                    fullWidth
+                  <Typography
+                    variant="body2"
+                    sx={{ textAlign: 'center', width: '100%' }}
                   >
                     Go Back To NFTs List
-                  </Button>
+                  </Typography>
                 </Link>
               </Stack>
             </Grid>
