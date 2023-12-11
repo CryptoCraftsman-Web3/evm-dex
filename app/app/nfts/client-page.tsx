@@ -8,7 +8,7 @@ import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { getNFTs } from '@/lib/nfts';
 import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
-import { Grid, Paper, Stack, Typography } from '@mui/material';
+import { Alert, Box, Grid, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useContractRead, useContractReads } from 'wagmi';
@@ -107,20 +107,42 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
           container
           spacing={3}
         >
-          {userNFTs.map((nft) => (
-            <Grid
-              item
-              key={`${nft.nftContractAddress}-${nft.tokenId}`}
-              xs={6}
-              md={3}
-              lg={2}
+          {userNFTs.length > 0 ? (
+            userNFTs.map((nft) => (
+              <Grid
+                item
+                key={`${nft.nftContractAddress}-${nft.tokenId}`}
+                xs={6}
+                md={3}
+                lg={2}
+              >
+                <NFTItem
+                  nftCacheRecord={nft}
+                  nftContract={nftContracts[nft.nftContractAddress]}
+                />
+              </Grid>
+            ))
+          ) : (
+            <Stack
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              width="100%"
+              spacing={4}
+              py={4}
             >
-              <NFTItem
-                nftCacheRecord={nft}
-                nftContract={nftContracts[nft.nftContractAddress]}
+              <Typography variant="h6">No NFTs found</Typography>
+
+              <Box
+                component="img"
+                src="/illustrations/no-nft.png"
+                sx={{ width: '100%', maxWidth: 400 }}
               />
-            </Grid>
-          ))}
+
+              <Alert severity="info">It looks like you don&apos;t have any NFTs yet</Alert>
+            </Stack>
+          )}
         </Grid>
       </Paper>
 
@@ -133,20 +155,42 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
           container
           spacing={3}
         >
-          {fractionalNFTs.map((nft) => (
-            <Grid
-              item
-              key={`${nft.nftContractAddress}-${nft.tokenId}`}
-              xs={6}
-              md={3}
-              lg={2}
+          {fractionalNFTs.length > 0 ? (
+            fractionalNFTs.map((nft) => (
+              <Grid
+                item
+                key={`${nft.nftContractAddress}-${nft.tokenId}`}
+                xs={6}
+                md={3}
+                lg={2}
+              >
+                <FractionalizedNFTItem
+                  nftContractAddress={nft.nftContractAddress}
+                  tokenId={nft.tokenId}
+                />
+              </Grid>
+            ))
+          ) : (
+            <Stack
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              width="100%"
+              spacing={4}
+              py={4}
             >
-              <FractionalizedNFTItem
-                nftContractAddress={nft.nftContractAddress}
-                tokenId={nft.tokenId}
+              <Typography variant="h6">No fractionalized NFTs found</Typography>
+
+              <Box
+                component="img"
+                src="/illustrations/no-nft.png"
+                sx={{ width: '100%', maxWidth: 400 }}
               />
-            </Grid>
-          ))}
+
+              <Alert severity="info">It looks like you haven&apos;t fractionalized any NFTs yet</Alert>
+            </Stack>
+          )}
         </Grid>
       </Paper>
     </Stack>
