@@ -7,13 +7,18 @@ import TokenIcon from '@mui/icons-material/Token';
 type NavItem = {
   label: string;
   href: string;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | string;
 };
 
 type AppConfig = {
   homeNavItems: NavItem[];
   appNavItems: NavItem[];
   feeTiers: FeeTier[];
+  socialNavItems: {
+    label: string;
+    href: string;
+    icon: string;
+  }[];
 };
 
 export const config: AppConfig = {
@@ -77,4 +82,16 @@ export const config: AppConfig = {
       tip: 'Best for exotic pairs',
     },
   ],
+  socialNavItems: [
+    {
+      label: 'X',
+      href: 'https://x.com/serpentswap',
+      icon: '/icons/x.svg',
+    },
+    {
+      label: 'Discord',
+      href: 'https://Discord.com/#',
+      icon: '/icons/discord.svg'
+    },
+  ]
 };

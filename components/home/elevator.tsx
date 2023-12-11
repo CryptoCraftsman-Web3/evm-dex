@@ -24,7 +24,7 @@ const Elevator = () => {
               overflow: 'hidden'
             }}
           />
-          <span style={{ color: '#519E4A' }}>Introducing Serpent swap</span> - your companion in navigating the XRPL EVM and it&apos;s technology. Manage your account, provide liquidity, swap your tokens and earn rewards.
+          <span style={{ color: '#519E4A' }}>Introducing Serpent swap</span> - your companion in navigating the XRPL EVM and its technology. Manage your account, provide liquidity, swap your tokens and earn rewards.
         </Typography>
       </Grid>
       <Grid item md={1}></Grid>

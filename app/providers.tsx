@@ -2,6 +2,8 @@
 
 import ConnectKitAuth from '@/components/connectkit-auth';
 import { xrplDevnet } from '@/lib/xrpl-chains';
+import { buttonThemeOptions } from '@/theme/button-theme-options';
+import { typographyThemeOptions } from '@/theme/typography-theme-options';
 import { createTheme, ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
@@ -62,7 +64,7 @@ declare module "@mui/material/Typography" {
   }
 }
 
-const colors = {
+export const colors = {
   cta: '#6B0099',
   white: '#FFFFFF',
   black: '#080708',
@@ -77,6 +79,7 @@ const colors = {
   darkStroke: '#353135',
   hoverPurple: '#A000E5',
   clickedPurple: '#56007A',
+  textGrey: '#ADADAD',
 };
 
 const textGrey = '#ADADAD';
@@ -99,143 +102,9 @@ const Providers = ({ children }: ProvidersProps) => {
         primary: colors.white
       }
     },
-    typography: {
-      fontFamily: 'GeneralSans, sans-serif',
-      h1: {
-        fontFamily: 'Kanit, sans-serif',
-        fontWeight: 500,
-        fontSize: '8.75rem',
-        lineHeight: '90%',
-        textTransform: 'uppercase',
-        '@media (max-width: 600px)': {
-          fontSize: '5rem',
-        }
-      },
-      h2: {
-        fontSize: '4.65rem',
-        fontWeight: 600,
-        lineHeight: '110%',
-      },
-      h3: {
-        fontSize: '3.5625rem',
-        fontWeight: 600,
-        fontStyle: 'normal',
-        lineHeight: '140%',
-      },
-      title: {
-        fontSize: '3rem',
-        fontWeight: 600,
-        lineHeight: '120%',
-      },
-      subtitle1: {
-        fontSize: '1.625rem',
-        fontStyle: 'normal',
-        fontWeight: 400,
-        lineHeight: '150%',
-      },
-      subtitle2: {
-        fontSize: '1.625rem',
-        fontStyle: 'normal',
-        fontWeight: 500,
-        lineHeight: '150%',
-      },
-      subtitle3: {
-        fontSize: '1.625rem',
-        fontStyle: 'normal',
-        fontWeight: 600,
-        lineHeight: '150%',
-      },
-      numbers: {
-        fontSize: '1.25rem',
-        fontStyle: 'normal',
-        fontWeight: 500,
-        lineHeight: '160%',
-      },
-      body1: {
-        color: textGrey,
-        fontSize: '1.125rem',
-        fontStyle: 'normal',
-        fontWeight: 400,
-        lineHeight: '160%',
-      },
-      body2: {
-        color: textGrey,
-        fontSize: '1rem',
-        fontStyle: 'normal',
-        fontWeight: 400,
-        lineHeight: '160%',
-      },
-      footnote: {
-        fontSize: '0.8125rem',
-        color: '#ADADAD',
-        fontStyle: 'normal',
-        fontWeight: 400,
-        lineHeight: '130%'
-      }
-    },
+    typography: typographyThemeOptions,
     components: {
-      MuiButton: {
-        defaultProps: {
-          disableElevation: true,
-          disableRipple: true,
-          disableFocusRipple: true,
-          style: {
-            transition: 'none',
-            minWidth: '0px'
-          }
-        },
-        styleOverrides: {
-          root: {
-            textTransform: 'none',
-            minWidth: '0px'
-          },
-        },
-        variants: [
-          {
-            props: { variant: 'contained', size: 'large' },
-            style: {
-              fontSize: '1.125rem',
-              fontWeight: 600,
-              lineHeight: '1.5rem',
-              padding: '1rem 1.75rem',
-              backgroundColor: colors.cta,
-              '&:hover': {
-                backgroundColor: colors.hoverPurple,
-              },
-              '&:active': {
-                backgroundColor: colors.clickedPurple,
-              },
-              '&:disabled': {
-                backgroundColor: colors.tertiaryBG,
-              },
-            }
-          },
-          {
-            props: { variant: 'contained', size: 'small' },
-            style: {
-              display: 'inline-flex',
-              padding: '0.63rem 1.75rem',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '0.75rem',
-              backgroundColor: colors.cta,
-              fontSize: '1rem',
-              fontStyle: 'normal',
-              fontWeight: 600,
-              lineHeight: '1.5rem',
-              '&:hover': {
-                backgroundColor: colors.hoverPurple,
-              },
-              '&:active': {
-                backgroundColor: colors.clickedPurple,
-              },
-              '&:disabled': {
-                backgroundColor: colors.tertiaryBG,
-              },
-            }
-          },
-        ]
-      },
+      MuiButton: buttonThemeOptions,
       MuiTextField: {
         styleOverrides: {
           root: {

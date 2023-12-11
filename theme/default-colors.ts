@@ -1,0 +1,17 @@
+export const colors = {
+  cta: '#6B0099',
+  white: '#FFFFFF',
+  black: '#080708',
+  secBG: '#181718',
+  tertiaryBG: '#252425',
+  green: '#075400',
+  lightGreen: '#C2E95A',
+  pink: '#DB8BFE',
+  secText: '#595959',
+  tertiaryText: '#353135',
+  stroke: '#595959',
+  darkStroke: '#353135',
+  hoverPurple: '#A000E5',
+  clickedPurple: '#56007A',
+  textGrey: '#ADADAD',
+};

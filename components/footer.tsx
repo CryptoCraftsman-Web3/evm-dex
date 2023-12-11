@@ -1,4 +1,4 @@
-import { Grid, Typography, Box } from '@mui/material'
+import { Grid, Typography, Box, Button } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
 import { config } from './config'
@@ -57,9 +57,38 @@ const Footer = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12} sx={{ display: 'inline-flex', mb: '40px', mx: 'auto' }}>
+      <Grid item xs={12} md={2} sx={{ display: 'inline-flex', mb: '80px', mx: 'auto' }}>
         <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-evenly', width: '100%' }}>
+          {config.socialNavItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+            >
+              <img
+                src={item.icon}
+                alt='social'
+                style={{
+                  filter: 'invert(1)',
+                }}
+              />
+            </Link>
 
+          ))}
+        </Box>
+      </Grid>
+      <Grid item xs={12} sx={{ display: 'inline-flex', mx: 'auto', pb: '40px' }}>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-evenly', width: '100%' }}>
+          <Link
+            href='/'
+            style={{
+              width: '100%',
+              textAlign: 'center',
+            }}
+          >
+            <Typography sx={{ color: '#FFF', mx: 'auto' }}>
+              © 2021 SerpentSwap
+            </Typography>
+          </Link>
         </Box>
       </Grid>
     </Grid>

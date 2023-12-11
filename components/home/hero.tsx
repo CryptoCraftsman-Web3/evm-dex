@@ -1,5 +1,5 @@
-import { Button, Grid, Typography } from '@mui/material'
-import Link from 'next/link'
+import { Button, Grid, Typography } from '@mui/material';
+import Link from 'next/link';
 
 const Hero = () => {
   return (
@@ -14,7 +14,11 @@ const Hero = () => {
         <Typography variant="h1">Serpent<br />Swap</Typography>
         <Typography variant='subtitle1' mb={'40px'} width={'525px'} maxWidth={'95%'}>Swap, and earn rewards on the smartest decentralized platform.</Typography>
         <Link href='/about'>
-          <Button variant='contained' size='large'>Learn More</Button>
+          <Button
+            variant='link'
+          >
+            Learn More
+          </Button>
         </Link>
       </Grid>
       <Grid item xs={12} md={12 / 2}>
