@@ -19,10 +19,13 @@ export default async function NFTsPage() {
   userNFTs.forEach((nft) => nftContractAddresses.add(nft.nftContractAddress));
 
   // fetch nft contract cache log from db
-  const nftContracts = await db
-    .select()
-    .from(nftContractCachedLog)
-    .where(inArray(nftContractCachedLog.nftContractAddress, Array.from(nftContractAddresses)));
+  const nftContracts =
+    nftContractAddresses.size > 0
+      ? await db
+          .select()
+          .from(nftContractCachedLog)
+          .where(inArray(nftContractCachedLog.nftContractAddress, Array.from(nftContractAddresses)))
+      : [];
 
   // map nft contract cache log to nft contract address
   const nftContractsMap: { [key: string]: NFTContractCachedLog } = {};
