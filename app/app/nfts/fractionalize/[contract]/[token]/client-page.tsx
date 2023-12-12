@@ -5,7 +5,7 @@ import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { cacheERC721Token } from '@/lib/nfts';
 import { NFTMetadata } from '@/types/common';
-import { erc721ABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { erc721ABI, serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
 import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
@@ -154,6 +154,24 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
+  const { data: serpentSwapNFTContract } = useContractRead({
+    address: serpentSwapNFTManager,
+    abi: serpentSwapNftManagerABI,
+    functionName: 'getUserSerpentSwapNFTContractForNFT',
+    args: [contract.nftContractAddress as `0x${string}`, BigInt(nft.tokenId)],
+  });
+
+  const isFractionalized = Boolean(serpentSwapNFTContract) && serpentSwapNFTContract !== zeroAddress;
+
+  const { data: fracTotalSupply } = useContractRead({
+    address: serpentSwapNFTContract,
+    abi: serpentSwapNftABI,
+    functionName: 'totalSupply',
+    enabled: isFractionalized,
+  });
+
+  const isRedeemed = fracTotalSupply === BigInt(0);
+
   return (
     <>
       {loading ? (
@@ -285,73 +303,90 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                 alignContent="center"
                 sx={{ height: '100%' }}
               >
-                {!isApproved && (
+                {!isFractionalized && (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: 'center' }}
-                    >
-                      This NFT needs to be approved for fractionalization
-                    </Typography>
+                    {!isApproved && (
+                      <>
+                        <Typography
+                          variant="h6"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          This NFT needs to be approved for fractionalization
+                        </Typography>
 
-                    <Typography
-                      variant="body1"
-                      sx={{ textAlign: 'center' }}
-                    >
-                      This will allow the SerpentSwap NFT Manager contract to transfer this NFT on your behalf and mint
-                      fractional tokens for you.
-                    </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          This will allow the SerpentSwap NFT Manager contract to transfer this NFT on your behalf and
+                          mint fractional tokens for you.
+                        </Typography>
 
-                    <LoadingButton
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      onClick={() => {
-                        if (approveNft) approveNft();
-                      }}
-                      loading={isSubmittingApproval || isApproving}
-                    >
-                      Approve NFT for Fractionalization
-                    </LoadingButton>
+                        <LoadingButton
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          onClick={() => {
+                            if (approveNft) approveNft();
+                          }}
+                          loading={isSubmittingApproval || isApproving}
+                        >
+                          Approve NFT for Fractionalization
+                        </LoadingButton>
+                      </>
+                    )}
+
+                    {isApproved && (
+                      <>
+                        <TextField
+                          label="Fractional Token Name"
+                          variant="outlined"
+                          fullWidth
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+
+                        <TextField
+                          label="Fractional Token Symbol"
+                          variant="outlined"
+                          fullWidth
+                          value={symbol}
+                          onChange={(e) => setSymbol(e.target.value)}
+                        />
+
+                        <TextField
+                          label="Fractional Token Supply"
+                          variant="outlined"
+                          fullWidth
+                          value={supply}
+                          onChange={(e) => setSupply(parseInt(e.target.value))}
+                        />
+                        <LoadingButton
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          loading={isSubmittingFractionalizeTx || isFractionalizing}
+                          onClick={() => {
+                            if (fractionalize) fractionalize();
+                          }}
+                        >
+                          Fractionalize
+                        </LoadingButton>
+                      </>
+                    )}
                   </>
                 )}
 
-                {isApproved && (
+                {isFractionalized && (
                   <>
-                    <TextField
-                      label="Fractional Token Name"
-                      variant="outlined"
-                      fullWidth
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-
-                    <TextField
-                      label="Fractional Token Symbol"
-                      variant="outlined"
-                      fullWidth
-                      value={symbol}
-                      onChange={(e) => setSymbol(e.target.value)}
-                    />
-
-                    <TextField
-                      label="Fractional Token Supply"
-                      variant="outlined"
-                      fullWidth
-                      value={supply}
-                      onChange={(e) => setSupply(parseInt(e.target.value))}
-                    />
-                    <LoadingButton
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      loading={isSubmittingFractionalizeTx || isFractionalizing}
-                      onClick={() => {
-                        if (fractionalize) fractionalize();
-                      }}
-                    >
-                      Fractionalize
-                    </LoadingButton>
+                    {!isRedeemed && (
+                      <Typography
+                        variant="h6"
+                        sx={{ textAlign: 'center' }}
+                      >
+                        This NFT has already been fractionalized and can be traded on liquidity pools
+                      </Typography>
+                    )}
                   </>
                 )}
 
