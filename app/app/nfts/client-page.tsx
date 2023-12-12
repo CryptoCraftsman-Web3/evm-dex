@@ -48,7 +48,7 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
 
   const nftReads = [...(nftContractReads || []), ...(tokenIdReads || [])];
 
-  const { data: fractionalNFTsData } = useContractReads({
+  const { data: fractionalNFTsData, isLoading: gettingFractionalNFTsData } = useContractReads({
     contracts: nftReads,
     enabled: Boolean(userAddress),
   });
@@ -103,12 +103,12 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
             Refresh NFTs
           </LoadingButton>
         </Stack>
-        <Grid
-          container
-          spacing={3}
-        >
-          {userNFTs.length > 0 ? (
-            userNFTs.map((nft) => (
+        {userNFTs.length > 0 ? (
+          <Grid
+            container
+            spacing={3}
+          >
+            {userNFTs.map((nft) => (
               <Grid
                 item
                 key={`${nft.nftContractAddress}-${nft.tokenId}`}
@@ -121,29 +121,29 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                   nftContract={nftContracts[nft.nftContractAddress]}
                 />
               </Grid>
-            ))
-          ) : (
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              textAlign="center"
-              width="100%"
-              spacing={4}
-              py={4}
-            >
-              <Typography variant="h6">No NFTs found</Typography>
+            ))}
+          </Grid>
+        ) : (
+          <Stack
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            textAlign="center"
+            width="100%"
+            spacing={4}
+            py={4}
+          >
+            <Typography variant="h6">No NFTs found</Typography>
 
-              <Box
-                component="img"
-                src="/illustrations/no-nft.png"
-                sx={{ width: '100%', maxWidth: 400 }}
-              />
+            <Box
+              component="img"
+              src="/illustrations/no-nft.png"
+              sx={{ width: '100%', maxWidth: 400 }}
+            />
 
-              <Alert severity="info">It looks like you don&apos;t have any NFTs yet</Alert>
-            </Stack>
-          )}
-        </Grid>
+            <Alert severity="info">It looks like you don&apos;t have any NFTs yet</Alert>
+          </Stack>
+        )}
       </Paper>
 
       <Paper
@@ -151,12 +151,13 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
         sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}
       >
         <Typography variant="h5">NFTs you have fractionalized</Typography>
-        <Grid
-          container
-          spacing={3}
-        >
-          {fractionalNFTs.length > 0 ? (
-            fractionalNFTs.map((nft) => (
+
+        {fractionalNFTs.length > 0 ? (
+          <Grid
+            container
+            spacing={3}
+          >
+            {fractionalNFTs.map((nft) => (
               <Grid
                 item
                 key={`${nft.nftContractAddress}-${nft.tokenId}`}
@@ -169,29 +170,29 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                   tokenId={nft.tokenId}
                 />
               </Grid>
-            ))
-          ) : (
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              textAlign="center"
-              width="100%"
-              spacing={4}
-              py={4}
-            >
-              <Typography variant="h6">No fractionalized NFTs found</Typography>
+            ))}
+          </Grid>
+        ) : (
+          <Stack
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            textAlign="center"
+            width="100%"
+            spacing={4}
+            py={4}
+          >
+            <Typography variant="h6">No fractionalized NFTs found</Typography>
 
-              <Box
-                component="img"
-                src="/illustrations/no-nft.png"
-                sx={{ width: '100%', maxWidth: 400 }}
-              />
+            <Box
+              component="img"
+              src="/illustrations/no-nft.png"
+              sx={{ width: '100%', maxWidth: 400 }}
+            />
 
-              <Alert severity="info">It looks like you haven&apos;t fractionalized any NFTs yet</Alert>
-            </Stack>
-          )}
-        </Grid>
+            <Alert severity="info">It looks like you haven&apos;t fractionalized any NFTs yet</Alert>
+          </Stack>
+        )}
       </Paper>
     </Stack>
   );
