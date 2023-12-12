@@ -11,8 +11,15 @@ import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mu
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { parseUnits, zeroAddress } from 'viem';
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { formatUnits, parseUnits, zeroAddress } from 'viem';
+import {
+  useAccount,
+  useContractRead,
+  useContractReads,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -68,7 +75,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const [supply, setSupply] = useState<number>(100);
 
   const { serpentSwapNFTManager } = useSwapProtocolAddresses();
-  const { address: owner } = useAccount();
+  const { address: userAddress } = useAccount();
 
   const { data: getApprovedData, refetch: checkApproval } = useContractRead({
     address: contract.nftContractAddress as `0x${string}`,
@@ -119,7 +126,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
       name,
       symbol,
       parseUnits(supply.toString(), 18),
-      owner || zeroAddress,
+      userAddress || zeroAddress,
       contract.nftContractAddress as `0x${string}`,
       BigInt(nft.tokenId),
     ],
@@ -154,23 +161,47 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
-  const { data: serpentSwapNFTContract } = useContractRead({
+  const { data: serpentSwapNFTContractAddress } = useContractRead({
     address: serpentSwapNFTManager,
     abi: serpentSwapNftManagerABI,
     functionName: 'getUserSerpentSwapNFTContractForNFT',
     args: [contract.nftContractAddress as `0x${string}`, BigInt(nft.tokenId)],
   });
 
-  const isFractionalized = Boolean(serpentSwapNFTContract) && serpentSwapNFTContract !== zeroAddress;
+  const isFractionalized = Boolean(serpentSwapNFTContractAddress) && serpentSwapNFTContractAddress !== zeroAddress;
 
-  const { data: fracTotalSupply } = useContractRead({
-    address: serpentSwapNFTContract,
+  const serpentSwapNFTContract = {
+    address: serpentSwapNFTContractAddress,
     abi: serpentSwapNftABI,
-    functionName: 'totalSupply',
-    enabled: isFractionalized,
+  };
+
+  const { data: fracTokenData } = useContractReads({
+    contracts: [
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'totalSupply',
+      },
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'balanceOf',
+        args: [userAddress || zeroAddress],
+      },
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'symbol',
+      },
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'name',
+      },
+    ],
   });
 
-  const isRedeemed = fracTotalSupply === BigInt(0);
+  const fracTokenTotalSupply = (fracTokenData?.at(0)?.result as bigint) || BigInt(0);
+  const fracTokenUserBalance = (fracTokenData?.at(1)?.result as bigint) || BigInt(0);
+  const fracTokenSymbol = (fracTokenData?.at(2)?.result as string) || '';
+  const fracTokenName = (fracTokenData?.at(3)?.result as string) || '';
+  const isRedeemed = fracTokenTotalSupply === BigInt(0);
 
   return (
     <>
@@ -380,12 +411,64 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                 {isFractionalized && (
                   <>
                     {!isRedeemed && (
-                      <Typography
-                        variant="h6"
-                        sx={{ textAlign: 'center' }}
-                      >
-                        This NFT has already been fractionalized and can be traded on liquidity pools
-                      </Typography>
+                      <>
+                        <Typography
+                          variant="h6"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          {`This NFT has already been fractionalized as ${fracTokenName} and can be traded on liquidity pools`}
+                        </Typography>
+
+                        <Typography
+                          variant="body1"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          Fractional Token Contract Address: {serpentSwapNFTContractAddress}
+                        </Typography>
+
+                        <Typography
+                          variant="body1"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          Fractional Token Total Supply: {formatUnits(fracTokenTotalSupply, 18).toString()}{' '}
+                          {fracTokenSymbol}
+                        </Typography>
+
+                        <Typography
+                          variant="body1"
+                          sx={{ textAlign: 'center' }}
+                        >
+                          Your Fractional Token Balance: {formatUnits(fracTokenUserBalance, 18).toString()}{' '}
+                          {fracTokenSymbol}
+                        </Typography>
+
+                        <Button
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                        >
+                          Add to Liquidity Pool
+                        </Button>
+
+                        {fracTokenUserBalance === fracTokenTotalSupply && (
+                          <>
+                            <Typography
+                              variant="body1"
+                              sx={{ textAlign: 'center' }}
+                              >
+                              You own 100% of the fractional token supply. You can redeem the original NFT.
+                              </Typography>
+
+                            <LoadingButton
+                              variant="contained"
+                              size="large"
+                              fullWidth
+                            >
+                              Redeem NFT
+                            </LoadingButton>
+                          </>
+                        )}
+                      </>
                     )}
                   </>
                 )}
