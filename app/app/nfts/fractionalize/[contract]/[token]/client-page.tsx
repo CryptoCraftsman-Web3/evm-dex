@@ -17,6 +17,7 @@ import {
   useContractRead,
   useContractReads,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
@@ -203,6 +204,8 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const fracTokenName = (fracTokenData?.at(3)?.result as string) || '';
   const isRedeemed = fracTokenTotalSupply === BigInt(0);
 
+  const { chain } = useNetwork();
+
   return (
     <>
       {loading ? (
@@ -298,12 +301,16 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
           <Grid
             container
             alignItems="stretch"
+            rowGap={6}
           >
             <Grid
               item
               xs={12}
               md={6}
               sx={{ height: '100%' }}
+              alignItems="center"
+              justifyContent="center"
+              display="flex"
             >
               <Paper
                 variant="outlined"
@@ -326,6 +333,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
               xs={12}
               md={6}
               sx={{ height: '100%' }}
+              alignItems="center"
             >
               <Stack
                 direction="column"
@@ -419,12 +427,21 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                           {`This NFT has already been fractionalized as ${fracTokenName} and can be traded on liquidity pools`}
                         </Typography>
 
-                        <Typography
-                          variant="body1"
-                          sx={{ textAlign: 'center' }}
+                        <Link
+                          href={`${chain?.blockExplorers?.default?.url}/address/${serpentSwapNFTContractAddress}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          passHref
+                          style={{ textAlign: 'center' }}
                         >
-                          Fractional Token Contract Address: {serpentSwapNFTContractAddress}
-                        </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{ textAlign: 'center', width: '100%' }}
+                          >
+                            Fractional Token Contract Address: {serpentSwapNFTContractAddress?.substring(0, 6)}...
+                            {serpentSwapNFTContractAddress?.substring(38, 42)}
+                          </Typography>
+                        </Link>
 
                         <Typography
                           variant="body1"
@@ -455,9 +472,9 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                             <Typography
                               variant="body1"
                               sx={{ textAlign: 'center' }}
-                              >
+                            >
                               You own 100% of the fractional token supply. You can redeem the original NFT.
-                              </Typography>
+                            </Typography>
 
                             <LoadingButton
                               variant="contained"
