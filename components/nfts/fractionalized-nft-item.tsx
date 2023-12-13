@@ -171,7 +171,7 @@ export default function FractionalizedNFTItem({ nftContractAddress, tokenId }: F
               variant="body2"
               sx={{ textAlign: 'center' }}
             >
-              {nftContractSymbol || 'Unknown Symbol'} #{tokenId.toString()}
+              {nftContractSymbol || 'Unknown Symbol'} #{tokenId?.toString()}
             </Typography>
           </Stack>
 

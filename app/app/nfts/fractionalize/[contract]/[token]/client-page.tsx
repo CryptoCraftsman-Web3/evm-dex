@@ -151,6 +151,9 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   useEffect(() => {
     if (fractionalizeSucceeded) {
       toast.success(`Fractionalized ${metadata?.name || 'Unknown NFT'} successfully`);
+      refetchSerpentSwapNFTContractAddress().then(() => {
+        refetchFracTokenData();
+      });
       setTimeout(() => {
         // wait for 3 seconds before caching nft so that we can fetch updated NFT data
         cacheERC721Token(contract.nftContractAddress as `0x${string}`, nft.tokenId);
@@ -162,7 +165,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
-  const { data: serpentSwapNFTContractAddress } = useContractRead({
+  const { data: serpentSwapNFTContractAddress, refetch: refetchSerpentSwapNFTContractAddress } = useContractRead({
     address: serpentSwapNFTManager,
     abi: serpentSwapNftManagerABI,
     functionName: 'getUserSerpentSwapNFTContractForNFT',
@@ -176,7 +179,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     abi: serpentSwapNftABI,
   };
 
-  const { data: fracTokenData } = useContractReads({
+  const { data: fracTokenData, refetch: refetchFracTokenData } = useContractReads({
     contracts: [
       {
         ...serpentSwapNFTContract,
@@ -296,6 +299,16 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
             <Typography variant="body1">
               {contract.nftContractSymbol} #{nft.tokenId}
             </Typography>
+            <Link
+              href={`${chain?.blockExplorers?.default?.url}/token/${contract.nftContractAddress}`}
+              target="_blank"
+              passHref
+            >
+              <Typography variant="body2">
+                {contract.nftContractName} {contract.nftContractAddress.substring(0, 6)}...
+                {contract.nftContractAddress.substring(38, 42)}
+              </Typography>
+            </Link>
           </Stack>
 
           <Grid
