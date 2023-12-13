@@ -15,7 +15,8 @@ const Hero = () => {
         <Typography variant='subtitle1' mb={'40px'} width={'525px'} maxWidth={'95%'}>Swap, and earn rewards on the smartest decentralized platform.</Typography>
         <Link href='/about'>
           <Button
-            variant='link'
+            variant='contained'
+            size='large'
           >
             Learn More
           </Button>

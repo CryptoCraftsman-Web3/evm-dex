@@ -5,6 +5,7 @@ import '../globals.css';
 import Providers from '../providers';
 import HomeHeader from '@/components/home-header';
 import Footer from '@/components/footer';
+import { Box } from '@mui/material';
 
 
 export const metadata: Metadata = {
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <HomeHeader />
 
-          {children}
+          <Box sx={{ width: '1320px', maxWidth: '100%', mx: 'auto', px: { xs: '2%', md: 0 } }}>
+            {children}
+          </Box>
 
           <Footer />
         </Providers>

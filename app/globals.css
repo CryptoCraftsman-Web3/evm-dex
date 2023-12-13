@@ -29,6 +29,36 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+/* This will affect the entire page */
+::-webkit-scrollbar {
+  width: 4px;
+  /* Width of the vertical scrollbar */
+  height: 4px;
+  /* Height of the horizontal scrollbar */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #595959;
+  /* Color of the scroll thumb */
+  border-radius: 100px;
+  /* Rounded corners on the scroll thumb */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darken the scroll thumb on hover */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #252425;
+  /* Color of the track */
+  border-radius: 100px;
+  /* Rounded corners on the track */
+}
+
 a {
   text-decoration: none;
   display: inline-flex;

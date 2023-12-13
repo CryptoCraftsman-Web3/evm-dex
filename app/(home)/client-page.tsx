@@ -11,14 +11,12 @@ import EndCta from '@/components/home/end-cta';
 const HomeClientPage = () => {
   return (
     <>
-      <Box sx={{ width: '1320px', maxWidth: '100%', mx: 'auto', px: { xs: '2%' } }}>
-        <Hero />
-        <Elevator />
-        <Statistics />
-        <Features />
-        <Faq />
-        <EndCta />
-      </Box>
+      <Hero />
+      <Elevator />
+      <Statistics />
+      <Features />
+      <Faq />
+      <EndCta />
     </>
   );
 };
