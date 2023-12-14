@@ -2,8 +2,6 @@
 
 import ConnectKitAuth from '@/components/connectkit-auth';
 import { xrplDevnet } from '@/lib/xrpl-chains';
-import { buttonThemeOptions } from '@/theme/button-theme-options';
-import { typographyThemeOptions } from '@/theme/typography-theme-options';
 import { createTheme, ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
@@ -64,7 +62,7 @@ declare module "@mui/material/Typography" {
   }
 }
 
-export const colors = {
+const colors = {
   cta: '#6B0099',
   white: '#FFFFFF',
   black: '#080708',
@@ -79,92 +77,226 @@ export const colors = {
   darkStroke: '#353135',
   hoverPurple: '#A000E5',
   clickedPurple: '#56007A',
-  textGrey: '#ADADAD',
 };
 
 const textGrey = '#ADADAD';
+const background = '#080708';
+const primary = '#6B0099';
+const primaryLight = lighten(0.3, primary);
 
-const Providers = ({ children }: ProvidersProps) => {
-  const background = '#080708';
-  const primary = '#6B0099';
-  const primaryLight = lighten(0.3, primary);
-  const theme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: colors.cta,
-        light: primaryLight,
-      },
-      background: {
-        default: colors.black,
-      },
-      text: {
-        primary: colors.white
+export const theme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: colors.cta,
+      light: primaryLight,
+    },
+    background: {
+      default: colors.black,
+    },
+    text: {
+      primary: colors.white
+    }
+  },
+  typography: {
+    fontFamily: 'GeneralSans, sans-serif',
+    h1: {
+      fontFamily: 'Kanit, sans-serif',
+      fontWeight: 500,
+      fontSize: '8.75rem',
+      lineHeight: '90%',
+      textTransform: 'uppercase',
+      '@media (max-width: 600px)': {
+        fontSize: '5rem',
       }
     },
-    typography: typographyThemeOptions,
-    components: {
-      MuiButton: buttonThemeOptions,
-      MuiTextField: {
-        styleOverrides: {
-          root: {
-            '& label.Mui-focused': {
-              color: primaryLight,
-            },
-          },
+    h2: {
+      fontSize: '4.65rem',
+      fontWeight: 600,
+      lineHeight: '110%',
+    },
+    h3: {
+      fontSize: '3.5625rem',
+      fontWeight: 600,
+      fontStyle: 'normal',
+      lineHeight: '140%',
+    },
+    title: {
+      fontSize: '3rem',
+      fontWeight: 600,
+      lineHeight: '120%',
+    },
+    subtitle1: {
+      fontSize: '1.625rem',
+      fontStyle: 'normal',
+      fontWeight: 400,
+      lineHeight: '150%',
+    },
+    subtitle2: {
+      fontSize: '1.625rem',
+      fontStyle: 'normal',
+      fontWeight: 500,
+      lineHeight: '150%',
+    },
+    subtitle3: {
+      fontSize: '1.625rem',
+      fontStyle: 'normal',
+      fontWeight: 600,
+      lineHeight: '150%',
+    },
+    numbers: {
+      fontSize: '1.25rem',
+      fontStyle: 'normal',
+      fontWeight: 500,
+      lineHeight: '160%',
+    },
+    body1: {
+      color: textGrey,
+      fontSize: '1.125rem',
+      fontStyle: 'normal',
+      fontWeight: 400,
+      lineHeight: '160%',
+    },
+    body2: {
+      color: textGrey,
+      fontSize: '1rem',
+      fontStyle: 'normal',
+      fontWeight: 400,
+      lineHeight: '160%',
+    },
+    footnote: {
+      fontSize: '0.8125rem',
+      color: '#ADADAD',
+      fontStyle: 'normal',
+      fontWeight: 400,
+      lineHeight: '130%'
+    }
+  },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+        disableRipple: true,
+        disableFocusRipple: true,
+        style: {
+          transition: 'none',
+          minWidth: '0px'
+        }
+      },
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          minWidth: '0px'
         },
       },
-      MuiOutlinedInput: {
-        styleOverrides: {
-          // notchedOutline: {
-          //   borderColor: primaryLight,
-          // },
-          root: {
-            // [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-            //   borderColor: primaryLight,
-            // },
-            [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-              borderColor: primaryLight,
+      variants: [
+        {
+          props: { variant: 'contained', size: 'large' },
+          style: {
+            fontSize: '1.125rem',
+            fontWeight: 600,
+            lineHeight: '1.5rem',
+            padding: '1rem 1.75rem',
+            backgroundColor: colors.cta,
+            '&:hover': {
+              backgroundColor: colors.hoverPurple,
             },
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            backgroundColor: colors.secBG,
-            color: colors.white,
-            borderRadius: '40px',
+            '&:active': {
+              backgroundColor: colors.clickedPurple,
+            },
+            '&:disabled': {
+              backgroundColor: colors.tertiaryBG,
+            },
           }
         },
-        variants: [
-          {
-            props: { variant: 'green' },
-            style: {
-              backgroundColor: colors.green,
-            }
-          },
-          {
-            props: { variant: 'lightGreen' },
-            style: {
-              backgroundColor: colors.lightGreen,
-              color: colors.black,
-            }
-          },
-          {
-            props: { variant: 'pink' },
-            style: {
-              backgroundColor: colors.pink,
-              color: colors.black,
-            }
-          },
-        ]
-      }
+        {
+          props: { variant: 'contained', size: 'small' },
+          style: {
+            display: 'inline-flex',
+            padding: '0.63rem 1.75rem',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '0.75rem',
+            backgroundColor: colors.cta,
+            fontSize: '1rem',
+            fontStyle: 'normal',
+            fontWeight: 600,
+            lineHeight: '1.5rem',
+            '&:hover': {
+              backgroundColor: colors.hoverPurple,
+            },
+            '&:active': {
+              backgroundColor: colors.clickedPurple,
+            },
+            '&:disabled': {
+              backgroundColor: colors.tertiaryBG,
+            },
+          }
+        },
+      ]
     },
-    shape: {
-      borderRadius: 60,
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& label.Mui-focused': {
+            color: primaryLight,
+          },
+        },
+      },
     },
-  });
+    MuiOutlinedInput: {
+      styleOverrides: {
+        // notchedOutline: {
+        //   borderColor: primaryLight,
+        // },
+        root: {
+          // [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+          //   borderColor: primaryLight,
+          // },
+          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: primaryLight,
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: colors.secBG,
+          color: colors.white,
+          borderRadius: '40px',
+        }
+      },
+      variants: [
+        {
+          props: { variant: 'green' },
+          style: {
+            backgroundColor: colors.green,
+          }
+        },
+        {
+          props: { variant: 'lightGreen' },
+          style: {
+            backgroundColor: colors.lightGreen,
+            color: colors.black,
+          }
+        },
+        {
+          props: { variant: 'pink' },
+          style: {
+            backgroundColor: colors.pink,
+            color: colors.black,
+          }
+        },
+      ]
+    }
+  },
+  shape: {
+    borderRadius: 60,
+  },
+});
+
+const Providers = ({ children }: ProvidersProps) => {
 
   const ckBorderRadius = `${theme.shape.borderRadius}px`;
 
@@ -201,9 +333,6 @@ const Providers = ({ children }: ProvidersProps) => {
             theme="dark"
             position="bottom-center"
             autoClose={2500}
-            bodyStyle={{
-              fontFamily: montserrat.style.fontFamily,
-            }}
             closeButton={false}
           />
         </ThemeProvider>
