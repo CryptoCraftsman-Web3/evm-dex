@@ -113,8 +113,9 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                 item
                 key={`${nft.nftContractAddress}-${nft.tokenId}`}
                 xs={6}
-                md={3}
-                lg={2}
+                md={4}
+                lg={3}
+                xl={2}
               >
                 <NFTItem
                   nftCacheRecord={nft}
@@ -162,8 +163,9 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                 item
                 key={`${nft.nftContractAddress}-${nft.tokenId}`}
                 xs={6}
-                md={3}
-                lg={2}
+                md={4}
+                lg={3}
+                xl={2}
               >
                 <FractionalizedNFTItem
                   nftContractAddress={nft.nftContractAddress}
