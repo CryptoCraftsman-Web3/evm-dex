@@ -16,7 +16,7 @@ const ConnectButton = () => {
 
         return (
           <Button
-            variant="contained"
+            variant="widget"
             size="small"
             onClick={show}
             startIcon={

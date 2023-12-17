@@ -8,6 +8,7 @@ type NavItem = {
   label: string;
   href: string;
   icon?: React.ReactNode | string;
+  isHidden?: boolean;
 };
 
 type AppConfig = {
@@ -26,14 +27,17 @@ export const config: AppConfig = {
     {
       label: 'Blog',
       href: '/blog',
+      isHidden: true,
     },
     {
       label: 'About',
       href: '/about',
+      isHidden: true,
     },
     {
       label: 'Help center',
       href: '/help',
+      isHidden: true,
     },
   ],
   appNavItems: [
@@ -42,10 +46,10 @@ export const config: AppConfig = {
       href: '/app/swap',
       icon: <SwapHorizIcon fontSize="large" />,
     },
-    // {
-    //   label: 'Tokens',
-    //   href: '/tokens',
-    // },
+    {
+      label: 'Tokens',
+      href: '/tokens',
+    },
     {
       label: 'NFTs',
       href: '/app/nfts',

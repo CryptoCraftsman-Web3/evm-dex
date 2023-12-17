@@ -1,5 +1,6 @@
 'use client';
 
+import { Alert, Paper, Stack, TextField, Typography, Box, Grid, Button } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useWrappedNativeToken } from '@/hooks/token-hooks';
@@ -10,13 +11,13 @@ import { serpentSwapUtilityABI } from '@/types/wagmi/serpent-swap';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { quoterV2ABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
-import { Alert, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useDebounce } from '@uidotdev/usehooks';
 import { ethers } from 'ethers';
 import { useEffect, useRef, useState } from 'react';
 import { IoWalletSharp } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { zeroAddress } from 'viem';
+import type { Quote } from './swap-types';
 import {
   erc20ABI,
   useAccount,
@@ -28,12 +29,21 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi';
+import SwapInput from '../../../components/swap-input/swap-input';
 
 const SwapClientPage = () => {
   const { chain } = useNetwork();
   const { address: userAddress, isConnected: isUserWalletConnected } = useAccount();
   const { serpentSwapUtility, poolFactory } = useSwapProtocolAddresses();
 
+  /**
+   * Token A and Token B are the tokens that the user wants to swap from one to the other.
+   * Token A is the token that the user wants to sell.
+   * Token B is the token that the user wants to buy.
+   * Token A and Token B cannot be the same token
+   * @constant {Token | null} tokenA 
+   * @constant {Token | null} tokenB
+   */
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
 
@@ -50,16 +60,6 @@ const SwapClientPage = () => {
   const ethersProvider = useEthersProvider();
   const { quoterV2 } = useSwapProtocolAddresses();
   const quoterV2Contract = new ethers.Contract(quoterV2, quoterV2ABI, ethersProvider || ethers.getDefaultProvider());
-
-  type Quote = {
-    tokenIn: `0x${string}`;
-    tokenOut: `0x${string}`;
-    amountIn: ethers.BigNumber;
-    amountOut: ethers.BigNumber;
-    fee: number;
-    sqrtPriceX96: ethers.BigNumber;
-    sqrtPriceX96After: ethers.BigNumber;
-  };
 
   const [isFetchingQuotes, setIsFetchingQuotes] = useState<boolean>(false);
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -391,226 +391,35 @@ const SwapClientPage = () => {
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
   return (
-    <Stack
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Paper
-        variant="elevation"
-        sx={{ p: 2, width: { xs: '100%', md: 500 } }}
-      >
-        <Stack
-          direction="column"
-          spacing={2}
-        >
-          {isUserWalletConnected ? (
-            <>
-              <Typography variant="h6">
-                <strong>Swap</strong>
-              </Typography>
-
-              <Paper
-                variant="outlined"
-                sx={{ p: 2 }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                >
-                  <Typography
-                    variant="body1"
-                    color="GrayText"
-                  >
-                    You Pay
-                  </Typography>
-                </Stack>
-
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <TextField
-                    inputRef={amountAInputRef}
-                    type="number"
-                    value={amountA}
-                    disabled={isFetchingQuotes}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === '') {
-                        setAmountA(0);
-                        return;
-                      }
-                      const parsed = parseFloat(value);
-                      if (isNaN(parsed)) setAmountA(0);
-
-                      if (parsed < 0) {
-                        setAmountA(0);
-                      }
-
-                      setAmountA(parsed);
-                    }}
-                    sx={{
-                      '& fieldset': { border: 'none' },
-                    }}
-                  />
-
-                  <SelectToken
-                    token={tokenA}
-                    setToken={setTokenA}
-                    inputLabel="Select a token"
-                  />
-                </Stack>
-              </Paper>
-
-              <Paper
-                variant="outlined"
-                sx={{ p: 2 }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                >
-                  <Typography
-                    variant="body1"
-                    color="GrayText"
-                  >
-                    You Receive (Estimate)
-                  </Typography>
-                </Stack>
-
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  {isFetchingQuotes ? (
-                    <Typography
-                      color="GrayText"
-                      sx={{ minWidth: '41%' }}
-                    >
-                      Fetching quotes...
-                    </Typography>
-                  ) : (
-                    <>
-                      <TextField
-                        type="number"
-                        value={Boolean(selectedQuote) ? amountB.toFixed(4) : 0}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                        onChange={(e) => {
-                          return;
-                        }}
-                        sx={{
-                          '& fieldset': { border: 'none' },
-                        }}
-                      />
-                    </>
-                  )}
-
-                  <SelectToken
-                    token={tokenB}
-                    setToken={setTokenB}
-                    inputLabel="Select a token"
-                  />
-                </Stack>
-              </Paper>
-            </>
-          ) : (
-            <Stack
-              alignItems="center"
-              sx={{ p: 4 }}
+    <>
+      <Box sx={{ height: { xs: '60px', md: '120px' } }} />
+      <Grid container justifyContent={'center'}>
+        <Grid item xs={12} md={6}>
+          <Paper
+            sx={{
+              width: { xs: '100%', md: '650px' },
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '8px',
+                width: '100%',
+              }}
             >
-              <IoWalletSharp size={256} />
-            </Stack>
-          )}
-
-          {!isUserWalletConnected ? (
-            <Alert severity="error">Please connect your wallet first</Alert>
-          ) : (
-            <>
-              {tokenA && tokenB ? (
-                <>
-                  {notEnoughTokenABalance ? (
-                    <Alert severity="error">You do not have enough {tokenA?.symbol} to swap</Alert>
-                  ) : (
-                    <>
-                      {notEnoughTokenAAllowance ? (
-                        <>
-                          <Alert severity="warning">
-                            You have not approved SerpentSwap to spend and swap your {tokenA?.symbol}
-                          </Alert>
-
-                          <LoadingButton
-                            variant="contained"
-                            size="large"
-                            onClick={() => {
-                              if (approveTokenA) approveTokenA();
-                            }}
-                            loading={isApprovingTokenA || isApproveTokenATxPending}
-                            fullWidth
-                          >
-                            Approve {tokenA?.symbol}
-                          </LoadingButton>
-                        </>
-                      ) : (
-                        <>
-                          {tokenA.address === tokenB.address ? (
-                            <Alert severity="error">You cannot swap the same token</Alert>
-                          ) : (
-                            <>
-                              {amountOutDiffTooGreat && !isFetchingQuotes && tokenA.address !== tokenB.address && (
-                                <Alert severity="warning">
-                                  The amount you receive is {amountOutDifferencePercentage.toFixed(2)}% different from
-                                  the expected amount based on the current price. This may be due to lack of liquidity
-                                  in the pool. Please proceed with caution.
-                                </Alert>
-                              )}
-
-                              <LoadingButton
-                                disabled={debouncedAmountA === 0 || isFetchingQuotes}
-                                variant="contained"
-                                size="large"
-                                onClick={() => {
-                                  if (isTokenANative) {
-                                    if (swapNativeForToken) swapNativeForToken();
-                                  } else if (isTokenBNative) {
-                                    console.log('swapTokenForNative', swapTokenForNative);
-                                    if (swapTokenForNative) swapTokenForNative();
-                                  } else {
-                                    if (swapTokens) swapTokens();
-                                  }
-                                }}
-                                loading={
-                                  isSwappingTokens ||
-                                  isSwapTokensTxPending ||
-                                  isSwappingNativeForToken ||
-                                  isSwapNativeForTokenTxPending ||
-                                  isSwappingTokenForNative ||
-                                  isSwapTokenForNativeTxPending
-                                }
-                                fullWidth
-                              >
-                                Swap
-                              </LoadingButton>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-                </>
-              ) : (
-                <Alert severity="error">Please select tokens</Alert>
-              )}
-            </>
-          )}
-        </Stack>
-      </Paper>
-    </Stack>
+              <SwapInput />
+              <SwapInput />
+            </Box>
+            <Button
+              variant='widget'
+              fullWidth
+            >{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</Button>
+          </Paper>
+        </Grid>
+      </Grid>
+    </>
   );
 };
 

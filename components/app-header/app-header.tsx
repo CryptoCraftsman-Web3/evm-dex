@@ -1,12 +1,12 @@
 'use client';
 
 import { Box, Typography, IconButton, Stack, TextField, Grid, InputAdornment } from '@mui/material';
-import { config } from './config';
+import { config } from '../config';
 import Link from 'next/link';
 import { CiSearch } from 'react-icons/ci';
 import Image from 'next/image';
 import { Avatar, ConnectKitButton } from 'connectkit';
-import ConnectButton from './connect-button';
+import ConnectButton from '../connect-button';
 
 const AppHeader = () => {
   return (

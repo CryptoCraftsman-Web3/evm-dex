@@ -37,6 +37,9 @@ export const buttonThemeOptions: Components['MuiButton'] = {
         color: colors.secText,
       },
     },
+    endIcon: {
+      margin: 0
+    }
   },
   variants: [
     {
@@ -55,10 +58,10 @@ export const buttonThemeOptions: Components['MuiButton'] = {
       props: { variant: 'contained', size: 'small' },
       style: {
         display: 'inline-flex',
-        padding: '10px 28px',
+        padding: '10px 20px',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '0.75rem',
+        gap: '4px',
         fontSize: '1rem',
         fontStyle: 'normal',
         fontWeight: 600,

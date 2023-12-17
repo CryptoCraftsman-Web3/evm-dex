@@ -1,10 +1,15 @@
+import React from "react";
 import type { Preview } from "@storybook/react";
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { withThemeFromJSXProvider } from '@storybook/addon-themes';
+import { WagmiConfig } from "wagmi";
+import { wagmiConfig } from "../app/providers";
+import { ConnectKitProvider } from "connectkit";
+import { connectKitTheme } from "../app/providers";
+
 
 /* TODO: update import for your custom Material UI themes */
 import Providers, { theme } from '../app/providers';
-import { Provider } from "react";
 
 const preview: Preview = {
   parameters: {
@@ -19,6 +24,13 @@ const preview: Preview = {
 };
 
 export const decorators = [
+  (Story) => (
+    <WagmiConfig config={wagmiConfig}>
+      <ConnectKitProvider customTheme={connectKitTheme}>
+        <Story />
+      </ConnectKitProvider>
+    </WagmiConfig>
+  ),
   withThemeFromJSXProvider({
     themes: {
       dark: theme,
