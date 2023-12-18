@@ -28,7 +28,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       serpentSwapUtility = '0x23eaF388008861D4649D393A1C9b12F69BFd632B';
       quoterV2 = '0xDb3721EBB2CC650e4A41f685294b51406F6Ab5D4';
       swapRouter = '0xD332359cd2AB1198ECfE355852d3bDE6EA59BeE2';
-      serpentSwapNFTManager = '0xfeC95800FAe80015612cC7B08029059C9a94efcC';
+      serpentSwapNFTManager = '0x1a83D08f39E94248840aCe11af730923038197c4';
       break;
     case 11155111:
       // Sepolia Testnet (our own deployments)
@@ -41,7 +41,7 @@ export const useSwapProtocolAddresses = (): SwapProtocolAddresses => {
       serpentSwapUtility = '0x2ed67E3587D9Cd3B85d0025949C4383F58bb9074';
       quoterV2 = '0x1BF0070245CF5C9Ed97B6b41E8a087703fd76e1B';
       swapRouter = '0x8049c9E3cE496b47E0fE8aa8EdAEf751cF87e07d';
-      serpentSwapNFTManager = '0xfeC95800FAe80015612cC7B08029059C9a94efcC';
+      serpentSwapNFTManager = '0x1a83D08f39E94248840aCe11af730923038197c4';
       break;
     default:
       poolFactory = zeroAddress;
