@@ -2,6 +2,7 @@
 
 import FractionalizedNFTItem from '@/components/nfts/fractionalized-nft-item';
 import NFTItem from '@/components/nfts/nft-item';
+import RefreshNFTsButton from '@/components/nfts/refresh-nfts-button';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
@@ -66,19 +67,6 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
     });
   }
 
-  const [refreshingNFTs, setRefreshingNFTs] = useState<boolean>(false);
-  const refreshNFTs = async () => {
-    setRefreshingNFTs(true);
-    try {
-      await getNFTs(userAddress!, true, true);
-      toast.success('Initiated NFT refresh. It may take a while for your NFTs to appear.');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setRefreshingNFTs(false);
-    }
-  };
-
   return (
     <Stack spacing={4}>
       <Typography variant="h4">
@@ -93,15 +81,10 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
           direction="row"
           justifyContent="space-between"
           alignItems="center"
+          width="100%"
         >
           <Typography variant="h5">Your NFTs</Typography>
-          <LoadingButton
-            variant="contained"
-            loading={refreshingNFTs}
-            onClick={refreshNFTs}
-          >
-            Refresh NFTs
-          </LoadingButton>
+          <RefreshNFTsButton userAddress={userAddress!} />
         </Stack>
         {userNFTs.length > 0 ? (
           <Grid
