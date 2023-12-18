@@ -40,7 +40,7 @@ export async function getNFTs(address: string, doSync: boolean = true, forceSync
     }
   }
 
-  revalidatePath(`/app/nfts`, 'page');
+  revalidatePath(`/application/nfts`, 'page');
   return nftBalances;
 }
 

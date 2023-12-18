@@ -3,13 +3,13 @@ import type { Preview } from "@storybook/react";
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { withThemeFromJSXProvider } from '@storybook/addon-themes';
 import { WagmiConfig } from "wagmi";
-import { wagmiConfig } from "../app/providers";
+import { wagmiConfig } from "../application/providers";
 import { ConnectKitProvider } from "connectkit";
-import { connectKitTheme } from "../app/providers";
+import { connectKitTheme } from "../application/providers";
 
 
 /* TODO: update import for your custom Material UI themes */
-import Providers, { theme } from '../app/providers';
+import Providers, { theme } from '../application/providers';
 
 const preview: Preview = {
   parameters: {

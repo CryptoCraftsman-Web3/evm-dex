@@ -19,7 +19,7 @@ const EndCta = () => {
             <Grid item xs={12} md={8} alignItems={'center'} textAlign={'center'}>
               <Typography variant='h2' mt={'60px'} mb={'20px'}>Ready to dive into the world of crypto?</Typography>
               <Typography mb={'20px'}>Interact with the future of digital finance with Serpent Swap. Whether you are a seasoned trader or just starting your journey, we&apos;ve got you covered.</Typography>
-              <Link href="/app/swap">
+              <Link href="/application/swap">
                 <Button variant='contained' size='large'>Launch app</Button>
               </Link>
             </Grid>

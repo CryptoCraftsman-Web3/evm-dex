@@ -176,7 +176,7 @@ export default function FractionalizedNFTItem({ nftContractAddress, tokenId }: F
           </Stack>
 
           <Link
-            href={`/app/nfts/fractionalize/${nftContractAddress}/${tokenId}`}
+            href={`/application/nfts/fractionalize/${nftContractAddress}/${tokenId}`}
             passHref
           >
             <Button

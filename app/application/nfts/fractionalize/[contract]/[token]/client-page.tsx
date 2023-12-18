@@ -623,7 +623,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                 )}
 
                 <Link
-                  href="/app/nfts"
+                  href="/application/nfts"
                   passHref
                 >
                   <Typography

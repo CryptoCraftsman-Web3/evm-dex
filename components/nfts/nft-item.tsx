@@ -151,7 +151,7 @@ export default function NFTItem({ nftCacheRecord, nftContract }: NFTItemProps) {
           </Stack>
 
           <Link
-            href={`/app/nfts/fractionalize/${nftCacheRecord.nftContractAddress}/${nftCacheRecord.tokenId}`}
+            href={`/application/nfts/fractionalize/${nftCacheRecord.nftContractAddress}/${nftCacheRecord.tokenId}`}
             passHref
           >
             <Button
