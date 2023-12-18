@@ -4,17 +4,10 @@ import FractionalizedNFTItem from '@/components/nfts/fractionalized-nft-item';
 import NFTItem from '@/components/nfts/nft-item';
 import RefreshNFTsButton from '@/components/nfts/refresh-nfts-button';
 import { useFractionalNFTs } from '@/hooks/nfts';
-import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
-import { getNFTs } from '@/lib/nfts';
-import { FractionalNFT } from '@/types/common';
-import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
-import { LoadingButton } from '@mui/lab';
 import { Alert, Box, Grid, Paper, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
-import { toast } from 'react-toastify';
-import { useAccount, useContractRead, useContractReads } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 type NFTsClientPageProps = {
   userNFTs: NFTCacheRecord[];
@@ -24,10 +17,7 @@ type NFTsClientPageProps = {
 export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPageProps) {
   const { address: userAddress } = useAccount();
 
-  const {
-    fractionalNFTs,
-    isLoading: loadingFractionalNFTs
-  } = useFractionalNFTs();
+  const { fractionalNFTs, isLoading: loadingFractionalNFTs } = useFractionalNFTs();
 
   return (
     <Stack spacing={4}>
