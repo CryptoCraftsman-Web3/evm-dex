@@ -7,6 +7,7 @@ import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { getNFTs } from '@/lib/nfts';
+import { FractionalNFT } from '@/types/common';
 import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Box, Grid, Paper, Stack, Typography } from '@mui/material';
@@ -54,11 +55,8 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
     enabled: Boolean(userAddress),
   });
 
-  const fractionalNFTs: {
-    fractionalContractAddress: `0x${string}`;
-    nftContractAddress: `0x${string}`;
-    tokenId: bigint;
-  }[] = [];
+  const fractionalNFTs: FractionalNFT[] = [];
+
   for (let i = 0; i < fractionalContractsCount; i++) {
     fractionalNFTs.push({
       fractionalContractAddress: fractionalContracts?.[i] as `0x${string}`,

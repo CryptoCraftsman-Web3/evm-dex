@@ -64,3 +64,9 @@ export type NFTMetadata = {
     value: string;
   }[];
 };
+
+export type FractionalNFT = {
+  fractionalContractAddress: `0x${string}`;
+  nftContractAddress: `0x${string}`;
+  tokenId: bigint;
+};
