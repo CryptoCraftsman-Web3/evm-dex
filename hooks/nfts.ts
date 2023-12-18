@@ -1,10 +1,11 @@
 'use client';
 
-import { useAccount, useContractRead, useContractReads } from 'wagmi';
+import { useAccount, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { useSwapProtocolAddresses } from './swap-protocol-hooks';
-import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { erc721ABI, serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { FractionalNFT, NFTMetadata } from '@/types/common';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export function useFractionalNFTs() {
   const { address: userAddress } = useAccount();
@@ -106,6 +107,59 @@ export function useNFTMetadataLoader(tokenURI: string) {
     loading,
     metadata,
     imageUrl,
-    setImageUrl
+    setImageUrl,
+  };
+}
+
+export function useNFTApproval(nftContractAddress: `0x${string}`, tokenId: bigint, metadata: NFTMetadata | undefined) {
+  const { serpentSwapNFTManager } = useSwapProtocolAddresses();
+  const { address: userAddress } = useAccount();
+
+  const { data: getApprovedData, refetch: checkApproval } = useContractRead({
+    address: nftContractAddress,
+    abi: erc721ABI,
+    functionName: 'getApproved',
+    args: [BigInt(tokenId)],
+  });
+
+  const isApproved = getApprovedData === serpentSwapNFTManager;
+
+  const { config: approveConfig } = usePrepareContractWrite({
+    address: nftContractAddress,
+    abi: erc721ABI,
+    functionName: 'approve',
+    args: [serpentSwapNFTManager, tokenId],
+  });
+
+  const {
+    data: approveData,
+    writeAsync: approveNft,
+    isLoading: isSubmittingApproval,
+  } = useContractWrite(approveConfig);
+  const {
+    isLoading: isApproving,
+    isSuccess: approvalSucceeded,
+    isError: approvalFailed,
+  } = useWaitForTransaction({
+    hash: approveData?.hash,
+  });
+
+  useEffect(() => {
+    if (approvalSucceeded) {
+      toast.success(`Approved ${metadata?.name || 'Unknown NFT'} successfully`);
+    }
+
+    if (approvalFailed) {
+      toast.error(`Failed to approve ${metadata?.name || 'Unknown NFT'}`);
+    }
+
+    checkApproval();
+  }, [approvalSucceeded, approvalFailed]);
+
+  return {
+    isApproved,
+    approveNft,
+    isSubmittingApproval,
+    isApproving,
   };
 }

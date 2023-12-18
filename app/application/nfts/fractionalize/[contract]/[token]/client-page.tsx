@@ -1,12 +1,11 @@
 'use client';
 
-import { useNFTMetadataLoader } from '@/hooks/nfts';
+import { useNFTApproval, useNFTMetadataLoader } from '@/hooks/nfts';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { cacheERC721Token } from '@/lib/nfts';
-import { NFTMetadata } from '@/types/common';
-import { erc721ABI, serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
+import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
 import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
@@ -38,46 +37,11 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const { serpentSwapNFTManager } = useSwapProtocolAddresses();
   const { address: userAddress } = useAccount();
 
-  const { data: getApprovedData, refetch: checkApproval } = useContractRead({
-    address: contract.nftContractAddress as `0x${string}`,
-    abi: erc721ABI,
-    functionName: 'getApproved',
-    args: [BigInt(nft.tokenId)],
-  });
-
-  const isApproved = getApprovedData === serpentSwapNFTManager;
-
-  const { config: approveConfig } = usePrepareContractWrite({
-    address: contract.nftContractAddress as `0x${string}`,
-    abi: erc721ABI,
-    functionName: 'approve',
-    args: [serpentSwapNFTManager, BigInt(nft.tokenId)],
-  });
-
-  const {
-    data: approveData,
-    writeAsync: approveNft,
-    isLoading: isSubmittingApproval,
-  } = useContractWrite(approveConfig);
-  const {
-    isLoading: isApproving,
-    isSuccess: approvalSucceeded,
-    isError: approvalFailed,
-  } = useWaitForTransaction({
-    hash: approveData?.hash,
-  });
-
-  useEffect(() => {
-    if (approvalSucceeded) {
-      toast.success(`Approved ${metadata?.name || 'Unknown NFT'} successfully`);
-    }
-
-    if (approvalFailed) {
-      toast.error(`Failed to approve ${metadata?.name || 'Unknown NFT'}`);
-    }
-
-    checkApproval();
-  }, [approvalSucceeded, approvalFailed]);
+  const { isApproved, isSubmittingApproval, approveNft, isApproving } = useNFTApproval(
+    nft.nftContractAddress as `0x${string}`,
+    BigInt(nft.tokenId),
+    metadata
+  );
 
   const { config } = usePrepareContractWrite({
     address: serpentSwapNFTManager,
