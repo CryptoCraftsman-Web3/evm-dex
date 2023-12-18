@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Paper, Stack, TextField, Typography, Box, Grid, Button } from '@mui/material';
+import { Paper, Typography, Box, Grid, Button, Modal, IconButton, Input, Divider } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useWrappedNativeToken } from '@/hooks/token-hooks';
@@ -31,6 +31,7 @@ import {
 } from 'wagmi';
 import SwapInput from '../../../components/swap-input/swap-input';
 import { useTokenManager } from './token';
+import { colors } from '@/theme/default-colors';
 
 const SwapClientPage = () => {
   const { chain } = useNetwork();
@@ -382,6 +383,8 @@ const SwapClientPage = () => {
     debouncedAmountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
   const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
 
+  const [tokenModalOpen, setTokenModalOpen] = useState<boolean>(false);
+
   return (
     <>
       <Box sx={{ height: { xs: '60px', md: '120px' } }} />
@@ -405,14 +408,14 @@ const SwapClientPage = () => {
                 token={tokenA}
                 onTokenChange={setTokenA}
                 onClick={() => {
-                  console.log('clicked');
+                  setTokenModalOpen(true);
                 }}
               />
               <SwapInput
                 token={tokenB}
                 onTokenChange={setTokenB}
                 onClick={() => {
-                  console.log('clicked');
+                  setTokenModalOpen(true);
                 }}
               />
             </Box>
@@ -423,6 +426,68 @@ const SwapClientPage = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Modal
+        open={tokenModalOpen}
+        onClose={() => setTokenModalOpen(false)}
+      >
+        <Paper
+          sx={{
+            position: 'absolute' as 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '650px',
+            maxWidth: '100%',
+            maxHeight: '85%'
+          }}
+        >
+          <IconButton
+            sx={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+            }}
+            onClick={() => setTokenModalOpen(false)}
+          >
+            <img src={'/icons/close.svg'} alt="close icon" />
+          </IconButton>
+          <Typography variant='subtitle3'>Select token</Typography>
+          <Input
+            placeholder='search'
+            startAdornment={<img src={'/icons/search.svg'} alt="search icon" />}
+            fullWidth
+            sx={{
+              p: '12px 28px',
+              backgroundColor: colors.tertiaryBG,
+              borderRadius: '40px',
+              gap: '20px'
+            }}
+          />
+          <Box
+            sx={{
+              backgroundColor: colors.tertiaryBG,
+              display: 'inline-flex',
+              gap: '8px',
+              alignItems: 'center',
+              py: '4px',
+              pl: '6px',
+              pr: '12px',
+              borderRadius: '60px'
+            }}
+          >
+            <img
+              style={{
+                width: '24px',
+                height: '24px',
+              }}
+              src={'/icons/unknown-token.svg'}
+              alt="unknown token icon"
+            />
+            <Typography variant={'body16Medium'} sx={{ color: '#ffffff' }}>XRP</Typography>
+          </Box>
+          <Divider sx={{ width: '100%' }} />
+        </Paper>
+      </Modal>
     </>
   );
 };

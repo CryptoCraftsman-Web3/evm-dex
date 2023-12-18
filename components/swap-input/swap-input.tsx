@@ -56,7 +56,7 @@ const SwapInput = ({ token, onTokenChange, onClick }: SwapInputProps) => {
         </Button>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default SwapInput
+export default SwapInput;
