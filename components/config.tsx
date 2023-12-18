@@ -43,26 +43,26 @@ export const config: AppConfig = {
   appNavItems: [
     {
       label: 'Swap',
-      href: '/app/swap',
+      href: '/application/swap',
       icon: <SwapHorizIcon fontSize="large" />,
     },
-    {
-      label: 'Tokens',
-      href: '/tokens',
-    },
+    // {
+    //   label: 'Tokens',
+    //   href: '/application/tokens',
+    // },
     {
       label: 'NFTs',
-      href: '/app/nfts',
+      href: '/application/nfts',
       icon: <TokenIcon fontSize="large" />,
     },
     {
       label: 'Pools',
-      href: '/app/pools',
+      href: '/application/pools',
       icon: <PoolIcon fontSize="large" />,
     },
     {
       label: 'Transactions',
-      href: '/app/transactions',
+      href: '/application/transactions',
       icon: <ReceiptLongIcon fontSize="large" />,
     },
   ],

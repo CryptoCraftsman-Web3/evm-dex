@@ -30,22 +30,14 @@ import {
   useWaitForTransaction,
 } from 'wagmi';
 import SwapInput from '../../../components/swap-input/swap-input';
+import { useTokenManager } from './token';
 
 const SwapClientPage = () => {
   const { chain } = useNetwork();
   const { address: userAddress, isConnected: isUserWalletConnected } = useAccount();
   const { serpentSwapUtility, poolFactory } = useSwapProtocolAddresses();
 
-  /**
-   * Token A and Token B are the tokens that the user wants to swap from one to the other.
-   * Token A is the token that the user wants to sell.
-   * Token B is the token that the user wants to buy.
-   * Token A and Token B cannot be the same token
-   * @constant {Token | null} tokenA 
-   * @constant {Token | null} tokenB
-   */
-  const [tokenA, setTokenA] = useState<Token | null>(null);
-  const [tokenB, setTokenB] = useState<Token | null>(null);
+  const { tokenA, tokenB, setTokenA, setTokenB } = useTokenManager();
 
   const isTokenANative = tokenA?.isNative;
   const isTokenBNative = tokenB?.isNative;
@@ -409,8 +401,20 @@ const SwapClientPage = () => {
                 width: '100%',
               }}
             >
-              <SwapInput />
-              <SwapInput />
+              <SwapInput
+                token={tokenA}
+                onTokenChange={setTokenA}
+                onClick={() => {
+                  console.log('clicked');
+                }}
+              />
+              <SwapInput
+                token={tokenB}
+                onTokenChange={setTokenB}
+                onClick={() => {
+                  console.log('clicked');
+                }}
+              />
             </Box>
             <Button
               variant='widget'

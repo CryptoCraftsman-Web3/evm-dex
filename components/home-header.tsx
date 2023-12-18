@@ -78,7 +78,7 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <Link href="/app/swap">
+          <Link href="/application/swap">
             <Button variant='contained' color='primary' size='small'>Launch App</Button>
           </Link>
         </Grid>
@@ -113,7 +113,7 @@ const AppHeader = () => {
           spacing={2}
           justifyContent="flex-end"
         >
-          <Link href="/app/swap">
+          <Link href="/application/swap">
             <Button variant='contained' color='primary' size='small'>Launch App</Button>
           </Link>
         </Stack>

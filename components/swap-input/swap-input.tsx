@@ -2,8 +2,15 @@
 
 import { Box, Typography, Stack, Button, Input } from "@mui/material"
 import { colors } from "@/theme/default-colors"
+import { Token } from '@/types/common';
 
-const SwapInput = () => {
+type SwapInputProps = {
+  token: Token | null;
+  onTokenChange: (token: Token | null) => void;
+  onClick: () => void;
+}
+
+const SwapInput = ({ token, onTokenChange, onClick }: SwapInputProps) => {
   return (
     <Box
       sx={{
@@ -42,9 +49,10 @@ const SwapInput = () => {
         <Button
           variant="contained"
           size="small"
+          onClick={onClick}
           endIcon={<img src={'/icons/keyboard_arrow_down.svg'} style={{ filter: 'invert(1)' }} alt="drop down icon" />}
         >
-          Select token
+          {token ? token.symbol : 'Select token'}
         </Button>
       </Box>
     </Box>
