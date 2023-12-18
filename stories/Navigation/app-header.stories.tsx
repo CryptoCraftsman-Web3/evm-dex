@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Providers from '@/application/providers';
 
 import AppHeader from '@/components/app-header/app-header';
 
