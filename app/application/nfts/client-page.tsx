@@ -3,6 +3,7 @@
 import FractionalizedNFTItem from '@/components/nfts/fractionalized-nft-item';
 import NFTItem from '@/components/nfts/nft-item';
 import RefreshNFTsButton from '@/components/nfts/refresh-nfts-button';
+import { useFractionalNFTs } from '@/hooks/nfts';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
@@ -22,48 +23,11 @@ type NFTsClientPageProps = {
 
 export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPageProps) {
   const { address: userAddress } = useAccount();
-  const { serpentSwapNFTManager } = useSwapProtocolAddresses();
 
-  const { data: fractionalContracts, isLoading: gettingFractionalContracts } = useContractRead({
-    address: serpentSwapNFTManager,
-    abi: serpentSwapNftManagerABI,
-    functionName: 'getUserSerpentSwapNFTContracts',
-    args: [userAddress!],
-    enabled: Boolean(userAddress),
-  });
-
-  const fractionalContractsCount = fractionalContracts?.length || 0;
-
-  const nftContractReads = fractionalContracts?.map((contractAddress: `0x${string}`) => ({
-    address: contractAddress,
-    abi: serpentSwapNftABI,
-    functionName: 'nftContract',
-    enabled: Boolean(userAddress),
-  }));
-
-  const tokenIdReads = fractionalContracts?.map((contractAddress: `0x${string}`) => ({
-    address: contractAddress,
-    abi: serpentSwapNftABI,
-    functionName: 'tokenId',
-    enabled: Boolean(userAddress),
-  }));
-
-  const nftReads = [...(nftContractReads || []), ...(tokenIdReads || [])];
-
-  const { data: fractionalNFTsData, isLoading: gettingFractionalNFTsData } = useContractReads({
-    contracts: nftReads,
-    enabled: Boolean(userAddress),
-  });
-
-  const fractionalNFTs: FractionalNFT[] = [];
-
-  for (let i = 0; i < fractionalContractsCount; i++) {
-    fractionalNFTs.push({
-      fractionalContractAddress: fractionalContracts?.[i] as `0x${string}`,
-      nftContractAddress: fractionalNFTsData?.[i].result as `0x${string}`,
-      tokenId: fractionalNFTsData?.[i + fractionalContractsCount].result as bigint,
-    });
-  }
+  const {
+    fractionalNFTs,
+    isLoading: loadingFractionalNFTs
+  } = useFractionalNFTs();
 
   return (
     <Stack spacing={4}>
