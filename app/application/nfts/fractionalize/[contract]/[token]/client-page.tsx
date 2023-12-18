@@ -1,5 +1,6 @@
 'use client';
 
+import { useNFTMetadataLoader } from '@/hooks/nfts';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
@@ -28,48 +29,7 @@ type FractionalizeNFTClientPageProps = {
 };
 
 export default function FractionalizeNFTClientPage({ nft, contract }: FractionalizeNFTClientPageProps) {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [metadata, setMetadata] = useState<NFTMetadata>();
-  const [imageUrl, setImageUrl] = useState<string>();
-
-  useEffect(() => {
-    // load nft from metadata
-    const { tokenURI } = nft;
-    if (!tokenURI) {
-      setLoading(false);
-      return;
-    }
-
-    let metadataUri = tokenURI;
-    if (tokenURI.startsWith('ipfs://')) {
-      metadataUri = tokenURI.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
-    }
-
-    const fetchMetadata = async (uri: string) => {
-      setLoading(true);
-      try {
-        const res = await fetch(uri);
-        if (!res.ok) throw new Error('Failed to fetch metadata');
-
-        const metadata = await res.json();
-        setMetadata(metadata);
-
-        // process image url
-        let imageUrl = metadata.image;
-        if (metadata.image.startsWith('ipfs://')) {
-          imageUrl = metadata.image.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
-        }
-        setImageUrl(imageUrl);
-      } catch (err) {
-        setImageUrl('/images/unknown-nft.webp');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetadata(metadataUri);
-  }, []);
+  const { loading, metadata, imageUrl, setImageUrl } = useNFTMetadataLoader(nft.tokenURI);
 
   const [name, setName] = useState<string>('');
   const [symbol, setSymbol] = useState<string>('');
