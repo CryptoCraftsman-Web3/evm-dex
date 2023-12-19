@@ -1,6 +1,35 @@
 import { colors } from "./default-colors"
 import { ThemeOptions } from '@mui/material/styles';
 
+declare module "@mui/material/styles" {
+  interface TypographyVariants {
+    title: React.CSSProperties;
+    subtitle3: React.CSSProperties;
+    numbers: React.CSSProperties;
+    footnote: React.CSSProperties;
+    body16Medium: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    title?: React.CSSProperties;
+    subtitle3?: React.CSSProperties;
+    numbers?: React.CSSProperties;
+    footnote?: React.CSSProperties;
+    body16Medium?: React.CSSProperties;
+  }
+}
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    title: true;
+    subtitle3: true;
+    numbers: true;
+    footnote: true;
+    body16Medium: true;
+  }
+}
+
 export const typographyThemeOptions: ThemeOptions['typography'] = {
   fontFamily: 'GeneralSans, sans-serif',
   h1: {
@@ -65,6 +94,13 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
     fontSize: '1rem',
     fontStyle: 'normal',
     fontWeight: 400,
+    lineHeight: '160%',
+  },
+  body16Medium: {
+    color: colors.secText,
+    fontSize: '16px',
+    fontStyle: 'normal',
+    fontWeight: 500,
     lineHeight: '160%',
   },
   footnote: {

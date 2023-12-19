@@ -38,32 +38,6 @@ declare module '@mui/material/Paper' {
   }
 }
 
-declare module "@mui/material/styles" {
-  interface TypographyVariants {
-    title: React.CSSProperties;
-    subtitle3: React.CSSProperties;
-    numbers: React.CSSProperties;
-    footnote: React.CSSProperties;
-  }
-
-  // allow configuration using `createTheme`
-  interface TypographyVariantsOptions {
-    title?: React.CSSProperties;
-    subtitle3?: React.CSSProperties;
-    numbers?: React.CSSProperties;
-    footnote?: React.CSSProperties;
-  }
-}
-
-declare module "@mui/material/Typography" {
-  interface TypographyPropsVariantOverrides {
-    title: true;
-    subtitle3: true;
-    numbers: true;
-    footnote: true;
-  }
-}
-
 const colors = {
   cta: '#6B0099',
   white: '#FFFFFF',
