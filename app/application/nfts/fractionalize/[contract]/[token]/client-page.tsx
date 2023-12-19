@@ -37,6 +37,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const { serpentSwapNFTManager } = useSwapProtocolAddresses();
   const { address: userAddress } = useAccount();
 
+  // NFT approval is required before fractionalization
   const {
     isApproved,
     isSubmittingApproval,
@@ -59,6 +60,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     checkApproval();
   }, [approvalSucceeded, approvalFailed]);
 
+  // fractionalization
   const { isFractionalizing, isSubmittingFractionalizeTx, fractionalizeSucceeded, fractionalizeFailed, fractionalize } =
     useDeployAndFractionalize(
       name,
@@ -86,6 +88,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
+  // query fractional token contract by nft address and token id
   const {
     serpentSwapNFTContractAddress,
     refetchSerpentSwapNFTContractAddress,
