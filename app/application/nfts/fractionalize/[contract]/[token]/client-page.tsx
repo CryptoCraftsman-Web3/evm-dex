@@ -1,6 +1,6 @@
 'use client';
 
-import { useNFTApproval, useNFTMetadataLoader } from '@/hooks/nfts';
+import { useDeployAndFractionalize, useFractionalContract, useNFTApproval, useNFTMetadataLoader } from '@/hooks/nfts';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
@@ -37,40 +37,37 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   const { serpentSwapNFTManager } = useSwapProtocolAddresses();
   const { address: userAddress } = useAccount();
 
-  const { isApproved, isSubmittingApproval, approveNft, isApproving } = useNFTApproval(
-    nft.nftContractAddress as `0x${string}`,
-    BigInt(nft.tokenId),
-    metadata
-  );
+  const {
+    isApproved,
+    isSubmittingApproval,
+    approveNft,
+    isApproving,
+    approvalSucceeded,
+    approvalFailed,
+    checkApproval,
+  } = useNFTApproval(nft.nftContractAddress as `0x${string}`, BigInt(nft.tokenId));
 
-  const { config } = usePrepareContractWrite({
-    address: serpentSwapNFTManager,
-    abi: serpentSwapNftManagerABI,
-    functionName: 'deployAndFractionalize',
-    args: [
+  useEffect(() => {
+    if (approvalSucceeded) {
+      toast.success(`Approved ${metadata?.name || 'Unknown NFT'} successfully`);
+    }
+
+    if (approvalFailed) {
+      toast.error(`Failed to approve ${metadata?.name || 'Unknown NFT'}`);
+    }
+
+    checkApproval();
+  }, [approvalSucceeded, approvalFailed]);
+
+  const { isFractionalizing, isSubmittingFractionalizeTx, fractionalizeSucceeded, fractionalizeFailed, fractionalize } =
+    useDeployAndFractionalize(
       name,
       symbol,
-      parseUnits(supply.toString(), 18),
-      userAddress || zeroAddress,
-      contract.nftContractAddress as `0x${string}`,
+      supply,
+      nft.nftContractAddress as `0x${string}`,
       BigInt(nft.tokenId),
-    ],
-    enabled: isApproved && Boolean(name) && Boolean(symbol) && supply > 0,
-  });
-
-  const {
-    data: fractionalizeData,
-    isLoading: isSubmittingFractionalizeTx,
-    writeAsync: fractionalize,
-  } = useContractWrite(config);
-
-  const {
-    isLoading: isFractionalizing,
-    isSuccess: fractionalizeSucceeded,
-    isError: fractionalizeFailed,
-  } = useWaitForTransaction({
-    hash: fractionalizeData?.hash,
-  });
+      isApproved && Boolean(name) && Boolean(symbol) && supply > 0
+    );
 
   useEffect(() => {
     if (fractionalizeSucceeded) {
@@ -89,54 +86,19 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     }
   }, [fractionalizeSucceeded, fractionalizeFailed]);
 
-  const { data: serpentSwapNFTContractAddress, refetch: refetchSerpentSwapNFTContractAddress } = useContractRead({
-    address: serpentSwapNFTManager,
-    abi: serpentSwapNftManagerABI,
-    functionName: 'getUserSerpentSwapNFTContractForNFT',
-    args: [contract.nftContractAddress as `0x${string}`, BigInt(nft.tokenId)],
-  });
-
-  const isFractionalized = Boolean(serpentSwapNFTContractAddress) && serpentSwapNFTContractAddress !== zeroAddress;
-
-  const serpentSwapNFTContract = {
-    address: serpentSwapNFTContractAddress,
-    abi: serpentSwapNftABI,
-  };
-
-  const { data: fracTokenData, refetch: refetchFracTokenData } = useContractReads({
-    contracts: [
-      {
-        ...serpentSwapNFTContract,
-        functionName: 'totalSupply',
-      },
-      {
-        ...serpentSwapNFTContract,
-        functionName: 'balanceOf',
-        args: [userAddress || zeroAddress],
-      },
-      {
-        ...serpentSwapNFTContract,
-        functionName: 'symbol',
-      },
-      {
-        ...serpentSwapNFTContract,
-        functionName: 'name',
-      },
-      {
-        ...serpentSwapNFTContract,
-        functionName: 'allowance',
-        args: [userAddress || zeroAddress, serpentSwapNFTManager],
-      },
-    ],
-  });
-
-  const fracTokenTotalSupply = (fracTokenData?.at(0)?.result as bigint) || BigInt(0);
-  const fracTokenUserBalance = (fracTokenData?.at(1)?.result as bigint) || BigInt(0);
-  const fracTokenSymbol = (fracTokenData?.at(2)?.result as string) || '';
-  const fracTokenName = (fracTokenData?.at(3)?.result as string) || '';
-  const fracTokenAllowance = (fracTokenData?.at(4)?.result as bigint) || BigInt(0);
-  const isApprovedToRedeem = fracTokenAllowance >= fracTokenTotalSupply;
-  const isRedeemed = fracTokenTotalSupply === BigInt(0);
+  const {
+    serpentSwapNFTContractAddress,
+    refetchSerpentSwapNFTContractAddress,
+    isFractionalized,
+    fracTokenTotalSupply,
+    fracTokenUserBalance,
+    fracTokenSymbol,
+    fracTokenName,
+    fracTokenAllowance,
+    refetchFracTokenData,
+    isApprovedToRedeem,
+    isRedeemed,
+  } = useFractionalContract(nft.nftContractAddress as `0x${string}`, BigInt(nft.tokenId));
 
   const { chain } = useNetwork();
 
