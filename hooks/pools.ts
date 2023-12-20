@@ -1,14 +1,13 @@
 'use client';
 
 import { Position } from '@/types/common';
-import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { erc20ABI, useAccount, useContractRead } from 'wagmi';
-import { useSwapProtocolAddresses } from './swap-protocol-hooks';
-import { zeroAddress } from 'viem';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
+import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
+import { zeroAddress } from 'viem';
+import { erc20ABI, useContractRead } from 'wagmi';
+import { useSwapProtocolAddresses } from './swap-protocol-hooks';
 
 export function useLiquidityPosition(tokenId: bigint) {
-  const { address } = useAccount();
   const { nfPositionManager, poolFactory } = useSwapProtocolAddresses();
 
   const {
@@ -96,6 +95,40 @@ export function useLiquidityPosition(tokenId: bigint) {
     enabled: Boolean(pool),
   });
 
+  const sqrtPriceX96 = slot0?.[0] || 0n;
+  const currentTick = slot0?.[1] || 0;
+
+  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+
+  const minPrice =
+    tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickLower / 10 ** (tokenBDecimals - tokenADecimals) : 0;
+  const maxPrice =
+    tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickUpper / 10 ** (tokenBDecimals - tokenADecimals) : 0;
+
+  const sqrtRatioA = Math.sqrt(1.0001 ** position.tickLower);
+  const sqrtRatioB = Math.sqrt(1.0001 ** position.tickUpper);
+  const sqrtPrice = Number(sqrtPriceX96) / 2 ** 96;
+
+  let amountAInWei = 0;
+  let amountBInWei = 0;
+  if (currentTick <= position.tickLower) {
+    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB)));
+  } else if (currentTick > position.tickUpper) {
+    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtRatioB - sqrtRatioA));
+  } else if (currentTick >= position.tickLower && currentTick < position.tickUpper) {
+    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB)));
+    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtPrice - sqrtRatioA));
+  }
+
+  const amountAFormatted = (amountAInWei / 10 ** (tokenADecimals || 18)).toLocaleString(undefined, {
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
+  });
+  const amountBFormatted = (amountBInWei / 10 ** (tokenBDecimals || 18)).toLocaleString(undefined, {
+    minimumFractionDigits: 8,
+    maximumFractionDigits: 8,
+  });
+
   return {
     position,
     gettingPosition,
@@ -116,5 +149,17 @@ export function useLiquidityPosition(tokenId: bigint) {
     gettingPool,
     slot0,
     gettingSlot0,
+    sqrtPriceX96,
+    currentTick,
+    price,
+    minPrice,
+    maxPrice,
+    sqrtRatioA,
+    sqrtRatioB,
+    sqrtPrice,
+    amountAInWei,
+    amountBInWei,
+    amountAFormatted,
+    amountBFormatted,
   };
 }
