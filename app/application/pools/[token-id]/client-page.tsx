@@ -1,22 +1,21 @@
 'use client';
 
 import AddLiquidity from '@/components/pools/add-liquidity';
-import ClaimTokens from '@/components/pools/claim-tokens';
 import RemoveLiquidity from '@/components/pools/remove-liquidity';
 import { useLiquidityPosition } from '@/hooks/pools';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useEthersProvider } from '@/lib/ethers';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { BigNumber, ethers } from 'ethers';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { IoLink } from 'react-icons/io5';
 import { formatUnits } from 'viem';
-import { useAccount, useNetwork } from 'wagmi';
-import SkeletonLoading from './skeleton-loading';
+import { useAccount } from 'wagmi';
 import LiquidityCard from './liquidity-card';
+import PriceCards from './price-cards';
+import SkeletonLoading from './skeleton-loading';
 import UnclaimedCard from './unclaimed-card';
 
 type PositionByTokenIdClientPageProps = {
@@ -24,7 +23,6 @@ type PositionByTokenIdClientPageProps = {
 };
 
 const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPageProps) => {
-  const { chain } = useNetwork();
   const { address } = useAccount();
   const { nfPositionManager, poolFactory } = useSwapProtocolAddresses();
 
@@ -233,121 +231,13 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
             tokenBUnclaimedFeesFormatted={tokenBUnclaimedFeesFormatted}
           />
 
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Paper
-              variant="outlined"
-              sx={{
-                padding: 2,
-                minWidth: { xs: '47%', md: '49%' },
-              }}
-            >
-              <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Typography
-                  variant="body1"
-                  color="GrayText"
-                >
-                  Min Price
-                </Typography>
-
-                <Typography variant="body1">
-                  <strong>
-                    {minPrice.toLocaleString(undefined, {
-                      minimumFractionDigits: 8,
-                      maximumFractionDigits: 8,
-                    })}
-                  </strong>
-                </Typography>
-
-                <Typography
-                  variant="body1"
-                  color="GrayText"
-                >
-                  {tokenBSymbol} per {tokenASymbol}
-                </Typography>
-              </Stack>
-            </Paper>
-            <Paper
-              variant="outlined"
-              sx={{
-                padding: 2,
-                minWidth: { xs: '47%', md: '49%' },
-              }}
-            >
-              <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Typography
-                  variant="body1"
-                  color="GrayText"
-                >
-                  Max Price
-                </Typography>
-
-                <Typography variant="body1">
-                  <strong>
-                    {maxPrice.toLocaleString(undefined, {
-                      minimumFractionDigits: 8,
-                      maximumFractionDigits: 8,
-                    })}
-                  </strong>
-                </Typography>
-
-                <Typography
-                  variant="body1"
-                  color="GrayText"
-                >
-                  {tokenBSymbol} per {tokenASymbol}
-                </Typography>
-              </Stack>
-            </Paper>
-          </Stack>
-
-          <Paper
-            variant="outlined"
-            sx={{
-              padding: 2,
-            }}
-          >
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography
-                variant="body1"
-                color="GrayText"
-              >
-                Current Price
-              </Typography>
-
-              <Typography variant="body1">
-                <strong>
-                  {price.toLocaleString(undefined, {
-                    minimumFractionDigits: 8,
-                    maximumFractionDigits: 8,
-                  })}
-                </strong>
-              </Typography>
-
-              <Typography
-                variant="body1"
-                color="GrayText"
-              >
-                {tokenBSymbol} per {tokenASymbol}
-              </Typography>
-            </Stack>
-          </Paper>
+          <PriceCards
+            tokenASymbol={tokenASymbol || ''}
+            tokenBSymbol={tokenBSymbol || ''}
+            price={price}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+          />
         </>
       )}
     </>
