@@ -15,6 +15,7 @@ import { IoMdArrowRoundBack } from 'react-icons/io';
 import { IoLink } from 'react-icons/io5';
 import { formatUnits } from 'viem';
 import { useAccount, useNetwork } from 'wagmi';
+import SkeletonLoading from './skeleton-loading';
 
 type PositionByTokenIdClientPageProps = {
   tokenId: bigint;
@@ -45,41 +46,19 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
     gettingToken1Name,
     gettingPool,
     gettingSlot0,
+    sqrtPriceX96,
+    currentTick,
+    price,
+    minPrice,
+    maxPrice,
+    sqrtRatioA,
+    sqrtRatioB,
+    sqrtPrice,
+    amountAInWei,
+    amountBInWei,
+    amountAFormatted,
+    amountBFormatted,
   } = useLiquidityPosition(tokenId);
-
-  const sqrtPriceX96 = slot0?.[0] || 0n;
-  const currentTick = slot0?.[1] || 0;
-
-  const price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
-
-  const minPrice =
-    tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickLower / 10 ** (tokenBDecimals - tokenADecimals) : 0;
-  const maxPrice =
-    tokenADecimals && tokenBDecimals ? 1.0001 ** position.tickUpper / 10 ** (tokenBDecimals - tokenADecimals) : 0;
-
-  const sqrtRatioA = Math.sqrt(1.0001 ** position.tickLower);
-  const sqrtRatioB = Math.sqrt(1.0001 ** position.tickUpper);
-  const sqrtPrice = Number(sqrtPriceX96) / 2 ** 96;
-
-  let amountAInWei = 0;
-  let amountBInWei = 0;
-  if (currentTick <= position.tickLower) {
-    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB)));
-  } else if (currentTick > position.tickUpper) {
-    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtRatioB - sqrtRatioA));
-  } else if (currentTick >= position.tickLower && currentTick < position.tickUpper) {
-    amountAInWei = Math.floor(Number(position.liquidity) * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB)));
-    amountBInWei = Math.floor(Number(position.liquidity) * (sqrtPrice - sqrtRatioA));
-  }
-
-  const amountAFormatted = (amountAInWei / 10 ** (tokenADecimals || 18)).toLocaleString(undefined, {
-    minimumFractionDigits: 8,
-    maximumFractionDigits: 8,
-  });
-  const amountBFormatted = (amountBInWei / 10 ** (tokenBDecimals || 18)).toLocaleString(undefined, {
-    minimumFractionDigits: 8,
-    maximumFractionDigits: 8,
-  });
 
   // we need to use ethers.js to get the amount of uncollected fees
   // this is because wagmi/viem does not have callstatic support
@@ -158,48 +137,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
       </Stack>
 
       {isLoading ? (
-        <>
-          <Skeleton
-            variant="rounded"
-            width="100%"
-            height={50}
-          />
-
-          <Skeleton
-            variant="rounded"
-            width="100%"
-            height={150}
-          />
-
-          <Skeleton
-            variant="rounded"
-            width="100%"
-            height={150}
-          />
-
-          <Stack
-            direction="row"
-            spacing={2}
-          >
-            <Skeleton
-              variant="rounded"
-              width="49%"
-              height={150}
-            />
-
-            <Skeleton
-              variant="rounded"
-              width="49%"
-              height={150}
-            />
-          </Stack>
-
-          <Skeleton
-            variant="rounded"
-            width="100%"
-            height={150}
-          />
-        </>
+        <SkeletonLoading />
       ) : (
         <>
           <Stack
