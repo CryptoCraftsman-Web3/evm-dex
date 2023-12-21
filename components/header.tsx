@@ -4,8 +4,15 @@ import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { config } from './config';
+import ConnectButton from './connect-button';
+import { useRouter } from 'next/router';
 
-const AppHeader = () => {
+type HeaderProps = {
+  location: 'home' | 'app';
+}
+
+const Header = ({ location }: HeaderProps) => {
+  const navItems = location === 'home' ? config.homeNavItems : config.appNavItems;
   return (
     <Box
       sx={{
@@ -51,7 +58,7 @@ const AppHeader = () => {
           gap={'40px'}
           p={'0rem'}
         >
-          {config.homeNavItems.map((item, index) => {
+          {navItems.map((item, index) => {
             return (
               <Link
                 key={index}
@@ -78,9 +85,7 @@ const AppHeader = () => {
             textAlign: 'right',
           }}
         >
-          <Link href="/application/swap">
-            <Button variant='contained' color='primary' size='small'>Launch App</Button>
-          </Link>
+          {location === 'home' ? <LaunchAppButton /> : <ConnectButton />}
         </Grid>
       </Grid>
 
@@ -113,13 +118,19 @@ const AppHeader = () => {
           spacing={2}
           justifyContent="flex-end"
         >
-          <Link href="/application/swap">
-            <Button variant='contained' color='primary' size='small'>Launch App</Button>
-          </Link>
+          {location === 'home' ? <LaunchAppButton /> : <ConnectButton />}
         </Stack>
       </Stack>
     </Box>
   );
 };
 
-export default AppHeader;
+const LaunchAppButton = () => {
+  return (
+    <Link href="/application/swap">
+      <Button variant='contained' color='primary' size='small'>Launch App</Button>
+    </Link>
+  )
+}
+
+export default Header;

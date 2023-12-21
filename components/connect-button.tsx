@@ -1,4 +1,4 @@
-import { Button, Theme, useMediaQuery } from '@mui/material';
+import { Button, Theme, useMediaQuery, Box, Typography } from '@mui/material';
 import { Avatar, ConnectKitButton } from 'connectkit';
 
 const ConnectButton = () => {
@@ -14,7 +14,7 @@ const ConnectButton = () => {
 
         const displayAddress = isMdAndUp ? shortAddress : shortestAddress;
 
-        return (
+        if (!isConnected) return (
           <Button
             variant="widget"
             size="small"
@@ -34,6 +34,30 @@ const ConnectButton = () => {
             {isConnected ? displayAddress : disconnectedLabel}
           </Button>
         );
+
+        return (
+          <button
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              width: '135px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'row',
+              gap: '12px'
+            }}
+            onClick={show}
+          >
+            <Avatar
+              size={18}
+              address={address}
+            />
+            <Typography>
+              {displayAddress}
+            </Typography>
+          </button>
+        )
       }}
     </ConnectKitButton.Custom>
   );

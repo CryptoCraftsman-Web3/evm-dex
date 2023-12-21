@@ -1,5 +1,5 @@
 import Footer from '@/components/footer';
-import HomeHeader from '@/components/home-header';
+import Header from '@/components/header';
 import { constants } from '@/lib/constants';
 import { Box } from '@mui/material';
 import type { Metadata } from 'next';
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>
-          <HomeHeader />
+          <Header location='home' />
 
           <Box sx={{ width: '1320px', maxWidth: '100%', mx: 'auto', px: { xs: '2%', md: 0 } }}>
             {children}
