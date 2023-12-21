@@ -75,7 +75,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
       alignItems="center"
       onClick={() => {}}
     >
-      <Link href={`/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
+      <Link href={`/application/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
         <Stack
           direction="column"
           spacing={0}
