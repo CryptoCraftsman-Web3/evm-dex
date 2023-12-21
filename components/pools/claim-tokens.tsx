@@ -115,10 +115,9 @@ const ClaimTokens = ({
   return (
     <>
       <Button
-        variant="contained"
-        color="primary"
+        variant="widget"
         onClick={handleOpen}
-        size="large"
+        size="small"
       >
         Claim Tokens
       </Button>

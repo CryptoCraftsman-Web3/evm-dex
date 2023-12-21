@@ -8,7 +8,7 @@ import { useEthersProvider } from '@/lib/ethers';
 import { Position } from '@/types/common';
 import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Grid, Paper, Skeleton, Stack, Typography, Box } from '@mui/material';
 import { BigNumber, ethers } from 'ethers';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -199,7 +199,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
   return (
     <>
       <Stack direction="row">
-        <Link href="/pools">
+        <Link href="/application/pools">
           <Typography
             variant="body1"
             sx={{
@@ -329,170 +329,162 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
             </Stack>
           </Stack>
 
-          <Paper
-            variant="outlined"
+          <Box
             sx={{
-              padding: 2,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '20px'
             }}
           >
-            <Stack
-              direction="column"
-              spacing={2}
-            >
-              <Typography variant="h6">Liquidity</Typography>
-
+            <Paper>
               <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+                direction="column"
+                spacing={2}
               >
-                <a
-                  href={`${chain?.blockExplorers?.default.url}/address/${position.token0}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Typography variant="h6">Liquidity</Typography>
+
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
-                  <Typography
-                    variant="body1"
-                    display="flex"
-                    alignItems="center"
-                    sx={{
-                      '&:hover': {
-                        color: 'primary.main',
-                      },
-                    }}
+                  <a
+                    href={`${chain?.blockExplorers?.default.url}/address/${position.token0}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    {tokenASymbol} ({tokenAName}) &nbsp; <IoLink />
-                  </Typography>
-                </a>
+                    <Typography
+                      variant="body1"
+                      display="flex"
+                      alignItems="center"
+                      sx={{
+                        '&:hover': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      {tokenASymbol} ({tokenAName}) &nbsp; <IoLink />
+                    </Typography>
+                  </a>
 
-                <Typography variant="body1">{amountAFormatted}</Typography>
+                  <Typography variant="body1">{amountAFormatted}</Typography>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <a
+                    href={`${chain?.blockExplorers?.default.url}/address/${position.token1}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Typography
+                      variant="body1"
+                      display="flex"
+                      alignItems="center"
+                      sx={{
+                        '&:hover': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      {tokenBSymbol} ({tokenBName}) &nbsp; <IoLink />
+                    </Typography>
+                  </a>
+
+                  <Typography variant="body1">{amountBFormatted}</Typography>
+                </Stack>
               </Stack>
+            </Paper>
 
+            <Paper>
               <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+                direction="column"
+                spacing={2}
               >
-                <a
-                  href={`${chain?.blockExplorers?.default.url}/address/${position.token1}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
-                  <Typography
-                    variant="body1"
-                    display="flex"
-                    alignItems="center"
-                    sx={{
-                      '&:hover': {
-                        color: 'primary.main',
-                      },
-                    }}
+                  <Typography variant="h6">Unclaimed Tokens</Typography>
+
+                  <ClaimTokens
+                    tokenASymbol={tokenASymbol || ''}
+                    tokenBSymbol={tokenBSymbol || ''}
+                    tokenAUnclaimedAmount={tokenAUnclaimedFees}
+                    tokenBUnclaimedAmount={tokenBUnclaimedFees}
+                    positionTokenId={tokenId}
+                    getUnclaimedTokens={getUnclaimedTokens}
+                  />
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <a
+                    href={`${chain?.blockExplorers?.default.url}/address/${position.token0}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    {tokenBSymbol} ({tokenBName}) &nbsp; <IoLink />
-                  </Typography>
-                </a>
+                    <Typography
+                      variant="body1"
+                      display="flex"
+                      alignItems="center"
+                      sx={{
+                        '&:hover': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      {tokenASymbol} ({tokenAName}) &nbsp; <IoLink />
+                    </Typography>
+                  </a>
 
-                <Typography variant="body1">{amountBFormatted}</Typography>
+                  <Typography variant="body1">{tokenAUnclaimedFeesFormatted}</Typography>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <a
+                    href={`${chain?.blockExplorers?.default.url}/address/${position.token1}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Typography
+                      variant="body1"
+                      display="flex"
+                      alignItems="center"
+                      sx={{
+                        '&:hover': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      {tokenBSymbol} ({tokenBName}) &nbsp; <IoLink />
+                    </Typography>
+                  </a>
+
+                  <Typography variant="body1">{tokenBUnclaimedFeesFormatted}</Typography>
+                </Stack>
               </Stack>
-            </Stack>
-          </Paper>
-
-          <Paper
-            variant="outlined"
+            </Paper>
+          </Box>
+          <Box
             sx={{
-              padding: 2,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '20px'
             }}
           >
-            <Stack
-              direction="column"
-              spacing={2}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Typography variant="h6">Unclaimed Tokens</Typography>
-
-                <ClaimTokens
-                  tokenASymbol={tokenASymbol || ''}
-                  tokenBSymbol={tokenBSymbol || ''}
-                  tokenAUnclaimedAmount={tokenAUnclaimedFees}
-                  tokenBUnclaimedAmount={tokenBUnclaimedFees}
-                  positionTokenId={tokenId}
-                  getUnclaimedTokens={getUnclaimedTokens}
-                />
-              </Stack>
-
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <a
-                  href={`${chain?.blockExplorers?.default.url}/address/${position.token0}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Typography
-                    variant="body1"
-                    display="flex"
-                    alignItems="center"
-                    sx={{
-                      '&:hover': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  >
-                    {tokenASymbol} ({tokenAName}) &nbsp; <IoLink />
-                  </Typography>
-                </a>
-
-                <Typography variant="body1">{tokenAUnclaimedFeesFormatted}</Typography>
-              </Stack>
-
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <a
-                  href={`${chain?.blockExplorers?.default.url}/address/${position.token1}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Typography
-                    variant="body1"
-                    display="flex"
-                    alignItems="center"
-                    sx={{
-                      '&:hover': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  >
-                    {tokenBSymbol} ({tokenBName}) &nbsp; <IoLink />
-                  </Typography>
-                </a>
-
-                <Typography variant="body1">{tokenBUnclaimedFeesFormatted}</Typography>
-              </Stack>
-            </Stack>
-          </Paper>
-
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Paper
-              variant="outlined"
-              sx={{
-                padding: 2,
-                minWidth: { xs: '47%', md: '49%'},
-              }}
-            >
+            <Paper>
               <Stack
                 direction="column"
                 justifyContent="center"
@@ -522,13 +514,7 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 </Typography>
               </Stack>
             </Paper>
-            <Paper
-              variant="outlined"
-              sx={{
-                padding: 2,
-                minWidth: { xs: '47%', md: '49%'},
-              }}
-            >
+            <Paper>
               <Stack
                 direction="column"
                 justifyContent="center"
@@ -558,43 +544,45 @@ const PositionByTokenIdClientPage = ({ tokenId }: PositionByTokenIdClientPagePro
                 </Typography>
               </Stack>
             </Paper>
-          </Stack>
-
-          <Paper
-            variant="outlined"
+          </Box>
+          <Box
             sx={{
-              padding: 2,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '20px'
             }}
           >
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography
-                variant="body1"
-                color="GrayText"
+            <Paper>
+              <Stack
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
               >
-                Current Price
-              </Typography>
+                <Typography
+                  variant="body1"
+                  color="GrayText"
+                >
+                  Current Price
+                </Typography>
 
-              <Typography variant="body1">
-                <strong>
-                  {price.toLocaleString(undefined, {
-                    minimumFractionDigits: 8,
-                    maximumFractionDigits: 8,
-                  })}
-                </strong>
-              </Typography>
+                <Typography variant="body1">
+                  <strong>
+                    {price.toLocaleString(undefined, {
+                      minimumFractionDigits: 8,
+                      maximumFractionDigits: 8,
+                    })}
+                  </strong>
+                </Typography>
 
-              <Typography
-                variant="body1"
-                color="GrayText"
-              >
-                {tokenBSymbol} per {tokenASymbol}
-              </Typography>
-            </Stack>
-          </Paper>
+                <Typography
+                  variant="body1"
+                  color="GrayText"
+                >
+                  {tokenBSymbol} per {tokenASymbol}
+                </Typography>
+              </Stack>
+            </Paper>
+          </Box>
         </>
       )}
     </>

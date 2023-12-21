@@ -5,12 +5,13 @@ import { colors } from "@/theme/default-colors"
 import { Token } from '@/types/common';
 
 type SwapInputProps = {
+  side: 'A' | 'B';
   token: Token | null;
   onTokenChange: (token: Token | null) => void;
   onClick: () => void;
 }
 
-const SwapInput = ({ token, onTokenChange, onClick }: SwapInputProps) => {
+const SwapInput = ({ side, token, onTokenChange, onClick }: SwapInputProps) => {
   return (
     <Box
       sx={{
@@ -27,7 +28,7 @@ const SwapInput = ({ token, onTokenChange, onClick }: SwapInputProps) => {
         <Typography
           variant="footnote"
         >
-          You pay
+          {side === 'A' ? 'You pay' : 'You get'}
         </Typography>
         <Input
           type='number'
@@ -49,7 +50,12 @@ const SwapInput = ({ token, onTokenChange, onClick }: SwapInputProps) => {
         <Button
           variant="contained"
           size="small"
+          sx={{
+            backgroundColor: token && colors.secBG,
+            p: token && '9px 12px'
+          }}
           onClick={onClick}
+          startIcon={token && <img style={{ width: '24px', height: '24px' }} src={'/icons/unknown-token.svg'} alt="unknown token icon" />}
           endIcon={<img src={'/icons/keyboard_arrow_down.svg'} style={{ filter: 'invert(1)' }} alt="drop down icon" />}
         >
           {token ? token.symbol : 'Select token'}

@@ -109,5 +109,12 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: '130%'
+  },
+  button: {
+    fontSize: '18px',
+    fontStyle: 'normal',
+    textTransform: 'none',
+    fontWeight: 600,
+    lineHeight: '24px'
   }
 }

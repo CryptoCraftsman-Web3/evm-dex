@@ -30,11 +30,12 @@ export function useTokenManager() {
    * @returns {void}
    */
   const setTokenA = (token: Token | null) => {
-    if (tokenB !== token) {
+    console.log(tokenA, tokenB, token)
+    if (tokenB?.symbol !== token?.symbol || tokenB?.address !== token?.address) {
       setTokenAState(token);
     } else {
-      setTokenAState(null);
-      setTokenBState(token);
+      setTokenAState(token);
+      setTokenBState(null);
     }
   };
 
@@ -44,11 +45,12 @@ export function useTokenManager() {
    * @returns {void}
    */
   const setTokenB = (token: Token | null) => {
-    if (tokenA !== token) {
+    console.log(tokenA, tokenB, token)
+    if (tokenA?.symbol !== token?.symbol || tokenA?.address !== token?.address) {
       setTokenBState(token);
     } else {
-      setTokenBState(null);
-      setTokenAState(token);
+      setTokenBState(token);
+      setTokenAState(null);
     }
   };
 
