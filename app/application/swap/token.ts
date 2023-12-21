@@ -30,7 +30,6 @@ export function useTokenManager() {
    * @returns {void}
    */
   const setTokenA = (token: Token | null) => {
-    console.log(tokenA, tokenB, token)
     if (tokenB?.symbol !== token?.symbol || tokenB?.address !== token?.address) {
       setTokenAState(token);
     } else {
@@ -45,7 +44,6 @@ export function useTokenManager() {
    * @returns {void}
    */
   const setTokenB = (token: Token | null) => {
-    console.log(tokenA, tokenB, token)
     if (tokenA?.symbol !== token?.symbol || tokenA?.address !== token?.address) {
       setTokenBState(token);
     } else {
