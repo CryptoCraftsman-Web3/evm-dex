@@ -32,92 +32,29 @@ import {
 import SwapInput from '../../../components/swap-input/swap-input';
 import { useTokenManager } from './token';
 import Tag from '@/components/tag';
+import { useQuoterV2, useTokenAllowance, useTokenSwap } from '@/hooks/swap';
 
 const SwapClientPage = () => {
-  const { chain } = useNetwork();
-  const { address: userAddress, isConnected: isUserWalletConnected } = useAccount();
-  const { serpentSwapUtility, poolFactory } = useSwapProtocolAddresses();
-
   const { tokenA, tokenB, setTokenA, setTokenB } = useTokenManager();
 
-  const isTokenANative = tokenA?.isNative;
-  const isTokenBNative = tokenB?.isNative;
+  const {
+    chain,
+    userAddress,
+    isUserWalletConnected,
+    serpentSwapUtility,
+    poolFactory,
+    isTokenANative,
+    isTokenBNative,
+    wrappedNativeToken,
+    amountA,
+    setAmountA,
+    debouncedAmountA,
+    amountB,
+    setAmountB,
+  } = useTokenSwap(tokenA, tokenB, setTokenA, setTokenB);
 
-  const wrappedNativeToken = useWrappedNativeToken();
-
-  const [amountA, setAmountA] = useState<number>(1);
-  const debouncedAmountA = useDebounce(amountA, 500);
-  console.log(amountA);
-
-  const [amountB, setAmountB] = useState<number>(1);
-
-  const ethersProvider = useEthersProvider();
-  const { quoterV2 } = useSwapProtocolAddresses();
-  const quoterV2Contract = new ethers.Contract(quoterV2, quoterV2ABI, ethersProvider || ethers.getDefaultProvider());
-
-  const [isFetchingQuotes, setIsFetchingQuotes] = useState<boolean>(false);
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
-
-  const tokenInAddress = isTokenANative ? wrappedNativeToken.address : tokenA?.address || zeroAddress;
-  const tokenOutAddress = isTokenBNative ? wrappedNativeToken.address : tokenB?.address || zeroAddress;
-
-  const getQuote = async () => {
-    if (!tokenInAddress || !tokenOutAddress) throw new Error('Invalid token addresses');
-
-    const amountIn = ethers.utils.parseUnits(debouncedAmountA.toString(), tokenA?.decimals || 18);
-    if (amountIn.isZero()) throw new Error('Invalid amount');
-
-    setIsFetchingQuotes(true);
-
-    try {
-      const fees = [500, 3000, 10000];
-
-      let maxAmountOut = -Infinity;
-      const mappedQuotes: Quote[] = [];
-      for (const [index, fee] of fees.entries()) {
-        try {
-          const retrievedQuote = await quoterV2Contract.callStatic.quoteExactInputSingle([
-            tokenInAddress,
-            tokenOutAddress,
-            amountIn,
-            fee,
-            0,
-          ]);
-
-          const amountOut: ethers.BigNumber = retrievedQuote.amountOut;
-          const amountOutParsed = parseFloat(ethers.utils.formatUnits(amountOut, tokenB?.decimals || 18));
-
-          const quote: Quote = {
-            tokenIn: tokenInAddress,
-            tokenOut: tokenOutAddress,
-            fee,
-            amountIn: amountIn,
-            amountOut: amountOut,
-            sqrtPriceX96: retrievedQuote.sqrtPriceX96,
-            sqrtPriceX96After: retrievedQuote.sqrtPriceX96After,
-          };
-
-          if (amountOutParsed > maxAmountOut) {
-            maxAmountOut = amountOutParsed;
-            setSelectedQuote(quote);
-          }
-
-          mappedQuotes.push(quote);
-        } catch (err) {
-          console.error(err);
-          console.error(`Pool or liquidity does not exist for fee ${fee}`);
-        }
-      }
-
-      setAmountB(maxAmountOut);
-      setQuotes(mappedQuotes);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsFetchingQuotes(false);
-    }
-  };
+  const { isFetchingQuotes, quotes, selectedQuote, getQuote, setSelectedQuote, tokenInAddress, tokenOutAddress } =
+    useQuoterV2(tokenA, tokenB, debouncedAmountA, isTokenANative, isTokenBNative, setAmountB);
 
   useEffect(() => {
     console.log(`tokenA: ${tokenA?.symbol}, tokenB: ${tokenB?.symbol}, debouncedAmountA: ${debouncedAmountA}`);
@@ -132,80 +69,31 @@ const SwapClientPage = () => {
     }
   }, [tokenA, tokenB, debouncedAmountA]);
 
-  // monitor tokenA allowance
-  // if user wallet's tokenA allowance is less than amountA, then call approve
-
-  const tokenAContract = {
-    address: tokenA?.address ?? zeroAddress,
-    abi: erc20ABI,
-  };
-
   const {
-    data: tokenAUserDetails,
-    refetch: refetchTokenAUserDetails,
-    isRefetching: refetchingTokenAUserDetails,
-  } = useContractReads({
-    contracts: [
-      {
-        ...tokenAContract,
-        functionName: 'balanceOf',
-        args: [userAddress ?? zeroAddress],
-      },
-      {
-        ...tokenAContract,
-        functionName: 'allowance',
-        args: [userAddress ?? zeroAddress, serpentSwapUtility],
-      },
-    ],
-    enabled: Boolean(tokenA) && Boolean(userAddress),
-  });
-
-  const { data: userNativeTokenBalance, refetch: refetchUserNativeTokenBalance } = useBalance({
-    address: userAddress ?? zeroAddress,
-    enabled: Boolean(userAddress),
-  });
-
-  const tokenAUserBalance = (tokenAUserDetails?.[0].result as bigint) || 0n;
-  const tokenAUserAllowance = (tokenAUserDetails?.[1].result as bigint) || 0n;
-  const amountAInBaseUnits = ethers.utils.parseUnits(debouncedAmountA.toString(), tokenA?.decimals || 18).toBigInt();
-
-  const notEnoughTokenABalance = isTokenANative
-    ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
-    : tokenAUserBalance < amountAInBaseUnits;
-  const notEnoughTokenAAllowance = isTokenANative
-    ? (userNativeTokenBalance?.value || 0n) < amountAInBaseUnits
-    : tokenAUserAllowance < amountAInBaseUnits;
-
-  const { config: tokenAConfig } = usePrepareContractWrite({
-    ...tokenAContract,
-    functionName: 'approve',
-    args: [serpentSwapUtility, amountAInBaseUnits],
-    enabled: Boolean(tokenA) && Boolean(userAddress),
-  });
-
-  const {
-    data: approveTokenAResult,
-    status: approveTokenAStatus,
-    isLoading: isApprovingTokenA,
-    isSuccess: isTokenAApproved,
-    write: approveTokenA,
-  } = useContractWrite(tokenAConfig);
+    tokenContract: tokenAContract,
+    amountInBaseUnits: amountAInBaseUnits,
+    tokenUserDetails,
+    refetchTokenUserDetails: refetchTokenAUserDetails,
+    refetchingTokenUserDetails,
+    userNativeTokenBalance,
+    refetchUserNativeTokenBalance,
+    notEnoughTokenBalance: notEnoughTokenABalance,
+    notEnoughTokenAllowance: notEnoughTokenAAllowance,
+    approveTokenResult: approveTokenAResult,
+    approveTokenStatus: approveTokenAStatus,
+    isApprovingToken: isApprovingTokenA,
+    isTokenApproved: isTokenAApproved,
+    approveToken: approveTokenA,
+    isApproveTokenTxPending: isApproveTokenATxPending,
+    isApproveTokenTxSuccess: isApproveTokenATxSuccess,
+    isApproveTokenTxError: isApproveTokenATxError,
+  } = useTokenAllowance(tokenA, userAddress, serpentSwapUtility, debouncedAmountA);
 
   useEffect(() => {
     if (approveTokenAResult?.hash && chain?.id) {
       syncTransaction(chain.id, approveTokenAResult.hash, 'approve');
     }
   }, [approveTokenAResult, chain]);
-
-  const {
-    data: approveTokenATxReceipt,
-    isLoading: isApproveTokenATxPending,
-    isSuccess: isApproveTokenATxSuccess,
-    isError: isApproveTokenATxError,
-  } = useWaitForTransaction({
-    hash: approveTokenAResult?.hash,
-    enabled: isTokenAApproved,
-  });
 
   useEffect(() => {
     refetchTokenAUserDetails();
