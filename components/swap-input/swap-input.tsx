@@ -9,9 +9,12 @@ type SwapInputProps = {
   token: Token | null;
   onTokenChange: (token: Token | null) => void;
   onClick: () => void;
+  amount: number;
+  setAmount: (amount: number) => void;
+  disabled?: boolean;
 }
 
-const SwapInput = ({ side, token, onTokenChange, onClick }: SwapInputProps) => {
+const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, disabled }: SwapInputProps) => {
   return (
     <Box
       sx={{
@@ -22,6 +25,7 @@ const SwapInput = ({ side, token, onTokenChange, onClick }: SwapInputProps) => {
         width: '100%',
         display: 'inline-flex',
         justifyContent: 'space-between',
+        opacity: disabled ? 0.5 : 1
       }}
     >
       <Stack gap={'2px'}>
@@ -40,6 +44,8 @@ const SwapInput = ({ side, token, onTokenChange, onClick }: SwapInputProps) => {
             height: '100%',
             borderBottom: 'none'
           }}
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
         />
       </Stack>
       <Box

@@ -47,6 +47,7 @@ const SwapClientPage = () => {
 
   const [amountA, setAmountA] = useState<number>(1);
   const debouncedAmountA = useDebounce(amountA, 500);
+  console.log(amountA);
 
   const [amountB, setAmountB] = useState<number>(1);
 
@@ -119,6 +120,7 @@ const SwapClientPage = () => {
   };
 
   useEffect(() => {
+    console.log(`tokenA: ${tokenA?.symbol}, tokenB: ${tokenB?.symbol}, debouncedAmountA: ${debouncedAmountA}`);
     if (tokenA && tokenB) {
       console.log(debouncedAmountA);
       if (debouncedAmountA > 0) {
@@ -387,11 +389,39 @@ const SwapClientPage = () => {
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [activeTokenInput, setActiveTokenInput] = useState<'A' | 'B'>('A');
 
+  const swap = async () => {
+    try {
+      if (!tokenA || !tokenB) throw new Error('Please select tokens to swap');
+      if (!isUserWalletConnected) throw new Error('Please connect your wallet');
+
+      if (isTokenANative && !isTokenBNative && swapNativeForToken) {
+        swapNativeForToken();
+      }
+
+      if (!isTokenANative && isTokenBNative && swapTokenForNative) {
+        swapTokenForNative();
+      }
+
+      if (!isTokenANative && !isTokenBNative && swapTokens) {
+        swapTokens();
+      }
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
   return (
     <>
       <Box sx={{ height: { xs: '60px', md: '120px' } }} />
-      <Grid container justifyContent={'center'}>
-        <Grid item xs={12} md={6}>
+      <Grid
+        container
+        justifyContent={'center'}
+      >
+        <Grid
+          item
+          xs={12}
+          md={6}
+        >
           <Paper
             sx={{
               width: { xs: '100%', md: '650px' },
@@ -406,7 +436,7 @@ const SwapClientPage = () => {
                 width: '100%',
               }}
             >
-              <Typography variant='button'>Swap</Typography>
+              <Typography variant="button">Swap</Typography>
               <Box
                 sx={{
                   display: 'flex',
@@ -415,8 +445,13 @@ const SwapClientPage = () => {
                   gap: '9px',
                 }}
               >
-                <Typography variant='button' sx={{ opacity: 0.3 }}>Buy</Typography>
-                <Tag color='green'>Coming soon</Tag>
+                <Typography
+                  variant="button"
+                  sx={{ opacity: 0.3 }}
+                >
+                  Buy
+                </Typography>
+                <Tag color="green">Coming soon</Tag>
               </Box>
             </Box>
             <Box
@@ -429,7 +464,7 @@ const SwapClientPage = () => {
               }}
             >
               <SwapInput
-                side='A'
+                side="A"
                 token={tokenA}
                 onTokenChange={setTokenA}
                 onClick={() => {
@@ -437,9 +472,12 @@ const SwapClientPage = () => {
                   setSelectedToken(tokenA);
                   setActiveTokenInput('A');
                 }}
+                amount={amountA}
+                setAmount={setAmountA}
+                disabled={isFetchingQuotes}
               />
               <SwapInput
-                side='B'
+                side="B"
                 token={tokenB}
                 onTokenChange={setTokenB}
                 onClick={() => {
@@ -447,12 +485,39 @@ const SwapClientPage = () => {
                   setSelectedToken(tokenB);
                   setActiveTokenInput('B');
                 }}
+                amount={amountB}
+                setAmount={setAmountB}
+                disabled={isFetchingQuotes}
               />
             </Box>
-            <Button
-              variant='widget'
-              fullWidth
-            >{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</Button>
+            {notEnoughTokenAAllowance && tokenA && tokenB ? (
+              <LoadingButton
+                variant="widget"
+                fullWidth
+                disabled={isFetchingQuotes}
+                loading={isApprovingTokenA || isApproveTokenATxPending}
+                onClick={approveTokenA}
+              >
+                {isFetchingQuotes ? 'Fetching quotes...' : `Approve ${tokenA?.symbol}`}
+              </LoadingButton>
+            ) : (
+              <LoadingButton
+                variant="widget"
+                fullWidth
+                disabled={isFetchingQuotes}
+                loading={
+                  isSwappingTokens ||
+                  isSwapTokensTxPending ||
+                  isSwappingNativeForToken ||
+                  isSwapNativeForTokenTxPending ||
+                  isSwappingTokenForNative ||
+                  isSwapTokenForNativeTxPending
+                }
+                onClick={swap}
+              >
+                {isFetchingQuotes ? 'Fetching quotes...' : <>{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</>}
+              </LoadingButton>
+            )}
           </Paper>
         </Grid>
       </Grid>
