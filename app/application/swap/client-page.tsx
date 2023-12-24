@@ -488,6 +488,7 @@ const SwapClientPage = () => {
                 amount={amountB}
                 setAmount={setAmountB}
                 disabled={isFetchingQuotes}
+                fixedDecimals={6}
               />
             </Box>
             {notEnoughTokenAAllowance && tokenA && tokenB ? (

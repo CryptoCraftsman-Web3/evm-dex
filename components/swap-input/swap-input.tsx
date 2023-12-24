@@ -12,9 +12,10 @@ type SwapInputProps = {
   amount: number;
   setAmount: (amount: number) => void;
   disabled?: boolean;
+  fixedDecimals?: number;
 }
 
-const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, disabled }: SwapInputProps) => {
+const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, disabled, fixedDecimals }: SwapInputProps) => {
   return (
     <Box
       sx={{
@@ -44,8 +45,10 @@ const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, dis
             height: '100%',
             borderBottom: 'none'
           }}
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
+          value={amount && fixedDecimals ? amount.toFixed(fixedDecimals) : amount}
+          onChange={(e) => {
+            setAmount(Number(e.target.value))
+          }}
         />
       </Stack>
       <Box
