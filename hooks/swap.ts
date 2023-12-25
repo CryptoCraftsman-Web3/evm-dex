@@ -18,8 +18,9 @@ import {
 } from 'wagmi';
 import { useSwapProtocolAddresses } from './swap-protocol-hooks';
 import { useWrappedNativeToken } from './token-hooks';
+import { serpentSwapUtilityABI } from '@/types/wagmi/serpent-swap';
 
-export function useTokenSwap(
+export function useTokenAmounts(
   tokenA: Token | null,
   tokenB: Token | null,
   setTokenA: (token: Token) => void,
@@ -241,5 +242,153 @@ export function useTokenAllowance(
     isApproveTokenTxPending,
     isApproveTokenTxSuccess,
     isApproveTokenTxError,
+  };
+}
+
+export function useErc20ToErc20Swap(selectedQuote: Quote | null, amountInBaseUnits: bigint) {
+  const { address: userAddress } = useAccount();
+  const { serpentSwapUtility } = useSwapProtocolAddresses();
+  // the code section below deals with SwapRouter to swap ERC20 tokens
+  const { config: swapTokensConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapTokens',
+    args: [
+      selectedQuote?.tokenIn ?? zeroAddress,
+      selectedQuote?.tokenOut ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      amountInBaseUnits,
+      0n,
+      0n,
+    ],
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
+  });
+
+  const {
+    data: swapTokensResult,
+    isLoading: isSwappingTokens,
+    isSuccess: isSwapTokensSuccess,
+    write: swapTokens,
+  } = useContractWrite(swapTokensConfig);
+
+  const {
+    isLoading: isSwapTokensTxPending,
+    isSuccess: isSwapTokensTxSuccess,
+    isError: isSwapTokensTxError,
+  } = useWaitForTransaction({
+    hash: swapTokensResult?.hash,
+    enabled: isSwapTokensSuccess,
+  });
+
+  return {
+    swapTokensConfig,
+    swapTokensResult,
+    isSwappingTokens,
+    isSwapTokensSuccess,
+    swapTokens,
+    isSwapTokensTxPending,
+    isSwapTokensTxSuccess,
+    isSwapTokensTxError,
+  };
+}
+
+export function useNativeToErc20Swap(
+  selectedQuote: Quote | null,
+  amountInBaseUnits: bigint,
+) {
+  const { address: userAddress } = useAccount();
+  const { serpentSwapUtility } = useSwapProtocolAddresses();
+
+  const { config: swapNativeForTokenConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapNativeForToken',
+    args: [
+      selectedQuote?.tokenOut ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      0n,
+      0n,
+    ],
+    value: amountInBaseUnits,
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
+  });
+
+  const {
+    data: swapNativeForTokenResult,
+    isLoading: isSwappingNativeForToken,
+    isSuccess: isSwapNativeForTokenSuccess,
+    write: swapNativeForToken,
+  } = useContractWrite(swapNativeForTokenConfig);
+
+  const {
+    isLoading: isSwapNativeForTokenTxPending,
+    isSuccess: isSwapNativeForTokenTxSuccess,
+    isError: isSwapNativeForTokenTxError,
+  } = useWaitForTransaction({
+    hash: swapNativeForTokenResult?.hash,
+    enabled: isSwapNativeForTokenSuccess,
+  });
+
+  return {
+    swapNativeForTokenConfig,
+    swapNativeForTokenResult,
+    isSwappingNativeForToken,
+    isSwapNativeForTokenSuccess,
+    swapNativeForToken,
+    isSwapNativeForTokenTxPending,
+    isSwapNativeForTokenTxSuccess,
+    isSwapNativeForTokenTxError,
+  };
+}
+
+export function useErc20ToNativeSwap(
+  selectedQuote: Quote | null,
+  amountInBaseUnits: bigint,
+) {
+  const { address: userAddress } = useAccount();
+  const { serpentSwapUtility } = useSwapProtocolAddresses();
+
+  const { config: swapTokenForNativeConfig } = usePrepareContractWrite({
+    address: serpentSwapUtility,
+    abi: serpentSwapUtilityABI,
+    functionName: 'swapTokenForNative',
+    args: [
+      selectedQuote?.tokenIn ?? zeroAddress,
+      selectedQuote?.fee ?? 0,
+      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
+      amountInBaseUnits,
+      0n,
+      0n,
+    ],
+    enabled: Boolean(userAddress) && Boolean(selectedQuote),
+  });
+
+  const {
+    data: swapTokenForNativeResult,
+    isLoading: isSwappingTokenForNative,
+    isSuccess: isSwapTokenForNativeSuccess,
+    write: swapTokenForNative,
+  } = useContractWrite(swapTokenForNativeConfig);
+
+  const {
+    isLoading: isSwapTokenForNativeTxPending,
+    isSuccess: isSwapTokenForNativeTxSuccess,
+    isError: isSwapTokenForNativeTxError,
+  } = useWaitForTransaction({
+    hash: swapTokenForNativeResult?.hash,
+    enabled: isSwapTokenForNativeSuccess,
+  });
+
+  return {
+    swapTokenForNativeConfig,
+    swapTokenForNativeResult,
+    isSwappingTokenForNative,
+    isSwapTokenForNativeSuccess,
+    swapTokenForNative,
+    isSwapTokenForNativeTxPending,
+    isSwapTokenForNativeTxSuccess,
+    isSwapTokenForNativeTxError,
   };
 }

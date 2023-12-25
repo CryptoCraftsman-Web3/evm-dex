@@ -32,7 +32,7 @@ import {
 import SwapInput from '../../../components/swap-input/swap-input';
 import { useTokenManager } from './token';
 import Tag from '@/components/tag';
-import { useQuoterV2, useTokenAllowance, useTokenSwap } from '@/hooks/swap';
+import { useErc20ToErc20Swap, useErc20ToNativeSwap, useNativeToErc20Swap, useQuoterV2, useTokenAllowance, useTokenAmounts } from '@/hooks/swap';
 
 const SwapClientPage = () => {
   const { tokenA, tokenB, setTokenA, setTokenB } = useTokenManager();
@@ -51,7 +51,7 @@ const SwapClientPage = () => {
     debouncedAmountA,
     amountB,
     setAmountB,
-  } = useTokenSwap(tokenA, tokenB, setTokenA, setTokenB);
+  } = useTokenAmounts(tokenA, tokenB, setTokenA, setTokenB);
 
   const { isFetchingQuotes, quotes, selectedQuote, getQuote, setSelectedQuote, tokenInAddress, tokenOutAddress } =
     useQuoterV2(tokenA, tokenB, debouncedAmountA, isTokenANative, isTokenBNative, setAmountB);
@@ -101,38 +101,16 @@ const SwapClientPage = () => {
     if (isApproveTokenATxError) toast.error(`Failed to approve ${tokenA?.symbol} allowance`);
   }, [isApproveTokenATxSuccess, isApproveTokenATxError]);
 
-  // the code section below deals with SwapRouter to swap ERC20 tokens
-  const { config: swapTokensConfig } = usePrepareContractWrite({
-    address: serpentSwapUtility,
-    abi: serpentSwapUtilityABI,
-    functionName: 'swapTokens',
-    args: [
-      selectedQuote?.tokenIn ?? zeroAddress,
-      selectedQuote?.tokenOut ?? zeroAddress,
-      selectedQuote?.fee ?? 0,
-      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
-      amountAInBaseUnits,
-      0n,
-      0n,
-    ],
-    enabled: Boolean(userAddress) && Boolean(selectedQuote),
-  });
-
   const {
-    data: swapTokensResult,
-    isLoading: isSwappingTokens,
-    isSuccess: isSwapTokensSuccess,
-    write: swapTokens,
-  } = useContractWrite(swapTokensConfig);
-
-  const {
-    isLoading: isSwapTokensTxPending,
-    isSuccess: isSwapTokensTxSuccess,
-    isError: isSwapTokensTxError,
-  } = useWaitForTransaction({
-    hash: swapTokensResult?.hash,
-    enabled: isSwapTokensSuccess,
-  });
+    swapTokensConfig,
+    swapTokensResult,
+    isSwappingTokens,
+    isSwapTokensSuccess,
+    swapTokens,
+    isSwapTokensTxPending,
+    isSwapTokensTxSuccess,
+    isSwapTokensTxError,
+  } = useErc20ToErc20Swap(selectedQuote, amountAInBaseUnits);
 
   useEffect(() => {
     if (swapTokensResult?.hash && chain?.id) {
@@ -146,36 +124,16 @@ const SwapClientPage = () => {
     if (isSwapTokensTxError) toast.error(`Failed to swap ${tokenA?.symbol} for ${tokenB?.symbol}`);
   }, [isSwapTokensTxSuccess, isSwapTokensTxError]);
 
-  const { config: swapNativeForTokenConfig } = usePrepareContractWrite({
-    address: serpentSwapUtility,
-    abi: serpentSwapUtilityABI,
-    functionName: 'swapNativeForToken',
-    args: [
-      selectedQuote?.tokenOut ?? zeroAddress,
-      selectedQuote?.fee ?? 0,
-      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
-      0n,
-      0n,
-    ],
-    value: amountAInBaseUnits,
-    enabled: Boolean(userAddress) && Boolean(selectedQuote),
-  });
-
   const {
-    data: swapNativeForTokenResult,
-    isLoading: isSwappingNativeForToken,
-    isSuccess: isSwapNativeForTokenSuccess,
-    write: swapNativeForToken,
-  } = useContractWrite(swapNativeForTokenConfig);
-
-  const {
-    isLoading: isSwapNativeForTokenTxPending,
-    isSuccess: isSwapNativeForTokenTxSuccess,
-    isError: isSwapNativeForTokenTxError,
-  } = useWaitForTransaction({
-    hash: swapNativeForTokenResult?.hash,
-    enabled: isSwapNativeForTokenSuccess,
-  });
+    swapNativeForTokenConfig,
+    swapNativeForTokenResult,
+    isSwappingNativeForToken,
+    isSwapNativeForTokenSuccess,
+    swapNativeForToken,
+    isSwapNativeForTokenTxPending,
+    isSwapNativeForTokenTxSuccess,
+    isSwapNativeForTokenTxError,
+  } = useNativeToErc20Swap(selectedQuote, amountAInBaseUnits);
 
   useEffect(() => {
     if (swapNativeForTokenResult?.hash && chain?.id) {
@@ -191,42 +149,22 @@ const SwapClientPage = () => {
       toast.error(`Failed to swap ${chain?.nativeCurrency.symbol} for ${tokenB?.symbol}`);
   }, [isSwapNativeForTokenTxSuccess, isSwapNativeForTokenTxError]);
 
-  const { config: swapTokenForNativeConfig } = usePrepareContractWrite({
-    address: serpentSwapUtility,
-    abi: serpentSwapUtilityABI,
-    functionName: 'swapTokenForNative',
-    args: [
-      selectedQuote?.tokenIn ?? zeroAddress,
-      selectedQuote?.fee ?? 0,
-      BigInt(Math.floor(Date.now() / 1000) + 60 * 60),
-      amountAInBaseUnits,
-      0n,
-      0n,
-    ],
-    enabled: Boolean(userAddress) && Boolean(selectedQuote),
-  });
-
   const {
-    data: swapTokenForNativeResult,
-    isLoading: isSwappingTokenForNative,
-    isSuccess: isSwapTokenForNativeSuccess,
-    write: swapTokenForNative,
-  } = useContractWrite(swapTokenForNativeConfig);
+    swapTokenForNativeConfig,
+    swapTokenForNativeResult,
+    isSwappingTokenForNative,
+    isSwapTokenForNativeSuccess,
+    swapTokenForNative,
+    isSwapTokenForNativeTxPending,
+    isSwapTokenForNativeTxSuccess,
+    isSwapTokenForNativeTxError,
+  } = useErc20ToNativeSwap(selectedQuote, amountAInBaseUnits);
 
   useEffect(() => {
     if (swapTokenForNativeResult?.hash && chain?.id) {
       syncTransaction(chain.id, swapTokenForNativeResult.hash, 'swapTokenForNative');
     }
   }, [swapTokenForNativeResult, chain]);
-
-  const {
-    isLoading: isSwapTokenForNativeTxPending,
-    isSuccess: isSwapTokenForNativeTxSuccess,
-    isError: isSwapTokenForNativeTxError,
-  } = useWaitForTransaction({
-    hash: swapTokenForNativeResult?.hash,
-    enabled: isSwapTokenForNativeSuccess,
-  });
 
   useEffect(() => {
     refetchTokenAUserDetails();
@@ -235,16 +173,6 @@ const SwapClientPage = () => {
     if (isSwapTokenForNativeTxError)
       toast.error(`Failed to swap ${tokenA?.symbol} for ${chain?.nativeCurrency.symbol}`);
   }, [isSwapTokenForNativeTxSuccess, isSwapTokenForNativeTxError]);
-
-  // focus on respective amount input field when token is selected, and select all text
-  const amountAInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (tokenA) {
-      amountAInputRef.current?.focus();
-      amountAInputRef.current?.select();
-    }
-  }, [tokenA, tokenB]);
 
   // pool-related code
   const { data: poolAddress } = useContractRead({
