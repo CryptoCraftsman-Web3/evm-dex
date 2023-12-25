@@ -32,7 +32,15 @@ import {
 import SwapInput from '../../../components/swap-input/swap-input';
 import { useTokenManager } from './token';
 import Tag from '@/components/tag';
-import { useErc20ToErc20Swap, useErc20ToNativeSwap, useNativeToErc20Swap, useQuoterV2, useTokenAllowance, useTokenAmounts } from '@/hooks/swap';
+import {
+  useErc20ToErc20Swap,
+  useErc20ToNativeSwap,
+  useNativeToErc20Swap,
+  useQuoterV2,
+  useSwapPool,
+  useTokenAllowance,
+  useTokenAmounts,
+} from '@/hooks/swap';
 
 const SwapClientPage = () => {
   const { tokenA, tokenB, setTokenA, setTokenB } = useTokenManager();
@@ -174,32 +182,16 @@ const SwapClientPage = () => {
       toast.error(`Failed to swap ${tokenA?.symbol} for ${chain?.nativeCurrency.symbol}`);
   }, [isSwapTokenForNativeTxSuccess, isSwapTokenForNativeTxError]);
 
-  // pool-related code
-  const { data: poolAddress } = useContractRead({
-    address: poolFactory,
-    abi: uniswapV3FactoryABI,
-    functionName: 'getPool',
-    args: [selectedQuote?.tokenIn || zeroAddress, selectedQuote?.tokenOut || zeroAddress, selectedQuote?.fee || 500],
-    enabled: Boolean(selectedQuote),
-  });
-
-  const { data: slot0 } = useContractRead({
-    address: poolAddress || zeroAddress,
-    abi: uniswapV3PoolABI,
-    functionName: 'slot0',
-    enabled: Boolean(selectedQuote) && Boolean(poolAddress),
-  });
-
-  const isPairReversed = BigInt(tokenInAddress) > BigInt(tokenOutAddress);
-
-  const sqrtPriceX96 = slot0?.[0] || 0n;
-  let price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
-  if (isPairReversed) price = 1 / price;
-  const expectedAmountOut = debouncedAmountA * price;
-
-  const amountOutDifferencePercentage =
-    debouncedAmountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
-  const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
+  const {
+    poolAddress,
+    slot0,
+    isPairReversed,
+    sqrtPriceX96,
+    price,
+    expectedAmountOut,
+    amountOutDifferencePercentage,
+    amountOutDiffTooGreat,
+  } = useSwapPool(selectedQuote, tokenInAddress, tokenOutAddress, debouncedAmountA, amountB);
 
   const [tokenModalOpen, setTokenModalOpen] = useState<boolean>(false);
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);

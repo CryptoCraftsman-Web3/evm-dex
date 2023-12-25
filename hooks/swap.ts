@@ -10,6 +10,7 @@ import {
   erc20ABI,
   useAccount,
   useBalance,
+  useContractRead,
   useContractReads,
   useContractWrite,
   useNetwork,
@@ -19,6 +20,7 @@ import {
 import { useSwapProtocolAddresses } from './swap-protocol-hooks';
 import { useWrappedNativeToken } from './token-hooks';
 import { serpentSwapUtilityABI } from '@/types/wagmi/serpent-swap';
+import { uniswapV3FactoryABI, uniswapV3PoolABI } from '@/types/wagmi/uniswap-v3-core';
 
 export function useTokenAmounts(
   tokenA: Token | null,
@@ -293,10 +295,7 @@ export function useErc20ToErc20Swap(selectedQuote: Quote | null, amountInBaseUni
   };
 }
 
-export function useNativeToErc20Swap(
-  selectedQuote: Quote | null,
-  amountInBaseUnits: bigint,
-) {
+export function useNativeToErc20Swap(selectedQuote: Quote | null, amountInBaseUnits: bigint) {
   const { address: userAddress } = useAccount();
   const { serpentSwapUtility } = useSwapProtocolAddresses();
 
@@ -343,10 +342,7 @@ export function useNativeToErc20Swap(
   };
 }
 
-export function useErc20ToNativeSwap(
-  selectedQuote: Quote | null,
-  amountInBaseUnits: bigint,
-) {
+export function useErc20ToNativeSwap(selectedQuote: Quote | null, amountInBaseUnits: bigint) {
   const { address: userAddress } = useAccount();
   const { serpentSwapUtility } = useSwapProtocolAddresses();
 
@@ -390,5 +386,52 @@ export function useErc20ToNativeSwap(
     isSwapTokenForNativeTxPending,
     isSwapTokenForNativeTxSuccess,
     isSwapTokenForNativeTxError,
+  };
+}
+
+export function useSwapPool(
+  selectedQuote: Quote | null,
+  tokenInAddress: string,
+  tokenOutAddress: string,
+  debouncedAmountA: number,
+  amountB: number
+) {
+  const { poolFactory } = useSwapProtocolAddresses();
+
+  const { data: poolAddress } = useContractRead({
+    address: poolFactory,
+    abi: uniswapV3FactoryABI,
+    functionName: 'getPool',
+    args: [selectedQuote?.tokenIn || zeroAddress, selectedQuote?.tokenOut || zeroAddress, selectedQuote?.fee || 500],
+    enabled: Boolean(selectedQuote),
+  });
+
+  const { data: slot0 } = useContractRead({
+    address: poolAddress || zeroAddress,
+    abi: uniswapV3PoolABI,
+    functionName: 'slot0',
+    enabled: Boolean(selectedQuote) && Boolean(poolAddress),
+  });
+
+  const isPairReversed = BigInt(tokenInAddress) > BigInt(tokenOutAddress);
+
+  const sqrtPriceX96 = slot0?.[0] || 0n;
+  let price = Math.pow(Number(sqrtPriceX96) / 2 ** 96, 2);
+  if (isPairReversed) price = 1 / price;
+  const expectedAmountOut = debouncedAmountA * price;
+
+  const amountOutDifferencePercentage =
+    debouncedAmountA > 0 ? Math.abs(((amountB - expectedAmountOut) / expectedAmountOut) * 100) : 0;
+  const amountOutDiffTooGreat = amountOutDifferencePercentage > 5; // 5% difference
+
+  return {
+    poolAddress,
+    slot0,
+    isPairReversed,
+    sqrtPriceX96,
+    price,
+    expectedAmountOut,
+    amountOutDifferencePercentage,
+    amountOutDiffTooGreat,
   };
 }
