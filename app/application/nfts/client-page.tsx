@@ -50,7 +50,7 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                 xs={6}
                 md={4}
                 lg={3}
-                xl={2}
+                xl={2.4}
               >
                 <NFTItem
                   nftCacheRecord={nft}
@@ -100,7 +100,7 @@ export default function NFTsClientPage({ userNFTs, nftContracts }: NFTsClientPag
                 xs={6}
                 md={4}
                 lg={3}
-                xl={2}
+                xl={2.4}
               >
                 <FractionalizedNFTItem
                   nftContractAddress={nft.nftContractAddress}
