@@ -22,6 +22,7 @@ import {
   useWaitForTransaction,
 } from 'wagmi';
 import SkeletonLoading from './skeleton-loading';
+import saveErc20Token from '@/lib/actions/tokens';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -75,8 +76,8 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   useEffect(() => {
     if (fractionalizeSucceeded) {
       toast.success(`Fractionalized ${metadata?.name || 'Unknown NFT'} successfully`);
-      refetchSerpentSwapNFTContractAddress().then(() => {
-        refetchFracTokenData();
+      refetchSerpentSwapNFTContractAddress().then(async () => {
+        await refetchFracTokenData();
       });
       setTimeout(() => {
         // wait for 3 seconds before caching nft so that we can fetch updated NFT data
@@ -174,6 +175,14 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
       toast.error(`Failed to redeem ${metadata?.name || 'Unknown NFT'}`);
     }
   }, [redeemSucceeded, redeemFailed]);
+
+  useEffect(() => {
+    if (!serpentSwapNFTContractAddress) return;
+    if (!fracTokenName) return;
+    if (!fracTokenSymbol) return;
+
+    saveErc20Token(serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol, 18);
+  }, [serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol]);
 
   return (
     <>
