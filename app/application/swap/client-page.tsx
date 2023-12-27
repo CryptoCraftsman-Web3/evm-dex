@@ -1,6 +1,6 @@
 'use client';
 
-import { Paper, Typography, Box, Grid, Button, Modal, IconButton, Input, Divider, colors } from '@mui/material';
+import { Paper, Typography, Box, Grid, Button, Modal, IconButton, Input, Divider, colors, Alert } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useWrappedNativeToken } from '@/hooks/token-hooks';
@@ -310,22 +310,31 @@ const SwapClientPage = () => {
                 {isFetchingQuotes ? 'Fetching quotes...' : `Approve ${tokenA?.symbol}`}
               </LoadingButton>
             ) : (
-              <LoadingButton
-                variant="widget"
-                fullWidth
-                disabled={isFetchingQuotes}
-                loading={
-                  isSwappingTokens ||
-                  isSwapTokensTxPending ||
-                  isSwappingNativeForToken ||
-                  isSwapNativeForTokenTxPending ||
-                  isSwappingTokenForNative ||
-                  isSwapTokenForNativeTxPending
-                }
-                onClick={swap}
-              >
-                {isFetchingQuotes ? 'Fetching quotes...' : <>{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</>}
-              </LoadingButton>
+              <>
+                <LoadingButton
+                  variant="widget"
+                  fullWidth
+                  disabled={isFetchingQuotes}
+                  loading={
+                    isSwappingTokens ||
+                    isSwapTokensTxPending ||
+                    isSwappingNativeForToken ||
+                    isSwapNativeForTokenTxPending ||
+                    isSwappingTokenForNative ||
+                    isSwapTokenForNativeTxPending
+                  }
+                  onClick={swap}
+                >
+                  {isFetchingQuotes ? 'Fetching quotes...' : <>{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</>}
+                </LoadingButton>
+
+                {amountOutDiffTooGreat && (
+                  <Alert severity="warning">
+                    You will be receiving less than expected. This is likely due to the pool not having enough
+                    liquidity.
+                  </Alert>
+                )}
+              </>
             )}
           </Paper>
         </Grid>
