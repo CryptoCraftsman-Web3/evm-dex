@@ -22,7 +22,7 @@ import {
   useWaitForTransaction,
 } from 'wagmi';
 import SkeletonLoading from './skeleton-loading';
-import saveErc20Token from '@/lib/actions/tokens';
+import { deleteErc20Token, saveErc20Token } from '@/lib/actions/tokens';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -166,6 +166,7 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
   useEffect(() => {
     if (redeemSucceeded) {
+      if (serpentSwapNFTContractAddress) deleteErc20Token(serpentSwapNFTContractAddress);
       toast.success(`Redeemed ${metadata?.name || 'Unknown NFT'} successfully`);
       refetchFracTokenData();
       refetchSerpentSwapNFTContractAddress();
