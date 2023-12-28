@@ -4,7 +4,7 @@ import { useDeployAndFractionalize, useFractionalContract, useNFTApproval, useNF
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
-import { cacheERC721Token } from '@/lib/nfts';
+import { cacheERC721Token, getNFTs } from '@/lib/nfts';
 import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
 import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
@@ -132,8 +132,10 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
   useEffect(() => {
     if (approveFracAllowanceSucceeded) {
       toast.success(`Approved fractional token allowance successfully`);
-      refetchFracTokenData();
-      refetchSerpentSwapNFTContractAddress();
+      refetchSerpentSwapNFTContractAddress().then(async () => {
+        await refetchFracTokenData();
+        await refetchRedeemPrepare();
+      });
     }
 
     if (approveFracAllowanceFailed) {
@@ -142,16 +144,20 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     refetchFracTokenData();
   }, [approveFracAllowanceSucceeded, approveFracAllowanceFailed]);
 
-  const { config: redeemConfig } = usePrepareContractWrite({
+  const redeemEnabled = fracTokenUserBalance === fracTokenTotalSupply && Boolean(serpentSwapNFTContractAddress) && serpentSwapNFTContractAddress !== zeroAddress;
+
+  const { config: redeemConfig, refetch: refetchRedeemPrepare } = usePrepareContractWrite({
     address: serpentSwapNFTManager,
     abi: serpentSwapNftManagerABI,
     functionName: 'redeem',
     args: [serpentSwapNFTContractAddress || zeroAddress],
-    enabled:
-      fracTokenUserBalance === fracTokenTotalSupply &&
-      Boolean(serpentSwapNFTContractAddress) &&
-      serpentSwapNFTContractAddress !== zeroAddress,
+    enabled: redeemEnabled
   });
+
+  console.log('fracTokenUserBalance', fracTokenUserBalance);
+  console.log('fracTokenTotalSupply', fracTokenTotalSupply);
+  console.log('serpentSwapNFTContractAddress', serpentSwapNFTContractAddress);
+  console.log('redeemEnabled', redeemEnabled);
 
   const { data: redeemData, writeAsync: redeemNFT, isLoading: isSubmittingRedeemTx } = useContractWrite(redeemConfig);
 
@@ -166,10 +172,14 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
   useEffect(() => {
     if (redeemSucceeded) {
-      if (serpentSwapNFTContractAddress) deleteErc20Token(serpentSwapNFTContractAddress);
+      if (serpentSwapNFTContractAddress) {
+        deleteErc20Token(serpentSwapNFTContractAddress);
+        getNFTs(serpentSwapNFTContractAddress, true, true);
+      }
       toast.success(`Redeemed ${metadata?.name || 'Unknown NFT'} successfully`);
-      refetchFracTokenData();
-      refetchSerpentSwapNFTContractAddress();
+      refetchSerpentSwapNFTContractAddress().then(async () => {
+        await refetchFracTokenData();
+      });
     }
 
     if (redeemFailed) {
@@ -184,6 +194,8 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
 
     saveErc20Token(serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol, 18);
   }, [serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol]);
+
+  console.log('serpentSwapNFTContractAddress', serpentSwapNFTContractAddress);
 
   return (
     <>
