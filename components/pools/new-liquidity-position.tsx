@@ -31,9 +31,10 @@ import PoolButtons from './pool-buttons';
 import SelectFeeTier from './select-fee-tier';
 import SetPriceRange from './set-price-range';
 import StartingPrice from './starting-price';
+import SelectTokenButton from '../common/select-token-button';
 
 type NewLiquidityPositionProps = {
-  refetchPoolsCount: () => void;
+  refetchPoolsCount?: () => void;
 };
 
 const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) => {
@@ -65,6 +66,10 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
 
   const [tokenA, setTokenA] = useState<Token | null>(null);
   const [tokenB, setTokenB] = useState<Token | null>(null);
+
+  const [tokenAModalOpen, setTokenAModalOpen] = useState<boolean>(false);
+  const [tokenBModalOpen, setTokenBModalOpen] = useState<boolean>(false);
+
   const [feeTier, setFeeTier] = useState<FeeTier>(config.feeTiers[0]);
   const [startingPrice, setStartingPrice] = useState<number>(0);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -129,7 +134,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
     setAmountB(0);
     handleClose();
 
-    refetchPoolsCount();
+    if (refetchPoolsCount) refetchPoolsCount();
   };
 
   return (
@@ -184,16 +189,28 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
                   width="100%"
                   justifyContent="stretch"
                 >
-                  <SelectToken
-                    inputLabel="Pair Token A"
+                  <SelectTokenButton
                     token={tokenA}
-                    setToken={setTokenA}
+                    onClick={() => setTokenAModalOpen(true)}
                   />
 
                   <SelectToken
-                    inputLabel="Pair Token B"
+                    tokenModalOpen={tokenAModalOpen}
+                    setTokenModalOpen={setTokenAModalOpen}
+                    selectedToken={tokenA}
+                    setSelectedToken={setTokenA}
+                  />
+
+                  <SelectTokenButton
                     token={tokenB}
-                    setToken={setTokenB}
+                    onClick={() => setTokenBModalOpen(true)}
+                  />
+
+                  <SelectToken
+                    tokenModalOpen={tokenBModalOpen}
+                    setTokenModalOpen={setTokenBModalOpen}
+                    selectedToken={tokenB}
+                    setSelectedToken={setTokenB}
                   />
                 </Stack>
                 {tokenA !== null && tokenB !== null && tokenA?.address === tokenB?.address && (
