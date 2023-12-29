@@ -2,27 +2,25 @@
 
 import { useDeployAndFractionalize, useFractionalContract, useNFTApproval, useNFTMetadataLoader } from '@/hooks/nfts';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
+import { deleteErc20Token, saveErc20Token } from '@/lib/actions/tokens';
 import { NFTCacheRecord } from '@/lib/db-schemas/nft-cache-record';
 import { NFTContractCachedLog } from '@/lib/db-schemas/nft-contract-cached-log';
 import { cacheERC721Token, getNFTs } from '@/lib/nfts';
 import { serpentSwapNftABI, serpentSwapNftManagerABI } from '@/types/wagmi/serpent-swap';
 import { LoadingButton } from '@mui/lab';
-import { Button, Grid, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material';
+import { Button, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { formatUnits, parseUnits, zeroAddress } from 'viem';
+import { formatUnits, zeroAddress } from 'viem';
 import {
   useAccount,
-  useContractRead,
-  useContractReads,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransaction
 } from 'wagmi';
 import SkeletonLoading from './skeleton-loading';
-import { deleteErc20Token, saveErc20Token } from '@/lib/actions/tokens';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -144,14 +142,17 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     refetchFracTokenData();
   }, [approveFracAllowanceSucceeded, approveFracAllowanceFailed]);
 
-  const redeemEnabled = fracTokenUserBalance === fracTokenTotalSupply && Boolean(serpentSwapNFTContractAddress) && serpentSwapNFTContractAddress !== zeroAddress;
+  const redeemEnabled =
+    fracTokenUserBalance === fracTokenTotalSupply &&
+    Boolean(serpentSwapNFTContractAddress) &&
+    serpentSwapNFTContractAddress !== zeroAddress;
 
   const { config: redeemConfig, refetch: refetchRedeemPrepare } = usePrepareContractWrite({
     address: serpentSwapNFTManager,
     abi: serpentSwapNftManagerABI,
     functionName: 'redeem',
     args: [serpentSwapNFTContractAddress || zeroAddress],
-    enabled: redeemEnabled
+    enabled: redeemEnabled,
   });
 
   console.log('fracTokenUserBalance', fracTokenUserBalance);
