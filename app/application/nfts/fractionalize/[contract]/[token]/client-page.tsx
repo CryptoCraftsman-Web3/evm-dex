@@ -21,6 +21,9 @@ import {
   useWaitForTransaction
 } from 'wagmi';
 import SkeletonLoading from './skeleton-loading';
+import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
+import { useNativeToken } from '@/hooks/token-hooks';
+import { Token } from '@/types/common';
 
 type FractionalizeNFTClientPageProps = {
   nft: NFTCacheRecord;
@@ -196,7 +199,14 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     saveErc20Token(serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol, 18);
   }, [serpentSwapNFTContractAddress, fracTokenName, fracTokenSymbol]);
 
-  console.log('serpentSwapNFTContractAddress', serpentSwapNFTContractAddress);
+  const nativeToken = useNativeToken();
+  const fractionalToken: Token = {
+    address: serpentSwapNFTContractAddress || zeroAddress,
+    name: fracTokenName || '',
+    symbol: fracTokenSymbol || '',
+    decimals: 18,
+    isNative: false,
+  };
 
   return (
     <>
@@ -403,13 +413,11 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                           </Typography>
                         </Stack>
 
-                        <Button
-                          variant="contained"
-                          size="large"
-                          fullWidth
-                        >
-                          Add to Liquidity Pool
-                        </Button>
+                        <NewLiquidityPosition
+                          buttonLabel={`Create Liquidity Position for ${fracTokenSymbol}`}
+                          preselectedTokenA={fractionalToken}
+                          preselectedTokenB={nativeToken}
+                        />
 
                         {fracTokenUserBalance === fracTokenTotalSupply && (
                           <Stack direction="column">
