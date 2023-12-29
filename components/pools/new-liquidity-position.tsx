@@ -34,10 +34,18 @@ import StartingPrice from './starting-price';
 import SelectTokenButton from '../common/select-token-button';
 
 type NewLiquidityPositionProps = {
+  buttonLabel?: string;
+  preselectedTokenA?: Token;
+  preselectedTokenB?: Token;
   refetchPoolsCount?: () => void;
 };
 
-const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) => {
+const NewLiquidityPosition = ({
+  buttonLabel,
+  preselectedTokenA,
+  preselectedTokenB,
+  refetchPoolsCount,
+}: NewLiquidityPositionProps) => {
   const { isConnected } = useAccount();
   const { chain } = useNetwork();
   const [open, setOpen] = useState(false);
@@ -64,8 +72,8 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
     handleClose();
   };
 
-  const [tokenA, setTokenA] = useState<Token | null>(null);
-  const [tokenB, setTokenB] = useState<Token | null>(null);
+  const [tokenA, setTokenA] = useState<Token | null>(preselectedTokenA || null);
+  const [tokenB, setTokenB] = useState<Token | null>(preselectedTokenB || null);
 
   const [tokenAModalOpen, setTokenAModalOpen] = useState<boolean>(false);
   const [tokenBModalOpen, setTokenBModalOpen] = useState<boolean>(false);
@@ -143,7 +151,7 @@ const NewLiquidityPosition = ({ refetchPoolsCount }: NewLiquidityPositionProps) 
         variant="contained"
         onClick={handleOpen}
       >
-        Add Liquidity
+        {buttonLabel || 'Add Liquidity'}
       </Button>
 
       <Dialog
