@@ -37,10 +37,10 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
   const tokenIds =
     tokenIdResults !== undefined
       ? (tokenIdResults
-          .map((t) => {
-            return t.status === 'success' ? (t.result as bigint) : undefined;
-          })
-          .filter((t) => t !== undefined) as bigint[])
+        .map((t) => {
+          return t.status === 'success' ? (t.result as bigint) : undefined;
+        })
+        .filter((t) => t !== undefined) as bigint[])
       : [];
 
   const { data: positionResults, isLoading: isGettingPositions } = useContractReads({
@@ -125,7 +125,7 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
         </>
       ) : (
         <>
-          <Stack
+          {/* <Stack
             direction="row"
             justifyContent="space-between"
             alignItems="center"
@@ -146,18 +146,22 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
             </Link>
           </Stack>
 
-          <Divider />
-
-          {positions.map((position, index) => {
-            return (
-              <Pool
-                key={index}
-                tokenId={position.tokenId}
-                position={position}
-                hideClosedPositions={hideClosedPositions}
-              />
-            );
-          })}
+          <Divider /> */}
+          <Stack
+            direction="column"
+            spacing='17px'
+          >
+            {positions.map((position, index) => {
+              return (
+                <Pool
+                  key={index}
+                  tokenId={position.tokenId}
+                  position={position}
+                  hideClosedPositions={hideClosedPositions}
+                />
+              );
+            })}
+          </Stack>
         </>
       )}
     </Stack>

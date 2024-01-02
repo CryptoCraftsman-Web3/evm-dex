@@ -1,7 +1,8 @@
 import { Position, Token } from '@/types/common';
-import { Stack, Typography } from '@mui/material';
+import { Paper, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { erc20ABI, useContractReads } from 'wagmi';
+import Tag from '@/components/tag';
 
 type PoolProps = {
   tokenId: bigint;
@@ -69,26 +70,29 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
   const maxPrice = 1.0001 ** position.tickUpper / 10 ** (tokenB.decimals - tokenA.decimals);
 
   return hideClosedPositions && position.liquidity === 0n ? null : (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      onClick={() => {}}
-    >
-      <Link href={`/application/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
+    <Paper>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        width="100%"
+        onClick={() => { }}
+      >
         <Stack
           direction="column"
-          spacing={0}
+          spacing="20px"
         >
           <Stack
             direction="row"
-            spacing={2}
+            spacing="16px"
             alignItems="center"
           >
-            <Typography variant="h6">
-              {tokenA.symbol}/{tokenB.symbol}
-            </Typography>
-            <Typography variant="body2">{position.fee / 10_000}% Fee</Typography>
+            <Link href={`/application/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
+              <Typography variant="subtitle1">
+                {tokenA.symbol} - {tokenB.symbol}
+              </Typography>
+            </Link>
+            <Tag color="green">{position.fee / 10_000}%</Tag>
           </Stack>
 
           <Stack
@@ -96,47 +100,17 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
             spacing={1}
             alignItems="center"
           >
-            <Typography
-              variant="body2"
-              color="GrayText"
-            >
-              Min:
-            </Typography>
-
             <Typography variant="body2">
-              {minPrice.toFixed(4)} {tokenB.symbol} per {tokenA.symbol}
-            </Typography>
-
-            <Typography
-              variant="body2"
-              color="GrayText"
-            >
-              ↔
-            </Typography>
-
-            <Typography
-              variant="body2"
-              color="GrayText"
-            >
-              Max:
-            </Typography>
-
-            <Typography variant="body2">
-              {maxPrice.toFixed(4)} {tokenB.symbol} per {tokenA.symbol}
+              {`Min ${minPrice.toFixed(4)} ${tokenB.symbol} per ${tokenA.symbol} / Max ${maxPrice.toFixed(4)} ${tokenB.symbol} per ${tokenA.symbol}`}
             </Typography>
           </Stack>
         </Stack>
-      </Link>
 
-      <Typography
-        variant="body1"
-        sx={{
-          color: position.liquidity > 0n ? 'success.main' : 'error.main',
-        }}
-      >
-        {position.liquidity > 0n ? 'Open' : 'Closed'}
-      </Typography>
-    </Stack>
+        <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
+          {position.liquidity > 0n ? 'Open' : 'Closed'}
+        </Tag>
+      </Stack>
+    </Paper>
   );
 };
 

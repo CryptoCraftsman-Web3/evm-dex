@@ -52,7 +52,7 @@ const Header = ({ location }: HeaderProps) => {
           item
           xs={7}
           sm={4}
-          md={3}
+          md={9}
           display={'flex'}
           alignItems={'flex-start'}
           gap={'40px'}
@@ -74,18 +74,19 @@ const Header = ({ location }: HeaderProps) => {
 
         <Grid
           item
-          xs={4}
-        >
-        </Grid>
-
-        <Grid
-          item
-          xs={4}
+          xs={2}
           sx={{
             textAlign: 'right',
           }}
         >
-          {location === 'home' ? <LaunchAppButton /> : <ConnectButton />}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            {location === 'home' ? <LaunchAppButton /> : <ConnectButton />}
+          </Box>
         </Grid>
       </Grid>
 

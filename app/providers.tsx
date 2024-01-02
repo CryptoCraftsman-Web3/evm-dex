@@ -2,6 +2,7 @@
 
 import ConnectKitAuth from '@/components/connectkit-auth';
 import { xrplDevnet } from '@/lib/xrpl-chains';
+import { alertThemeOptions } from '@/theme/alert-theme-options';
 import { buttonThemeOptions } from '@/theme/button-theme-options';
 import { typographyThemeOptions } from '@/theme/typography-theme-options';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -103,6 +104,7 @@ export const theme = createTheme({
         }
       }
     },
+    MuiAlert: alertThemeOptions,
     MuiInputBase: {
       styleOverrides: {
         root: {

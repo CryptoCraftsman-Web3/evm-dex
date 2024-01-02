@@ -4,7 +4,7 @@ import NotSignedIn from '@/components/common/not-signed-in';
 
 const PoolsPage = async () => {
   const session = await getSession();
-  if (!session) return <NotSignedIn />;
+  // if (!session) return <NotSignedIn />;
 
   return <PoolsClientPage />;
 };

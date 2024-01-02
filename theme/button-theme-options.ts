@@ -39,7 +39,10 @@ export const buttonThemeOptions: Components['MuiButton'] = {
     },
     endIcon: {
       margin: 0
-    }
+    },
+    startIcon: {
+      margin: 0
+    },
   },
   variants: [
     {
@@ -88,6 +91,8 @@ export const buttonThemeOptions: Components['MuiButton'] = {
         fontWeight: 600,
         lineHeight: '1.5rem',
         padding: '10px 28px',
+        gap: '4px',
+        maxHeight: '44px'
       }
     },
     {

@@ -107,11 +107,11 @@ const NewLiquidityPosition = ({
   const poolAddress =
     tokenA !== null && tokenB !== null && tokenA?.address !== tokenB?.address
       ? (computePoolAddress({
-          factoryAddress: poolFactory,
-          tokenA: uniswapTokenA,
-          tokenB: uniswapTokenB,
-          fee: feeTier.value,
-        }) as `0x${string}`)
+        factoryAddress: poolFactory,
+        tokenA: uniswapTokenA,
+        tokenB: uniswapTokenB,
+        fee: feeTier.value,
+      }) as `0x${string}`)
       : zeroAddress;
 
   const { data: poolAddressFromFactory, refetch: refetchPoolAddressFromFactory } = useContractRead({
@@ -148,8 +148,10 @@ const NewLiquidityPosition = ({
   return (
     <>
       <Button
-        variant="contained"
+        variant="widget"
+        size='small'
         onClick={handleOpen}
+        startIcon={<img src="/icons/add.svg" alt="plus icon" width='20px' height='20px' />}
       >
         {buttonLabel || 'Add Liquidity'}
       </Button>
