@@ -105,6 +105,7 @@ const SelectToken = ({ tokenModalOpen, setTokenModalOpen, selectedToken, setSele
           >
             {tokensWithNative.map((token, index) => (
               <Box
+                key={index}
                 sx={{
                   display: 'flex',
                   flexDirection: 'row',

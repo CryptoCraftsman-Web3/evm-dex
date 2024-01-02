@@ -1,5 +1,5 @@
 import { Position, Token } from '@/types/common';
-import { Paper, Stack, Typography } from '@mui/material';
+import { Paper, Stack, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 import { erc20ABI, useContractReads } from 'wagmi';
 import Tag from '@/components/tag';
@@ -80,11 +80,22 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
       >
         <Stack
           direction="column"
-          spacing="20px"
+          gap={{ xs: '16px', md: '20px' }}
         >
           <Stack
+            sx={{ display: { xs: 'flex', md: 'none' } }}
             direction="row"
-            spacing="16px"
+            justifyContent={'space-between'}
+          >
+            <Tag color="green">{position.fee / 10_000}%</Tag>
+            <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
+              {position.liquidity > 0n ? 'Open' : 'Closed'}
+            </Tag>
+          </Stack>
+
+          <Stack
+            direction="row"
+            gap="16px"
             alignItems="center"
           >
             <Link href={`/application/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
@@ -92,7 +103,9 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
                 {tokenA.symbol} - {tokenB.symbol}
               </Typography>
             </Link>
-            <Tag color="green">{position.fee / 10_000}%</Tag>
+            <Box sx={{ display: { xs: 'none', md: 'initial' } }}>
+              <Tag color="green">{position.fee / 10_000}%</Tag>
+            </Box>
           </Stack>
 
           <Stack
@@ -106,9 +119,11 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
           </Stack>
         </Stack>
 
-        <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
-          {position.liquidity > 0n ? 'Open' : 'Closed'}
-        </Tag>
+        <Box sx={{ display: { xs: 'none', md: 'initial' } }}>
+          <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
+            {position.liquidity > 0n ? 'Open' : 'Closed'}
+          </Tag>
+        </Box>
       </Stack>
     </Paper>
   );
