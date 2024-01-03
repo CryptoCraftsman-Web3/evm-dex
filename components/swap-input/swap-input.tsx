@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { Box, Typography, Stack, Button, Input } from "@mui/material"
-import { colors } from "@/theme/default-colors"
+import { Box, Typography, Stack, Button, Input } from '@mui/material';
+import { colors } from '@/theme/default-colors';
 import { Token } from '@/types/common';
 
 type SwapInputProps = {
@@ -9,13 +9,34 @@ type SwapInputProps = {
   token: Token | null;
   onTokenChange: (token: Token | null) => void;
   onClick: () => void;
-  amount: number;
+  amount: number | null;
   setAmount: (amount: number) => void;
   disabled?: boolean;
   fixedDecimals?: number;
-}
+  readOnly?: boolean;
+};
 
-const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, disabled, fixedDecimals }: SwapInputProps) => {
+const SwapInput = ({
+  side,
+  token,
+  onTokenChange,
+  onClick,
+  amount,
+  setAmount,
+  disabled,
+  fixedDecimals,
+  readOnly,
+}: SwapInputProps) => {
+  let inputValue = "";
+
+  if (amount !== null && fixedDecimals) {
+    inputValue = amount.toFixed(fixedDecimals);
+  }
+
+  if (amount !== null && !fixedDecimals) {
+    inputValue = amount.toString();
+  }
+
   return (
     <Box
       sx={{
@@ -26,29 +47,26 @@ const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, dis
         width: '100%',
         display: 'inline-flex',
         justifyContent: 'space-between',
-        opacity: disabled ? 0.5 : 1
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       <Stack gap={'2px'}>
-        <Typography
-          variant="footnote"
-        >
-          {side === 'A' ? 'You pay' : 'You get'}
-        </Typography>
+        <Typography variant="footnote">{side === 'A' ? 'You pay' : 'You get'}</Typography>
         <Input
-          type='number'
-          placeholder={'0'}
+          type="number"
           fullWidth
           sx={{
             display: 'flex',
             alignItems: 'flex-end',
             height: '100%',
-            borderBottom: 'none'
+            borderBottom: 'none',
           }}
-          value={amount && fixedDecimals ? amount.toFixed(fixedDecimals) : amount}
+          value={inputValue}
           onChange={(e) => {
-            setAmount(Number(e.target.value))
+            setAmount(Number(e.target.value));
           }}
+          disabled={disabled}
+          readOnly={readOnly}
         />
       </Stack>
       <Box
@@ -61,11 +79,25 @@ const SwapInput = ({ side, token, onTokenChange, onClick, amount, setAmount, dis
           size="small"
           sx={{
             backgroundColor: token && colors.secBG,
-            p: token && '9px 12px'
+            p: token && '9px 12px',
           }}
           onClick={onClick}
-          startIcon={token && <img style={{ width: '24px', height: '24px' }} src={'/icons/unknown-token.svg'} alt="unknown token icon" />}
-          endIcon={<img src={'/icons/keyboard_arrow_down.svg'} style={{ filter: 'invert(1)' }} alt="drop down icon" />}
+          startIcon={
+            token && (
+              <img
+                style={{ width: '24px', height: '24px' }}
+                src={'/icons/unknown-token.svg'}
+                alt="unknown token icon"
+              />
+            )
+          }
+          endIcon={
+            <img
+              src={'/icons/keyboard_arrow_down.svg'}
+              style={{ filter: 'invert(1)' }}
+              alt="drop down icon"
+            />
+          }
         >
           {token ? token.symbol : 'Select token'}
         </Button>

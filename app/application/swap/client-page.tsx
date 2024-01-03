@@ -293,10 +293,11 @@ const SwapClientPage = () => {
                   setSelectedToken(tokenB);
                   setActiveTokenInput('B');
                 }}
-                amount={amountB}
+                amount={selectedQuote ? amountB : null}
                 setAmount={setAmountB}
                 disabled={isFetchingQuotes}
                 fixedDecimals={6}
+                readOnly
               />
             </Box>
             {notEnoughTokenAAllowance && tokenA && tokenB ? (
@@ -328,7 +329,7 @@ const SwapClientPage = () => {
                   {isFetchingQuotes ? 'Fetching quotes...' : <>{isUserWalletConnected ? 'Swap' : 'Connect Wallet'}</>}
                 </LoadingButton>
 
-                {amountOutDiffTooGreat && (
+                {amountOutDiffTooGreat && selectedQuote && (
                   <Alert severity="warning">
                     You will be receiving less than expected. This is likely due to the pool not having enough
                     liquidity.
