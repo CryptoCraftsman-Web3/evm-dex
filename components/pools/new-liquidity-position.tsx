@@ -167,7 +167,7 @@ const NewLiquidityPosition = ({
         }}
       >
         <DialogTitle>
-          <b>Add Liquidity</b>
+          Add Position
           <IconButton
             onClick={handleClose}
             sx={{

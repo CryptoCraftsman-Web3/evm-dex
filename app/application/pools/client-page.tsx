@@ -4,7 +4,7 @@ import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
 import PoolsList from '@/components/pools/pools-list';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Button, Paper, Stack, Typography, Grid, Box } from '@mui/material';
+import { Button, Paper, Stack, Typography, Grid, Box, Modal, IconButton } from '@mui/material';
 import { useModal } from 'connectkit';
 import { IoFileTrayStackedOutline } from 'react-icons/io5';
 import { useAccount, useContractRead } from 'wagmi';
@@ -44,7 +44,7 @@ const PoolsClientPage = () => {
             marginBottom={'20px'}
           >
             <Typography variant="title">
-              <b>Pools</b>
+              Pools
             </Typography>
 
             <NewLiquidityPosition refetchPoolsCount={refetchPoolsCount} />

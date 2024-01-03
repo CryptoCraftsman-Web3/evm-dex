@@ -89,7 +89,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
           >
             <Tag color="green">{position.fee / 10_000}%</Tag>
             <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
-              {position.liquidity > 0n ? 'Open' : 'Closed'}
+              {position.liquidity > 0n ? 'Active' : 'Closed'}
             </Tag>
           </Stack>
 
@@ -121,7 +121,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
 
         <Box sx={{ display: { xs: 'none', md: 'initial' } }}>
           <Tag color={position.liquidity > 0n ? 'darkGreen' : 'red'}>
-            {position.liquidity > 0n ? 'Open' : 'Closed'}
+            {position.liquidity > 0n ? 'Active' : 'Closed'}
           </Tag>
         </Box>
       </Stack>

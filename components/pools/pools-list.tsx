@@ -1,11 +1,12 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
-import { Divider, Link, Skeleton, Stack, Typography } from '@mui/material';
+import { Skeleton, Stack, Button } from '@mui/material';
+import { useState } from 'react';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractReads } from 'wagmi';
 import Pool from './pool';
-import { useState } from 'react';
+import TokenIdModal from './token-id-modal';
 
 type PoolsListProps = {
   poolsCount: bigint;
@@ -104,28 +105,31 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
     setHideClosedPositions(!hideClosedPositions);
   };
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
   return (
-    <Stack
-      direction="column"
-      spacing={2}
-    >
-      {isGettingPoolsCount || isGettingTokenIds || isGettingPositions ? (
-        <>
-          {Array(14)
-            .fill(0)
-            .map((_, index) => {
-              return (
-                <Skeleton
-                  key={index}
-                  variant="rounded"
-                  width="100%"
-                />
-              );
-            })}
-        </>
-      ) : (
-        <>
-          {/* <Stack
+    <>
+      <Stack
+        direction="column"
+        spacing={2}
+      >
+        {isGettingPoolsCount || isGettingTokenIds || isGettingPositions ? (
+          <>
+            {Array(14)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <Skeleton
+                    key={index}
+                    variant="rounded"
+                    width="100%"
+                  />
+                );
+              })}
+          </>
+        ) : (
+          <>
+            {/* <Stack
             direction="row"
             justifyContent="space-between"
             alignItems="center"
@@ -147,24 +151,27 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
           </Stack>
 
           <Divider /> */}
-          <Stack
-            direction="column"
-            spacing='17px'
-          >
-            {positions.map((position, index) => {
-              return (
-                <Pool
-                  key={index}
-                  tokenId={position.tokenId}
-                  position={position}
-                  hideClosedPositions={hideClosedPositions}
-                />
-              );
-            })}
-          </Stack>
-        </>
-      )}
-    </Stack>
+            <Stack
+              direction="column"
+              spacing='17px'
+            >
+              {positions.map((position, index) => {
+                return (
+                  <Pool
+                    key={index}
+                    tokenId={position.tokenId}
+                    position={position}
+                    hideClosedPositions={hideClosedPositions}
+                  />
+                );
+              })}
+            </Stack>
+          </>
+        )}
+      </Stack>
+      <TokenIdModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Button variant='widget' onClick={() => setIsModalOpen(true)}>test modal open</Button>
+    </>
   );
 };
 
