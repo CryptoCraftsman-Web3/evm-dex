@@ -188,10 +188,11 @@ const AddLiquidity = ({
   return (
     <>
       <Button
-        variant="contained"
+        variant="widget"
         color="primary"
         size="large"
         onClick={handleOpen}
+        fullWidth
       >
         Add Liquidity
       </Button>
