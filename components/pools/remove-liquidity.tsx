@@ -132,9 +132,10 @@ const RemoveLiquidity = ({
   return (
     <>
       <Button
-        variant="contained"
+        variant="widget"
         size="large"
         onClick={handleOpen}
+        fullWidth
       >
         Remove Liquidity
       </Button>
