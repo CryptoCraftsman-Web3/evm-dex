@@ -3,14 +3,16 @@ import { Paper, Stack, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 import { erc20ABI, useContractReads } from 'wagmi';
 import Tag from '@/components/tag';
+import { set } from 'lodash';
 
 type PoolProps = {
   tokenId: bigint;
   position: Position;
   hideClosedPositions: boolean;
+  setSelectedTokenId: (tokenId: bigint) => void;
 };
 
-const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
+const Pool = ({ tokenId, position, hideClosedPositions, setSelectedTokenId }: PoolProps) => {
   const tokenAAddress = position.token0;
   const tokenBAddress = position.token1;
 
@@ -76,7 +78,7 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
         justifyContent="space-between"
         alignItems="center"
         width="100%"
-        onClick={() => { }}
+        onClick={() => {}}
       >
         <Stack
           direction="column"
@@ -98,7 +100,11 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
             gap="16px"
             alignItems="center"
           >
-            <Link href={`/application/pools/${tokenId.toString()}`} style={{ textDecoration: 'none' }}>
+            <Link
+              href={`javascript:void(0);`}
+              style={{ textDecoration: 'none' }}
+              onClick={() => setSelectedTokenId(tokenId)}
+            >
               <Typography variant="subtitle1">
                 {tokenA.symbol} - {tokenB.symbol}
               </Typography>
@@ -114,7 +120,9 @@ const Pool = ({ tokenId, position, hideClosedPositions }: PoolProps) => {
             alignItems="center"
           >
             <Typography variant="body2">
-              {`Min ${minPrice.toFixed(4)} ${tokenB.symbol} per ${tokenA.symbol} / Max ${maxPrice.toFixed(4)} ${tokenB.symbol} per ${tokenA.symbol}`}
+              {`Min ${minPrice.toFixed(4)} ${tokenB.symbol} per ${tokenA.symbol} / Max ${maxPrice.toFixed(4)} ${
+                tokenB.symbol
+              } per ${tokenA.symbol}`}
             </Typography>
           </Stack>
         </Stack>
