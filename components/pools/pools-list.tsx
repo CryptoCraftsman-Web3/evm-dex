@@ -2,7 +2,7 @@ import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { Position } from '@/types/common';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { Skeleton, Stack, Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zeroAddress } from 'viem';
 import { useAccount, useContractReads } from 'wagmi';
 import Pool from './pool';
@@ -38,10 +38,10 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
   const tokenIds =
     tokenIdResults !== undefined
       ? (tokenIdResults
-        .map((t) => {
-          return t.status === 'success' ? (t.result as bigint) : undefined;
-        })
-        .filter((t) => t !== undefined) as bigint[])
+          .map((t) => {
+            return t.status === 'success' ? (t.result as bigint) : undefined;
+          })
+          .filter((t) => t !== undefined) as bigint[])
       : [];
 
   const { data: positionResults, isLoading: isGettingPositions } = useContractReads({
@@ -105,7 +105,20 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
     setHideClosedPositions(!hideClosedPositions);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState<boolean>(false);
+  const [selectedTokenId, setSelectedTokenId] = useState<bigint | null>(null);
+
+  useEffect(() => {
+    if (selectedTokenId !== null) {
+      setIsTokenModalOpen(true);
+    }
+  }, [selectedTokenId]);
+
+  useEffect(() => {
+    if (!isTokenModalOpen) {
+      setSelectedTokenId(null);
+    }
+  }, [isTokenModalOpen]);
 
   return (
     <>
@@ -129,31 +142,9 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
           </>
         ) : (
           <>
-            {/* <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            {hideClosedPositions ? (
-              <Typography variant="h6">
-                You have {positions.filter((p) => p.liquidity > 0n).length} open positions
-              </Typography>
-            ) : (
-              <Typography variant="h6">You have {positions.length} positions</Typography>
-            )}
-
-            <Link
-              onClick={toggleHideClosedPositions}
-              sx={{ cursor: 'pointer', textDecoration: 'none', textAlign: 'right' }}
-            >
-              {hideClosedPositions ? 'Show Closed Positions' : 'Hide Closed Positions'}
-            </Link>
-          </Stack>
-
-          <Divider /> */}
             <Stack
               direction="column"
-              spacing='17px'
+              spacing="17px"
             >
               {positions.map((position, index) => {
                 return (
@@ -162,6 +153,7 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
                     tokenId={position.tokenId}
                     position={position}
                     hideClosedPositions={hideClosedPositions}
+                    setSelectedTokenId={setSelectedTokenId}
                   />
                 );
               })}
@@ -169,8 +161,13 @@ const PoolsList = ({ poolsCount, isGettingPoolsCount, refetchPoolsCount }: Pools
           </>
         )}
       </Stack>
-      <TokenIdModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      <Button variant='widget' onClick={() => setIsModalOpen(true)}>test modal open</Button>
+      {selectedTokenId !== null && (
+        <TokenIdModal
+          isModalOpen={isTokenModalOpen}
+          setIsModalOpen={setIsTokenModalOpen}
+          tokenId={selectedTokenId}
+        />
+      )}
     </>
   );
 };
