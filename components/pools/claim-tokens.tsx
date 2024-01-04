@@ -119,7 +119,7 @@ const ClaimTokens = ({
         onClick={handleOpen}
         size="small"
       >
-        Claim Tokens
+        Collect
       </Button>
 
       <Dialog
