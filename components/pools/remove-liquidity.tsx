@@ -2,6 +2,7 @@
 
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { syncTransaction } from '@/lib/actions/transactions';
+import { colors } from '@/theme/default-colors';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -143,14 +144,14 @@ const RemoveLiquidity = ({
       <Dialog
         open={open}
         onClose={handleBackdropClose}
-        maxWidth="lg"
+        maxWidth="md"
         fullWidth={!isMdAndUp}
         PaperProps={{
           variant: 'outlined',
         }}
       >
         <DialogTitle>
-          <b>Remove Liquidity</b>
+          Remove Liquidity
           <IconButton
             onClick={handleClose}
             sx={{
@@ -166,18 +167,18 @@ const RemoveLiquidity = ({
           <Stack
             direction="column"
             spacing={1}
-            sx={{ width: { xs: '100%', md: 400 } }}
+            sx={{ width: { xs: '100%' } }}
           >
             <Typography variant="h6">
-              <strong>
-                {tokenASymbol} / {tokenBSymbol}
-              </strong>
+              {tokenASymbol} / {tokenBSymbol}
             </Typography>
 
             <Paper
-              variant="outlined"
+              elevation={0}
               sx={{
-                p: 2,
+                p: '20px',
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -190,17 +191,18 @@ const RemoveLiquidity = ({
               </Typography>
 
               <Stack
-                direction="row"
+                direction={{ xs: 'column', md: 'row' }}
                 spacing={1}
                 justifyContent="space-between"
                 alignItems="center"
-                my={2}
+                width="100%"
               >
                 <Typography variant="h4">{percentToRemove}%</Typography>
 
                 <ButtonGroup
                   variant="contained"
                   size="medium"
+                  sx={{ display: { xs: 'none', md: 'flex' }}}
                 >
                   <Button onClick={() => setPercentToRemove(25)}>25%</Button>
                   <Button onClick={() => setPercentToRemove(50)}>50%</Button>
@@ -223,9 +225,11 @@ const RemoveLiquidity = ({
             </Paper>
 
             <Paper
-              variant="outlined"
+              elevation={0}
               sx={{
-                p: 2,
+                p: '20px',
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,
@@ -263,7 +267,7 @@ const RemoveLiquidity = ({
             </Paper>
 
             <LoadingButton
-              variant="contained"
+              variant="widget"
               size="large"
               fullWidth
               disabled={!isConnected || percentToRemove === 0}
@@ -277,7 +281,10 @@ const RemoveLiquidity = ({
 
             <Alert
               severity="info"
-              variant="outlined"
+              variant="standard"
+              sx={{
+                borderRadius: '12px',
+              }}
             >
               <Typography
                 variant="body2"
