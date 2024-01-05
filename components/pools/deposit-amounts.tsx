@@ -272,7 +272,7 @@ const DepositAmounts = ({
         {(isMinPriceLargerThanMaxPrice || isExchangeRateZeroOrLess || !validPriceRange) && (
           <Alert
             severity="error"
-            variant="outlined"
+            variant="standard"
           >
             The price range you have selected is invalid. Please adjust the price range.
           </Alert>
