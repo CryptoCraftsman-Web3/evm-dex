@@ -16,7 +16,7 @@ import {
   Stack,
   Theme,
   Typography,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
@@ -32,6 +32,7 @@ import {
 } from 'wagmi';
 import DepositAmounts from './deposit-amounts';
 import { syncTransaction } from '@/lib/actions/transactions';
+import { colors } from '@/theme/default-colors';
 
 type AddLiquidityProps = {
   positionTokenId: bigint;
@@ -207,7 +208,7 @@ const AddLiquidity = ({
         }}
       >
         <DialogTitle>
-          <b>Add Liquidity</b>
+          Add Liquidity
           <IconButton
             onClick={handleClose}
             sx={{
@@ -223,18 +224,21 @@ const AddLiquidity = ({
           <Stack
             direction="column"
             spacing={1}
-            sx={{ width: { xs: '100%', md: 400 } }}
+            sx={{ width: { xs: '100%' } }}
           >
             <Typography variant="h6">
               {tokenASymbol}/{tokenBSymbol}
             </Typography>
 
             <Paper
-              variant="outlined"
+              elevation={0}
               sx={{
-                p: 2,
+                p: '20px',
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
                 display: 'flex',
                 flexDirection: 'column',
+                gap: '8px',
               }}
             >
               <Stack
@@ -242,6 +246,7 @@ const AddLiquidity = ({
                 spacing={2}
                 alignItems="center"
                 justifyContent="space-between"
+                width="100%"
               >
                 <Typography variant="body1">{tokenASymbol}</Typography>
                 <Typography variant="body1">{amountAFormatted}</Typography>
@@ -252,6 +257,7 @@ const AddLiquidity = ({
                 spacing={2}
                 alignItems="center"
                 justifyContent="space-between"
+                width="100%"
               >
                 <Typography variant="body1">{tokenBSymbol}</Typography>
                 <Typography variant="body1">{amountBFormatted}</Typography>
@@ -259,7 +265,7 @@ const AddLiquidity = ({
 
               <Divider
                 sx={{
-                  my: 1,
+                  width: '100%',
                 }}
               />
 
@@ -288,9 +294,11 @@ const AddLiquidity = ({
               alignItems="center"
             >
               <Paper
-                variant="outlined"
+                elevation={0}
                 sx={{
-                  padding: 2,
+                  p: '20px',
+                  borderRadius: '12px',
+                  backgroundColor: colors.tertiaryBG,
                   minWidth: { xs: '47%', md: '49%' },
                 }}
               >
@@ -298,6 +306,7 @@ const AddLiquidity = ({
                   direction="column"
                   justifyContent="center"
                   alignItems="center"
+                  width="100%"
                 >
                   <Typography
                     variant="body1"
@@ -324,16 +333,19 @@ const AddLiquidity = ({
                 </Stack>
               </Paper>
               <Paper
-                variant="outlined"
+                elevation={0}
                 sx={{
-                  padding: 2,
-                  minWidth: '49%',
+                  p: '20px',
+                  borderRadius: '12px',
+                  backgroundColor: colors.tertiaryBG,
+                  minWidth: { xs: '47%', md: '49%' },
                 }}
               >
                 <Stack
                   direction="column"
                   justifyContent="center"
                   alignItems="center"
+                  width="100%"
                 >
                   <Typography
                     variant="body1"
@@ -362,15 +374,19 @@ const AddLiquidity = ({
             </Stack>
 
             <Paper
-              variant="outlined"
+              elevation={0}
               sx={{
-                padding: 2,
+                p: '20px',
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
+                minWidth: { xs: '47%', md: '49%' },
               }}
             >
               <Stack
                 direction="column"
                 justifyContent="center"
                 alignItems="center"
+                width="100%"
               >
                 <Typography
                   variant="body1"
@@ -419,11 +435,11 @@ const AddLiquidity = ({
               minPrice={minPrice}
               maxPrice={maxPrice}
               showLabel={false}
-              layout="column"
+              layout="row"
             />
 
             <LoadingButton
-              variant="contained"
+              variant="widget"
               color="primary"
               size="large"
               fullWidth
