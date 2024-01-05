@@ -1,14 +1,17 @@
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { syncTransaction } from '@/lib/actions/transactions';
+import { colors } from '@/theme/default-colors';
 import { nonfungiblePositionManagerABI } from '@/types/wagmi/uniswap-v3-periphery';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
+  Box,
   Button,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
+  Link,
   Paper,
   Stack,
   Theme,
@@ -150,7 +153,14 @@ const ClaimTokens = ({
             spacing={2}
             sx={{ width: { xs: '100%', md: 400 } }}
           >
-            <Paper variant="outlined">
+            <Box
+                  sx={{
+                    p: '20px',
+                    borderRadius: '12px',
+                    backgroundColor: colors.tertiaryBG,
+                    width: '100%',
+                  }}
+                >
               <Stack
                 direction="column"
                 spacing={2}
@@ -164,14 +174,20 @@ const ClaimTokens = ({
                   {tokenBSymbol}: {tokenBUnclaimedAmount}
                 </Typography>
               </Stack>
-            </Paper>
+            </Box>
 
             <Alert
               severity="info"
-              variant="outlined"
+              color="info"
+              variant="standard"
+              sx={{
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
+                width: '100%',
+              }}
             >
               <Typography
-                variant="body1"
+                variant="body2"
                 width="100%"
               >
                 Claiming tokens will withdraw currently available tokens to your wallet
@@ -179,7 +195,7 @@ const ClaimTokens = ({
             </Alert>
 
             <LoadingButton
-              variant="contained"
+              variant="widget"
               color="primary"
               size="large"
               fullWidth
