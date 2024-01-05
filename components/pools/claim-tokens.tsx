@@ -154,13 +154,13 @@ const ClaimTokens = ({
             sx={{ width: { xs: '100%', md: 400 } }}
           >
             <Box
-                  sx={{
-                    p: '20px',
-                    borderRadius: '12px',
-                    backgroundColor: colors.tertiaryBG,
-                    width: '100%',
-                  }}
-                >
+              sx={{
+                p: '20px',
+                borderRadius: '12px',
+                backgroundColor: colors.tertiaryBG,
+                width: '100%',
+              }}
+            >
               <Stack
                 direction="column"
                 spacing={2}
