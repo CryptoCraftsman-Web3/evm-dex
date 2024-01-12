@@ -13,13 +13,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { formatUnits, zeroAddress } from 'viem';
-import {
-  useAccount,
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-  useWaitForTransaction
-} from 'wagmi';
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import SkeletonLoading from './skeleton-loading';
 import NewLiquidityPosition from '@/components/pools/new-liquidity-position';
 import { useNativeToken } from '@/hooks/token-hooks';
@@ -101,6 +95,8 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     fracTokenSymbol,
     fracTokenName,
     fracTokenAllowance,
+    fracContractIsUnlocked,
+    unlockPercentageSupplyHeld,
     refetchFracTokenData,
     isApprovedToRedeem,
     isRedeemed,
@@ -202,6 +198,44 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     decimals: 18,
     isNative: false,
   };
+
+  const { config: redeemUnlockedConfig } = usePrepareContractWrite({
+    address: serpentSwapNFTContractAddress || zeroAddress,
+    abi: serpentSwapNftABI,
+    functionName: 'redeemUnlocked',
+  });
+
+  const {
+    data: redeemUnlockedData,
+    writeAsync: redeemUnlockedNFT,
+    isLoading: isSubmittingRedeemUnlockedTx,
+  } = useContractWrite(redeemUnlockedConfig);
+
+  const {
+    isLoading: isRedeemingUnlocked,
+    isSuccess: redeemUnlockedSucceeded,
+    isError: redeemUnlockedFailed,
+  } = useWaitForTransaction({
+    hash: redeemUnlockedData?.hash,
+    enabled: Boolean(redeemUnlockedData?.hash),
+  });
+
+  useEffect(() => {
+    if (redeemUnlockedSucceeded) {
+      if (serpentSwapNFTContractAddress) {
+        deleteErc20Token(serpentSwapNFTContractAddress);
+        getNFTs(serpentSwapNFTContractAddress, true, true);
+      }
+      toast.success(`Redeemed ${metadata?.name || 'Unknown NFT'} successfully`);
+      refetchSerpentSwapNFTContractAddress().then(async () => {
+        await refetchFracTokenData();
+      });
+    }
+
+    if (redeemUnlockedFailed) {
+      toast.error(`Failed to redeem ${metadata?.name || 'Unknown NFT'}`);
+    }
+  }, [redeemUnlockedSucceeded, redeemUnlockedFailed]);
 
   return (
     <>
@@ -443,6 +477,53 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
                                 }}
                               >
                                 Redeem NFT
+                              </LoadingButton>
+                            ) : (
+                              <LoadingButton
+                                variant="contained"
+                                size="large"
+                                fullWidth
+                                loading={isSubmittingApproveFracAllowanceTx || isApprovingFracAllowance}
+                                onClick={() => {
+                                  if (approveFracAllowance) approveFracAllowance();
+                                }}
+                              >
+                                Approve Fractional Token Allowance
+                              </LoadingButton>
+                            )}
+                          </Stack>
+                        )}
+
+                        {fracContractIsUnlocked && (
+                          <Stack direction="column">
+                            <Typography
+                              variant="body1"
+                              sx={{ textAlign: 'center', fontSize: '14px' }}
+                            >
+                              This fractional token contract is unlocked. You may be able to redeem the NFT provided you
+                              own {unlockPercentageSupplyHeld.toString()}% of the fractional token supply.
+                            </Typography>
+                            {!isApprovedToRedeem && (
+                              <Typography
+                                variant="body1"
+                                sx={{ textAlign: 'center', fontSize: '14px' }}
+                              >
+                                You will need to first approve the fractional token contract to transfer your fractional
+                                tokens on your behalf.
+                              </Typography>
+                            )}
+
+                            {isApprovedToRedeem ? (
+                              <LoadingButton
+                                variant="contained"
+                                size="large"
+                                fullWidth
+                                loading={isSubmittingRedeemUnlockedTx || isRedeemingUnlocked}
+                                onClick={() => {
+                                  if (redeemUnlockedNFT) redeemUnlockedNFT();
+                                }}
+                              >
+                                Redeem Unlocked NFT
                               </LoadingButton>
                             ) : (
                               <LoadingButton
