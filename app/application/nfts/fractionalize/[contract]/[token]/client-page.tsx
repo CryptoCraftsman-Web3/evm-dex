@@ -158,11 +158,6 @@ export default function FractionalizeNFTClientPage({ nft, contract }: Fractional
     enabled: redeemEnabled,
   });
 
-  console.log('fracTokenUserBalance', fracTokenUserBalance);
-  console.log('fracTokenTotalSupply', fracTokenTotalSupply);
-  console.log('serpentSwapNFTContractAddress', serpentSwapNFTContractAddress);
-  console.log('redeemEnabled', redeemEnabled);
-
   const { data: redeemData, writeAsync: redeemNFT, isLoading: isSubmittingRedeemTx } = useContractWrite(redeemConfig);
 
   const {
