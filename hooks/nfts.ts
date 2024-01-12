@@ -246,6 +246,14 @@ export function useFractionalContract(nftContractAddress: `0x${string}`, tokenId
         functionName: 'allowance',
         args: [userAddress || zeroAddress, serpentSwapNFTManager],
       },
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'isUnlocked',
+      },
+      {
+        ...serpentSwapNFTContract,
+        functionName: 'unlockPercentageSupplyHeld',
+      }
     ],
   });
 
@@ -254,6 +262,8 @@ export function useFractionalContract(nftContractAddress: `0x${string}`, tokenId
   const fracTokenSymbol = (fracTokenData?.at(2)?.result as string) || '';
   const fracTokenName = (fracTokenData?.at(3)?.result as string) || '';
   const fracTokenAllowance = (fracTokenData?.at(4)?.result as bigint) || BigInt(0);
+  const fracContractIsUnlocked = (fracTokenData?.at(5)?.result as boolean) || false;
+  const unlockPercentageSupplyHeld = (fracTokenData?.at(6)?.result as bigint) || BigInt(0);
   const isApprovedToRedeem = fracTokenAllowance >= fracTokenTotalSupply;
   const isRedeemed = fracTokenTotalSupply === BigInt(0);
 
@@ -266,6 +276,8 @@ export function useFractionalContract(nftContractAddress: `0x${string}`, tokenId
     fracTokenSymbol,
     fracTokenName,
     fracTokenAllowance,
+    fracContractIsUnlocked,
+    unlockPercentageSupplyHeld,
     refetchFracTokenData,
     isApprovedToRedeem,
     isRedeemed,
