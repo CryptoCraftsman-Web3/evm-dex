@@ -10,24 +10,44 @@ const Hero = () => {
         minHeight: '90vh',
       }}
     >
-      <Grid item xs={12} md={12 / 2} mt={{ xs: '35px', md: '124px' }}>
-        <Typography variant="h1">Serpent<br />Swap</Typography>
-        <Typography variant='subtitle1' mb={'40px'} width={'525px'} maxWidth={'95%'}>Swap, and earn rewards on the smartest decentralized platform.</Typography>
-        <Link href='/about'>
+      <Grid
+        item
+        xs={12}
+        md={12 / 2}
+        mt={{ xs: '35px', md: '124px' }}
+      >
+        <Typography variant="h1">
+          Serpent
+          <br />
+          Swap
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          mb={'40px'}
+          width={'525px'}
+          maxWidth={'95%'}
+        >
+          Shed the old, and embrace a new future of multi-fungible finance
+        </Typography>
+        <Link href="/about">
           <Button
-            variant='contained'
-            size='large'
+            variant="contained"
+            size="large"
           >
             Learn More
           </Button>
         </Link>
       </Grid>
-      <Grid item xs={12} md={12 / 2}>
+      <Grid
+        item
+        xs={12}
+        md={12 / 2}
+      >
         <div style={{ position: 'relative', height: '100%', width: '100%' }}>
           <img
-            src='/hero-illustration.svg'
-            alt='hero'
-            height='100%'
+            src="/hero-illustration.svg"
+            alt="hero"
+            height="100%"
             style={{
               position: 'absolute',
               right: 0,
@@ -37,7 +57,7 @@ const Hero = () => {
         </div>
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

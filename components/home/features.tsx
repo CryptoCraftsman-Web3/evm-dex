@@ -1,15 +1,42 @@
-import { Grid, Typography, Paper, Stack, Box } from '@mui/material'
+import { Grid, Typography, Paper, Stack, Box } from '@mui/material';
 
 const Features = () => {
   return (
-    <Grid container spacing={2} py={'70px'}>
-      <Grid item xs={12}>
-        <Typography variant='h2' textAlign={'center'} mb={'20px'}>Features</Typography>
+    <Grid
+      container
+      spacing={2}
+      py={'70px'}
+    >
+      <Grid
+        item
+        xs={12}
+      >
+        <Typography
+          variant="h2"
+          textAlign={'center'}
+          mb={'20px'}
+        >
+          Features
+        </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Paper sx={{ p: '80px', height: '640px', overflow: 'hidden' }} variant='green'>
-          <Grid container spacing={2} height={'100%'} justifyContent={'space-between'}>
-            <Grid item xs={12} md={4.5}
+      <Grid
+        item
+        xs={12}
+      >
+        <Paper
+          sx={{ p: '80px', height: '640px', overflow: 'hidden' }}
+          variant="green"
+        >
+          <Grid
+            container
+            spacing={2}
+            height={'100%'}
+            justifyContent={'space-between'}
+          >
+            <Grid
+              item
+              xs={12}
+              md={4.5}
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -18,8 +45,11 @@ const Features = () => {
                 height: '100%',
               }}
             >
-              <Typography variant='title'>Earn with Serpent Swap liquidity pools</Typography>
-              <Typography mt={'16px'}>Our Liquidity Pools feature allows you to provide liquidity to decentralized markets and earn passive income in the form of rewards and transaction fees.</Typography>
+              <Typography variant="title">Earn with SerpentSwap multi-fungible liquidity pools</Typography>
+              <Typography mt={'16px'}>
+                Our liquidity pools allow users to earn rewards on their favorite tokens and NFTs through trading fees.
+                A dangerously inclusive decentralized exchange (DEX), poised to unlock all facets of EVM DeFi liquidity.
+              </Typography>
             </Grid>
             <Grid
               item
@@ -42,7 +72,7 @@ const Features = () => {
                   backgroundSize: 'cover',
                   backgroundRepeat: 'no-repeat',
                   borderRadius: '32px',
-                  opacity: '0.2'
+                  opacity: '0.2',
                 }}
               />
               <Box
@@ -61,16 +91,26 @@ const Features = () => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid
+        item
+        xs={12}
+        md={6}
+      >
         <Paper
           sx={{
             p: '60px',
             overflow: 'hidden',
           }}
-          variant='pink'
+          variant="pink"
         >
-          <Grid container gap={'60px'}>
-            <Grid item xs={12}>
+          <Grid
+            container
+            gap={'60px'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
               <Box
                 sx={{
                   backgroundImage: 'url(/ui/swap.png)',
@@ -83,17 +123,40 @@ const Features = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Typography variant='title'>Swap your tokens</Typography>
-              <Typography mt={'16px'} color={'#080708'}>A multi-token swap, often referred to as a multi-token decentralized exchange (DEX) transaction, is a complex and versatile financial operation commonly associated.</Typography>
+            <Grid
+              item
+              xs={12}
+            >
+              <Typography variant="title">Swap Tokens</Typography>
+              <Typography
+                mt={'16px'}
+                color={'#080708'}
+              >
+                The SerpentSwap DEX is a powerful tool when navigating the EVM ecosystem. Swap between any tokens in
+                seconds and participate in the fastest growing DeFi ecosystem.
+              </Typography>
             </Grid>
           </Grid>
         </Paper>
-      </Grid >
-      <Grid item xs={12} md={6}>
-        <Paper sx={{ p: '60px', overflow: 'hidden' }} variant='lightGreen'>
-          <Grid container gap={'60px'}>
-            <Grid item xs={12}>
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        md={6}
+      >
+        <Paper
+          sx={{ p: '60px', overflow: 'hidden' }}
+          variant="lightGreen"
+        >
+          <Grid
+            container
+            gap={'60px'}
+            sx={{ alignItems: 'stretch' }}
+          >
+            <Grid
+              item
+              xs={12}
+            >
               <Box
                 sx={{
                   backgroundImage: 'url(/ui/fractional-nft.png)',
@@ -106,15 +169,29 @@ const Features = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Typography variant='title' color={'#080708'}>Buy fractional NFTs</Typography>
-              <Typography mt={'16px'} color={'#080708'}>Forget having to puurchase insecure, illiquid NFTs. Trade fractions of NFTs and be sure your liquidity is always there when you are ready to sell.</Typography>
+            <Grid
+              item
+              xs={12}
+            >
+              <Typography
+                variant="title"
+                color={'#080708'}
+              >
+                Fractionalize NFTs
+              </Typography>
+              <Typography
+                mt={'16px'}
+                color={'#080708'}
+              >
+                Swap, trade and liquidity pool fractions of non-fungible tokens. Fractionalizing increases the liquidity
+                and utility of all NFTs.
+              </Typography>
             </Grid>
           </Grid>
         </Paper>
       </Grid>
-    </Grid >
-  )
-}
+    </Grid>
+  );
+};
 
-export default Features
+export default Features;
