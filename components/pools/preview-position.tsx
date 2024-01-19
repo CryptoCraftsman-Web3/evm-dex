@@ -302,6 +302,7 @@ const PreviewPosition = ({
               <Stack
                 direction="column"
                 spacing={2}
+                sx={{ width: '100%' }}
               >
                 <Stack
                   direction="row"
@@ -355,6 +356,7 @@ const PreviewPosition = ({
                 <Stack
                   direction="column"
                   justifyContent="center"
+                  width="100%"
                 >
                   <Typography
                     variant="body2"
@@ -388,6 +390,7 @@ const PreviewPosition = ({
                 <Stack
                   direction="column"
                   justifyContent="center"
+                  width="100%"
                 >
                   <Typography
                     variant="body2"
@@ -422,6 +425,7 @@ const PreviewPosition = ({
               <Stack
                 direction="column"
                 justifyContent="center"
+                width="100%"
               >
                 <Typography
                   variant="body2"
