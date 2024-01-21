@@ -53,7 +53,12 @@ export const buttonThemeOptions: Components['MuiButton'] = {
         fontWeight: 600,
         lineHeight: '1.5rem',
         padding: '16px 28px',
-
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '12px',
+        alignSelf: 'stretch',
+        borderRadius: '60px'
       }
     },
     {

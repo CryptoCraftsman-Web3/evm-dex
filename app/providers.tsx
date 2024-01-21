@@ -172,7 +172,7 @@ export const theme = createTheme({
     }
   },
   shape: {
-    borderRadius: 60,
+    borderRadius: 12,
   },
 });
 
@@ -191,7 +191,7 @@ export const connectKitTheme = {
   '--ck-connectbutton-active-background': theme.palette.primary.dark,
   '--ck-body-background': theme.palette.background.default,
   '--ck-primary-button-color': theme.palette.primary.contrastText,
-  '--ck-primary-button-background': theme.palette.primary.dark,
+  '--ck-primary-button-background': colors.tertiaryBG,
   '--ck-primary-button-hover-background': theme.palette.primary.main,
   '--ck-primary-button-active-background': theme.palette.primary.dark,
   '--ck-primary-button-border-radius': ckBorderRadius,

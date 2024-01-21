@@ -12,8 +12,9 @@ const Footer = () => {
       pt={'70px'}
       sx={{
         alignItems: 'center',
-        display: { xs: 'none', md: 'flex' },
+        display: { md: 'flex' },
         height: '80px',
+        width: '100%',
         maxWidth: '1320px',
         mx: 'auto',
       }}

@@ -30,42 +30,41 @@ const stats: StatsProps[] = [
 
 const Statistics = () => {
   return (
-    <Grid
-      container
-      spacing={2}
-      py={'70px'}
+    <Stack
+      direction={{ xs: 'column', md: 'row' }}
+      gap={{ xs: '20px', md: '19px' }}
     >
       {stats.map((stat, index) => (
-        <Grid
-          item
-          xs={12}
-          md={4}
+        <Paper
           key={index}
+          sx={{
+            p: { xs: '20px, 28px', md: '40px' },
+            width: '427px',
+            maxWidth: '100%',
+            mx: 'auto',
+          }}
         >
-          <Paper sx={{ p: '40px' }}>
-            <Stack justifyContent={'space-between'}>
-              <Box
-                sx={{
-                  padding: '20px',
-                  width: '80px',
-                  height: '80px',
-                  backgroundColor: stat.bg,
-                  borderRadius: '50%',
-                  overflow: 'visible',
-                  mb: '28px',
-                }}
-              >
-                <img src={stat.icon} />
-              </Box>
-              <Box sx={{ textTransform: 'capitalize' }}>
-                <Typography variant="h4">{stat.value}</Typography>
-                <Typography variant="subtitle1">{stat.text}</Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Grid>
+          <Stack gap={{ xs: '20px', md: '28px' }}>
+            <Box
+              sx={{
+                padding: '20px',
+                width: '80px',
+                height: '80px',
+                backgroundColor: stat.bg,
+                borderRadius: '50%',
+                overflow: 'visible',
+              }}
+            >
+              <img src={stat.icon} />
+            </Box>
+            <Box sx={{ textTransform: 'capitalize' }}>
+              <Typography variant="title">{stat.value}</Typography>
+              <Typography variant="subtitle1">{stat.text}</Typography>
+            </Box>
+          </Stack>
+        </Paper>
       ))}
-    </Grid>
+    </Stack>
   );
 };
 

@@ -27,7 +27,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Header location='app' />
 
-          <Box sx={{ width: '1320px', maxWidth: '100%', mx: 'auto', px: { xs: '8px', md: 0 } }}>
+          <Box
+            sx={{
+              width: '1320px',
+              maxWidth: '100%',
+              mx: 'auto',
+              px: { xs: '8px', md: 0 }
+            }}
+          >
             {children}
           </Box>
 

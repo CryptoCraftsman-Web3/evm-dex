@@ -6,9 +6,16 @@ import { faqAnswers } from '@/lib/data/faq'
 const Faq = () => {
   const [isOpen, setIsOpen] = useState(false)
   return (
-    <Grid container spacing={2} py={'70px'} justifyContent={'center'}>
+    <Grid container spacing={2} justifyContent={'center'}>
       <Grid item xs={12}>
-        <Typography variant='h2' textAlign={'center'} mb={'60px'}>Got questions?</Typography>
+        <Typography
+          variant='h2'
+          textAlign={'center'}
+          mb={'60px'}
+          fontSize={{ xs: '40px', md: '74px' }}
+        >
+          Got questions?
+        </Typography>
       </Grid>
       {faqAnswers.map((faq, index) => (
         <Grid item xs={12} md={8} key={index}>

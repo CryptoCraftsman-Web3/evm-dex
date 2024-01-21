@@ -1,7 +1,10 @@
-import { Grid, Paper, Typography, Button } from '@mui/material';
+import { Grid, Paper, Typography, Button, useTheme } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery'
 import Link from 'next/link';
 
 const EndCta = () => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
   return (
     <Grid
       container
@@ -31,9 +34,10 @@ const EndCta = () => {
               textAlign={'center'}
             >
               <Typography
-                variant="h2"
+                variant='h2'
                 mt={'60px'}
                 mb={'20px'}
+                fontSize={{ xs: '40px', md: 'initial' }}
               >
                 Ready to turn on the power?
               </Typography>

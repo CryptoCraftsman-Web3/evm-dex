@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Box, Button, Paper, Typography } from '@mui/material'
+import { Box, Button, Paper, Typography, useTheme } from '@mui/material'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 type FaqBoxProps = {
   title: string
@@ -7,6 +8,8 @@ type FaqBoxProps = {
 }
 
 const FaqBox = ({ title, content }: FaqBoxProps) => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper
@@ -16,6 +19,7 @@ const FaqBox = ({ title, content }: FaqBoxProps) => {
         display: 'flex',
         width: '100%',
         flexDirection: 'column',
+        gap: '0'
       }}
     >
       <Box
@@ -25,9 +29,10 @@ const FaqBox = ({ title, content }: FaqBoxProps) => {
           width: '100%',
           transition: 'all 0.3s ease-in-out',
           zIndex: 1,
+          alignItems: 'center',
         }}
       >
-        <Typography variant='subtitle2'>{title}</Typography>
+        <Typography variant={matches ? 'subtitleMedium' : 'body18Medium'} color='#FFF'>{title}</Typography>
         <Button
           aria-label='Expand FAQ box'
           variant='contained'

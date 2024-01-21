@@ -14,15 +14,24 @@ const Hero = () => {
         item
         xs={12}
         md={12 / 2}
-        mt={{ xs: '35px', md: '124px' }}
+        textAlign={{ xs: 'center', md: 'left' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: { xs: 'center', md: 'flex-start' },
+        }}
       >
-        <Typography variant="h1">
-          Serpent
-          <br />
-          Swap
+        <Typography
+          variant="h1"
+          sx={{
+            textAlign: { xs: 'center', md: 'left' },
+          }}
+        >
+          Serpent<br />Swap
         </Typography>
         <Typography
-          variant="subtitle1"
+          variant="subtitle"
           mb={'40px'}
           width={'525px'}
           maxWidth={'95%'}
@@ -51,7 +60,8 @@ const Hero = () => {
             style={{
               position: 'absolute',
               right: 0,
-              maxWidth: '800px',
+              width: '800px',
+              maxWidth: '100%',
             }}
           />
         </div>

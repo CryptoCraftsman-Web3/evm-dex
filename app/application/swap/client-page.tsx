@@ -1,6 +1,6 @@
 'use client';
 
-import { Paper, Typography, Box, Grid, Button, Modal, IconButton, Input, Divider, colors, Alert } from '@mui/material';
+import { Paper, Typography, Box, Grid, Button, Modal, IconButton, Input, Divider, Alert } from '@mui/material';
 import SelectToken from '@/components/common/select-token';
 import { useSwapProtocolAddresses } from '@/hooks/swap-protocol-hooks';
 import { useWrappedNativeToken } from '@/hooks/token-hooks';
@@ -41,6 +41,8 @@ import {
   useTokenAllowance,
   useTokenAmounts,
 } from '@/hooks/swap';
+import Image from 'next/image';
+import { colors } from '@/theme/default-colors';
 
 const SwapClientPage = () => {
   const { tokenA, tokenB, setTokenA, setTokenB } = useTokenManager();
@@ -218,6 +220,13 @@ const SwapClientPage = () => {
     }
   };
 
+  const handleSwitch = () => {
+    const aTemp = tokenA;
+    const bTemp = tokenB;
+    setTokenA(bTemp);
+    setTokenB(aTemp);
+  }
+
   return (
     <>
       <Box sx={{ height: { xs: '60px', md: '120px' } }} />
@@ -284,6 +293,17 @@ const SwapClientPage = () => {
                 setAmount={setAmountA}
                 disabled={isFetchingQuotes}
               />
+              <Button
+                onClick={handleSwitch}
+                sx={{
+                  p: '10px',
+                  backgroundColor: colors.secBG,
+                  mx: 'auto',
+                  my: '-24px'
+                }}
+              >
+                <Image src="/icons/switch.svg" width={24} height={24} alt="switch icon" />
+              </Button>
               <SwapInput
                 side="B"
                 token={tokenB}

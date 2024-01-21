@@ -4,29 +4,47 @@ import { ThemeOptions } from '@mui/material/styles';
 declare module "@mui/material/styles" {
   interface TypographyVariants {
     title: React.CSSProperties;
-    subtitle3: React.CSSProperties;
+    subtitleSemibold: React.CSSProperties;
+    subtitleMedium: React.CSSProperties;
+    subtitle: React.CSSProperties;
     numbers: React.CSSProperties;
-    footnote: React.CSSProperties;
+    body18: React.CSSProperties;
+    body18Medium: React.CSSProperties;
+    body16: React.CSSProperties;
     body16Medium: React.CSSProperties;
+    footnoteMedium: React.CSSProperties;
+    footnote: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
   interface TypographyVariantsOptions {
     title?: React.CSSProperties;
-    subtitle3?: React.CSSProperties;
+    subtitleSemibold: React.CSSProperties;
+    subtitleMedium: React.CSSProperties;
+    subtitle?: React.CSSProperties;
     numbers?: React.CSSProperties;
-    footnote?: React.CSSProperties;
+    body18?: React.CSSProperties;
+    body18Medium?: React.CSSProperties;
+    body16?: React.CSSProperties;
     body16Medium?: React.CSSProperties;
+    footnoteMedium?: React.CSSProperties;
+    footnote?: React.CSSProperties;
   }
 }
 
 declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     title: true;
-    subtitle3: true;
+    subtitleSemibold: true;
+    subtitleMedium: true;
+    subtitle: true;
     numbers: true;
-    footnote: true;
+    body18: true;
+    body18Medium: true;
+    body16: true;
     body16Medium: true;
+    footnoteMedium: true;
+    footnote: true;
   }
 }
 
@@ -34,46 +52,49 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
   fontFamily: 'GeneralSans, sans-serif',
   h1: {
     fontFamily: 'Kanit, sans-serif',
+    fontSize: '140px',
+    fontStyle: 'normal',
     fontWeight: 500,
-    fontSize: '8.75rem',
     lineHeight: '90%',
     textTransform: 'uppercase',
     '@media (max-width: 600px)': {
-      fontSize: '5rem',
+      fontSize: '64px',
     }
   },
   h2: {
-    fontSize: '4.65rem',
+    fontSize: '74px',
+    fontStyle: 'normal',
     fontWeight: 600,
     lineHeight: '110%',
   },
   h3: {
-    fontSize: '3.5625rem',
-    fontWeight: 600,
+    fontSize: '57px',
     fontStyle: 'normal',
+    fontWeight: 600,
     lineHeight: '140%',
   },
   title: {
-    fontSize: '3rem',
+    fontSize: '48px',
+    fontStyle: 'normal',
     fontWeight: 600,
     lineHeight: '120%',
   },
-  subtitle1: {
-    fontSize: '1.625rem',
+  subtitleSemibold: {
+    fontSize: '26px',
     fontStyle: 'normal',
-    fontWeight: 400,
+    fontWeight: 600,
     lineHeight: '150%',
   },
-  subtitle2: {
-    fontSize: '1.625rem',
+  subtitleMedium: {
+    fontSize: '26px',
     fontStyle: 'normal',
     fontWeight: 500,
     lineHeight: '150%',
   },
-  subtitle3: {
-    fontSize: '1.625rem',
+  subtitle: {
+    fontSize: '26px',
     fontStyle: 'normal',
-    fontWeight: 600,
+    fontWeight: 400,
     lineHeight: '150%',
   },
   numbers: {
@@ -84,7 +105,7 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
   },
   body1: {
     color: colors.textGrey,
-    fontSize: '1.125rem',
+    fontSize: '18px',
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: '160%',
@@ -96,6 +117,27 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
     fontWeight: 400,
     lineHeight: '160%',
   },
+  body18: {
+    color: colors.secText,
+    fontSize: '18px',
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: '160%',
+  },
+  body18Medium: {
+    color: colors.secText,
+    fontSize: '18px',
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: '160%',
+  },
+  body16: {
+    color: colors.secText,
+    fontSize: '16px',
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: '160%',
+  },
   body16Medium: {
     color: colors.secText,
     fontSize: '16px',
@@ -103,9 +145,16 @@ export const typographyThemeOptions: ThemeOptions['typography'] = {
     fontWeight: 500,
     lineHeight: '160%',
   },
+  footnoteMedium: {
+    fontSize: '13px',
+    color: colors.secText,
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: '130%'
+  },
   footnote: {
-    fontSize: '0.8125rem',
-    color: '#ADADAD',
+    fontSize: '13px',
+    color: colors.secText,
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: '130%'

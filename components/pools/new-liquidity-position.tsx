@@ -16,6 +16,7 @@ import {
   Stack,
   Theme,
   useMediaQuery,
+  Typography
 } from '@mui/material';
 import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { computePoolAddress } from '@uniswap/v3-sdk';
@@ -32,6 +33,8 @@ import SelectFeeTier from './select-fee-tier';
 import SetPriceRange from './set-price-range';
 import StartingPrice from './starting-price';
 import SelectTokenButton from '../common/select-token-button';
+import Image from 'next/image';
+import ModalContainer from '../common/modal-container';
 
 type NewLiquidityPositionProps = {
   buttonLabel?: string;
@@ -156,32 +159,35 @@ const NewLiquidityPosition = ({
         {buttonLabel || 'Add Liquidity'}
       </Button>
 
-      <Dialog
-        open={open}
-        onClose={handleBackdropClose}
-        maxWidth="lg"
-        fullWidth={!isMdAndUp}
-        PaperProps={{
-          variant: 'outlined',
-          elevation: 0,
-        }}
-      >
-        <DialogTitle>
-          Add Position
+      <ModalContainer open={open} handleClose={handleOpen}>
+        <Typography
+          variant="subtitle3"
+          textAlign="center"
+          width="100%"
+          sx={{
+            display: 'flex',
+            position: 'relative',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <IconButton
             onClick={handleClose}
             sx={{
               position: 'absolute',
-              right: 8,
-              top: 8,
+              left: '0',
             }}
           >
-            <IoIosClose />
+            <Image src="/icons/arrow_back.svg" width={24} height={24} alt="arrow back button icon" />
           </IconButton>
+          Add Liquidity
+        </Typography>
+        <DialogTitle>
+          Add Position
         </DialogTitle>
         <DialogContent>
           <Stack
-            direction={{ xs: 'column', md: 'row' }}
+            direction="column"
             spacing={{ xs: 2, md: 4 }}
             alignItems="stretch"
           >
@@ -337,7 +343,7 @@ const NewLiquidityPosition = ({
             {/* end of column 2 in desktop layout */}
           </Stack>
         </DialogContent>
-      </Dialog>
+      </ModalContainer>
     </>
   );
 };
